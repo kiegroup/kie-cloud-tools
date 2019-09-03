@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.kie.cloud.tests</groupId>
+  <artifactId>test-tools-parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>KIE :: Cloud Integration Test Tools</name>
+  <description>Set of tools for Cloud Integration Tests.</description>
+
+  <modules>
+    <module>core</module>
+    <module>pod-logs-collector</module>
+  </modules>
+
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- Used internally -->
+    <version.org.kie.test-tools>1.0.0-SNAPSHOT</version.org.kie.test-tools>
+
+    <version.kubernetes-client>4.4.2</version.kubernetes-client>
+    <version.cz.xtf>0.13</version.cz.xtf>
+    <version.rx-java>1.3.0</version.rx-java> <!-- rxjava dependency version depends on version.cz.xtf used -->
+    <version.rx-java-string>1.1.1</version.rx-java-string> <!-- rxjava-string dependency version depends on version.cz.xtf used -->
+
+    <version.org.slf4j>1.7.26</version.org.slf4j>
+    <version.org.mockito>2.28.2</version.org.mockito>
+    
+    <version.org.junit.minor>5.0</version.org.junit.minor> <!-- so that org.junit.platform and org.junit can share the same minor version -->
+    <version.org.junit>5.${version.org.junit.minor}</version.org.junit>
+    <version.org.junit.jupiter>${version.org.junit}</version.org.junit.jupiter>
+    <version.org.junit.vintage>${version.org.junit}</version.org.junit.vintage>
+    <version.org.junit.platform>1.${version.org.junit.minor}</version.org.junit.platform>
+  </properties>
+
+  <repositories>
+    <!-- Bootstrap repository to locate the parent pom when the parent pom 
+      has not been build locally. -->
+    <repository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Repository Group</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>daily</updatePolicy>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>bintray-xtf-cz-xtf</id>
+      <name>Bintray XTF</name>
+      <url>https://dl.bintray.com/xtf-cz/xtf</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>oss-jfrog-snapshots</id>
+      <name>oss-jfrog-artifactory-snapshots</name>
+      <url>https://oss.jfrog.org/artifactory/oss-snapshot-local</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+  </repositories>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.kie.cloud.tests</groupId>
+        <artifactId>test-tools-core</artifactId>
+        <version>${version.org.kie.test-tools}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>kubernetes-client</artifactId>
+        <version>${version.kubernetes-client}</version>
+      </dependency>
+      <dependency>
+        <groupId>cz.xtf</groupId>
+        <artifactId>core</artifactId>
+        <version>${version.cz.xtf}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>cz.xtf</groupId>
+        <artifactId>builder</artifactId>
+        <version>${version.cz.xtf}</version>
+      </dependency>
+      <dependency>
+        <groupId>cz.xtf</groupId>
+        <artifactId>http-client</artifactId>
+        <version>${version.cz.xtf}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.reactivex</groupId>
+        <artifactId>rxjava</artifactId>
+        <version>${version.rx-java}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.reactivex</groupId>
+        <artifactId>rxjava-string</artifactId>
+        <version>${version.rx-java-string}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${version.org.slf4j}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>${version.org.junit.jupiter}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${version.org.mockito}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>${version.org.mockito}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.19.1</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.junit.platform</groupId>
+              <artifactId>junit-platform-surefire-provider</artifactId>
+              <version>${version.org.junit.platform}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
