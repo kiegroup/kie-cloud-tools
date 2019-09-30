@@ -32,9 +32,6 @@ import org.kie.cloud.tests.core.resources.Project;
 import rx.Observable;
 import rx.observables.StringObservable;
 
-/**
- * 
- */
 public class PodEntity {
 
     private Project project;

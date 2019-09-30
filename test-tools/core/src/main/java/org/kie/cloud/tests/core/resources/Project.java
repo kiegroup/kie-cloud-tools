@@ -39,7 +39,6 @@ import io.fabric8.openshift.api.model.ImageStream;
 import org.kie.cloud.tests.core.util.ProcessExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.security.jca.GetInstance.Instance;
 
 import static java.util.stream.Collectors.toList;
 
@@ -227,11 +226,7 @@ public class Project implements AutoCloseable {
      * @param yamlUrls Urls to yaml files with resources
      */
     public void createResourcesFromYaml(List<String> yamlUrls) {
-        final OpenShiftBinary oc = openShiftBinaryClient();
-        for (String url : yamlUrls) {
-            final String output = oc.execute("create", "-f", url);
-            LOGGER.info("Yaml resources from file {} were created by oc client. Output = {}", url, output);
-        }
+        yamlUrls.forEach(this::createResourcesFromYaml);
     }
 
     /**
@@ -248,11 +243,7 @@ public class Project implements AutoCloseable {
      * @param yamlUrls Url to yaml files with resources
      */
     public void createResourcesFromYamlAsAdmin(List<String> yamlUrls) {
-        final OpenShiftBinary oc = openShiftBinaryAdminClient();
-        for (String url : yamlUrls) {
-            final String output = oc.execute("create", "-f", url);
-            LOGGER.info("Yaml resources from file {} were created by oc client. Output = {}", url, output);
-        }
+        yamlUrls.forEach(this::createResourcesFromYamlAsAdmin);
     }
 
     /**
@@ -306,8 +297,7 @@ public class Project implements AutoCloseable {
     /**
      * Return list of all scheduled instances in the project.
      *
-     * @return List of Instances
-     * @see Instance
+     * @return List of Pods
      */
     public List<Pod> getAllPods() {
         return openShift

@@ -9,7 +9,7 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>KIE :: Cloud Integration Test Tools</name>
+  <name>KIE :: Cloud :: Tools :: Integration Test</name>
   <description>Set of tools for Cloud Integration Tests.</description>
 
   <modules>
