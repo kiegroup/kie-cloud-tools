@@ -39,6 +39,7 @@ import io.fabric8.openshift.api.model.ImageStream;
 import org.kie.cloud.tests.core.util.ProcessExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.security.jca.GetInstance.Instance;
 
 import static java.util.stream.Collectors.toList;
 
@@ -52,7 +53,7 @@ public class Project implements AutoCloseable {
     private OpenShift openShift;
     private OpenShift openShiftAdmin;
 
-    public Project(String projectName) {
+    private Project(String projectName) {
         this.projectName = projectName;
         this.openShift = OpenShifts.master(projectName);
         this.openShiftAdmin = OpenShifts.admin(projectName);
@@ -129,7 +130,12 @@ public class Project implements AutoCloseable {
         try (ProcessExecutor executor = new ProcessExecutor()) {
             File processedTemplate = executor.executeProcessCommandToTempFile(completeProcessingCommand);
             oc.execute("create", "-n", getName(), "-f", processedTemplate.getAbsolutePath());
+            //            openShift.load(Files.newInputStream(processedTemplate.toPath()))
+            //                .;
+        } catch (Exception e) {
+            throw new RuntimeException("Error while processing template", e);
         }
+
         // TODO: Temporary workaround to wait until scenario is completely initialized as there is a delay between finishing template creation command
         // and actual creation of resources on OpenShift. This should be removed when deployments won't be scaled in the beginning and will contain availability check.
         try {
