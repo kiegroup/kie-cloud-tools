@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,7 +50,8 @@ public class PodLogsCollectorRunnable implements Runnable {
         return project.getAllPods()
                 .stream()
                 .map(PodUtils::getPodName)
-                .filter(Objects::nonNull)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .map(podName -> new PodEntity(project, podName))
                 .collect(Collectors.toList());
     }

@@ -24,10 +24,11 @@ public class PodUtils {
 
     /**
      * Get pod name or null if it does not exist
+     * 
      * @param pod
      * @return
      */
-    public static final String getPodName(Pod pod) {
-        return Optional.ofNullable(pod).map(Pod::getMetadata).map(ObjectMeta::getName).orElse(null);
+    public static final Optional<String> getPodName(Pod pod) {
+        return Optional.ofNullable(pod).map(Pod::getMetadata).map(ObjectMeta::getName);
     }
 }
