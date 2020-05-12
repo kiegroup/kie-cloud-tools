@@ -14,12 +14,24 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @RegisterForReflection
 public class Packages {
 
+    @JsonProperty("manager")
+    private String manager;
     @JsonProperty("content_sets_file")
     private String contentSetsFile;
     @JsonProperty("install")
     private List<String> install = null;
 
     public Packages(){}
+
+    @JsonProperty("manager")
+    public String getManager() {
+        return manager;
+    }
+
+    @JsonProperty("manager")
+    public void setManager(String manager) {
+        this.manager = manager;
+    }
 
     @JsonProperty("content_sets_file")
     public String getContentSetsFile() {
