@@ -39,7 +39,6 @@ public class SingleFileValidator {
 
                 } else {
                     image = mapper.readValue(is, Image.class);
-                    log.fine(image.toString());
                     if (null == image.getName()) {
                         log.info("Image file [" + name.toString() + "] loaded and validated");
                     } else {
