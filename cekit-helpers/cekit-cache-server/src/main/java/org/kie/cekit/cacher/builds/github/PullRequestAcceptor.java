@@ -3,7 +3,7 @@ package org.kie.cekit.cacher.builds.github;
 import org.kie.cekit.cacher.builds.yaml.YamlFilesHelper;
 import org.kie.cekit.cacher.objects.PlainArtifact;
 import org.kie.cekit.cacher.properties.CacherProperties;
-import org.kie.cekit.image.descriptors.module.Modules;
+import org.kie.cekit.image.descriptors.module.Module;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -93,22 +93,22 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                     gitRepository.handleBranch(BranchOperation.NEW_BRANCH, branchName, baseBranch, "rhpam-7-image");
 
                     String bcMonitoringFile = cacherProperties.getGitDir() + "/rhpam-7-image/businesscentral-monitoring/modules/businesscentral-monitoring/module.yaml";
-                    Modules bcMonitoring = yamlFilesHelper.load(bcMonitoringFile);
+                    Module bcMonitoring = yamlFilesHelper.load(bcMonitoringFile);
 
                     String businessCentralFile = cacherProperties.getGitDir() + "/rhpam-7-image/businesscentral/modules/businesscentral/module.yaml";
-                    Modules businessCentral = yamlFilesHelper.load(businessCentralFile);
+                    Module businessCentral = yamlFilesHelper.load(businessCentralFile);
 
                     String controllerFile = cacherProperties.getGitDir() + "/rhpam-7-image/controller/modules/controller/module.yaml";
-                    Modules controller = yamlFilesHelper.load(controllerFile);
+                    Module controller = yamlFilesHelper.load(controllerFile);
 
                     String kieserverFile = cacherProperties.getGitDir() + "/rhpam-7-image/kieserver/modules/kieserver/module.yaml";
-                    Modules kieserver = yamlFilesHelper.load(kieserverFile);
+                    Module kieserver = yamlFilesHelper.load(kieserverFile);
 
                     String smartrouterFile = cacherProperties.getGitDir() + "/rhpam-7-image/smartrouter/modules/smartrouter/module.yaml";
-                    Modules smartrouter = yamlFilesHelper.load(smartrouterFile);
+                    Module smartrouter = yamlFilesHelper.load(smartrouterFile);
 
                     String processMigrationFile = cacherProperties.getGitDir() + "/rhpam-7-image/process-migration/modules/process-migration/module.yaml";
-                    Modules processMigration = yamlFilesHelper.load(processMigrationFile);
+                    Module processMigration = yamlFilesHelper.load(processMigrationFile);
 
                     // Prepare Business Central Monitoring Changes
                     bcMonitoring.getArtifacts().stream().forEach(artifact -> {
@@ -354,13 +354,13 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
                     // load all required files:
                     String controllerFile = cacherProperties.getGitDir() + "/rhdm-7-image/controller/modules/controller/module.yaml";
-                    Modules controller = yamlFilesHelper.load(controllerFile);
+                    Module controller = yamlFilesHelper.load(controllerFile);
 
                     String decisionCentralFile = cacherProperties.getGitDir() + "/rhdm-7-image/decisioncentral/modules/decisioncentral/module.yaml";
-                    Modules decisionCentral = yamlFilesHelper.load(decisionCentralFile);
+                    Module decisionCentral = yamlFilesHelper.load(decisionCentralFile);
 
                     String kieserverFile = cacherProperties.getGitDir() + "/rhdm-7-image/kieserver/modules/kieserver/module.yaml";
-                    Modules kieserver = yamlFilesHelper.load(kieserverFile);
+                    Module kieserver = yamlFilesHelper.load(kieserverFile);
 
                     // Prepare controller Changes - artifacts
                     controller.getArtifacts().stream().forEach(artifact -> {

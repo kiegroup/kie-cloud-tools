@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.io.IOUtils;
-import org.kie.cekit.image.descriptors.module.Modules;
+import org.kie.cekit.image.descriptors.module.Module;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.io.File;
@@ -26,18 +26,18 @@ public class YamlFilesHelper {
      * Receives a absolute file path or filename, it will first look on the classpath, if not found, if not found, look at filesystem.
      *
      * @param {@link String} file
-     * @return {@link Modules}
+     * @return {@link Module}
      */
-    public Modules load(String file) {
+    public Module load(String file) {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
         try (InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(file)) {
-            return mapper.readValue(stream, Modules.class);
+            return mapper.readValue(stream, Module.class);
 
         } catch (final Exception e) {
             log.fine("Failed to lookup " + file + " on Thread Context Class loader, trying from filesystem.");
             try (InputStream inputStream = new FileInputStream(file)) {
-                return mapper.readValue(inputStream, Modules.class);
+                return mapper.readValue(inputStream, Module.class);
 
             } catch (final Exception ex) {
                 log.warning("Failed to load yaml file [" + file + "] from classloader and from filesystem");
@@ -76,7 +76,7 @@ public class YamlFilesHelper {
      * @param module
      * @param fileDestination
      */
-    public void writeModule(Modules module, String fileDestination) {
+    public void writeModule(Module module, String fileDestination) {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.enable(SerializationFeature.INDENT_OUTPUT);

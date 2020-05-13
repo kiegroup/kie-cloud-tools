@@ -30,8 +30,8 @@ public class MultipleFilesValidator {
                             f.getFileName().toString().equals("container.yaml"))
                     .collect(Collectors.toList());
 
-            log.info("Files collected:");
-            files.stream().map(f -> f.getFileName()).forEach(System.out::println);
+            log.info("Files collected (" + files.size() + "):");
+            files.stream().map(f -> f.toString()).forEach(System.out::println);
 
             log.info("Processing files...");
 
@@ -45,6 +45,9 @@ public class MultipleFilesValidator {
         } catch (IOException e) {
             log.severe(e.getMessage());
             return 5;
+        } catch (final Exception e) {
+            log.severe(e.getMessage());
+            return 6;
         }
 
         return 0;

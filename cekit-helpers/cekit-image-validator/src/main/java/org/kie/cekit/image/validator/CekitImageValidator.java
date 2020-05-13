@@ -31,6 +31,7 @@ public class CekitImageValidator implements QuarkusApplication {
      *  0 - success
      *  1 - File validation failed
      *  5 - IOException errors
+     *  6 - Generic Exceptions
      *  10 - provided file not found
      *  15 - Insufficient permissions
      */

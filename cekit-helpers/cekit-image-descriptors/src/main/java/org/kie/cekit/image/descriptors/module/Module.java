@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import org.kie.cekit.image.descriptors.common.Env;
 import org.kie.cekit.image.descriptors.common.Label;
+import org.kie.cekit.image.descriptors.common.Modules;
+import org.kie.cekit.image.descriptors.common.Packages;
 import org.kie.cekit.image.descriptors.common.Port;
 import org.kie.cekit.image.descriptors.common.Run;
 
@@ -22,10 +24,12 @@ import java.util.List;
         "ports",
         "artifacts",
         "run",
-        "execute"
+        "execute",
+        "modules",
+        "packages"
 })
 @RegisterForReflection
-public class Modules {
+public class Module {
 
     @JsonProperty("schema_version")
     private Integer schemaVersion;
@@ -38,8 +42,10 @@ public class Modules {
     private List<Artifact> artifacts;
     private Run run;
     private List<Execute> execute;
+    private Modules modules;
+    private Packages packages;
 
-    public Modules(){}
+    public Module(){}
 
     public Integer getSchemaVersion() {
         return schemaVersion;
@@ -121,17 +127,37 @@ public class Modules {
         this.execute = execute;
     }
 
+    public Modules getModules() {
+        return modules;
+    }
+
+    public void setModules(Modules modules) {
+        this.modules = modules;
+    }
+
+    public Packages getPackages() {
+        return packages;
+    }
+
+    public void setPackages(Packages packages) {
+        this.packages = packages;
+    }
+
     @Override
     public String toString() {
-        return "Modules{" +
+        return "Module{" +
                 "schemaVersion=" + schemaVersion +
-                ", name='" + name +
-                ", description='" + description +
-                ", labels=" + labels.toString() +
-                ", envs=" + envs.toString() +
-                ", artifacts=" + artifacts.toString() +
-                ", run=" + run.toString() +
-                ", execute=" + execute.toString() +
+                ", name='" + name + '\'' +
+                ", version='" + version + '\'' +
+                ", description='" + description + '\'' +
+                ", labels=" + labels +
+                ", envs=" + envs +
+                ", ports=" + ports +
+                ", artifacts=" + artifacts +
+                ", run=" + run +
+                ", execute=" + execute +
+                ", modules=" + modules +
+                ", packages=" + packages +
                 '}';
     }
 }

@@ -1,4 +1,4 @@
-package org.kie.cekit.image.descriptors.image;
+package org.kie.cekit.image.descriptors.common;
 
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;

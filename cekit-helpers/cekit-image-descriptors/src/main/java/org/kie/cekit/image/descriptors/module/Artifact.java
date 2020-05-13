@@ -7,6 +7,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "name",
+        "url",
         "target",
         "md5"
 })
@@ -14,6 +15,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 public class Artifact {
 
     private String name;
+    private String url;
     private String target;
     private String md5;
 
@@ -26,6 +28,14 @@ public class Artifact {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getTarget() {
@@ -48,6 +58,7 @@ public class Artifact {
     public String toString() {
         return "Artifact{" +
                 "name='" + name + '\'' +
+                ", url='" + url + '\'' +
                 ", target='" + target + '\'' +
                 ", md5='" + md5 + '\'' +
                 '}';

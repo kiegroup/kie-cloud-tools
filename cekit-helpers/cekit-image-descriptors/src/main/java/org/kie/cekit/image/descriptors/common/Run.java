@@ -9,7 +9,8 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "user",
-        "cmd"
+        "cmd",
+        "workdir"
 })
 @RegisterForReflection
 public class Run {
@@ -18,6 +19,8 @@ public class Run {
     private Integer user;
     @JsonProperty("cmd")
     private List<String> cmd;
+    @JsonProperty("workdir")
+    private String workdir;
 
     public Run(){}
 
@@ -41,4 +44,20 @@ public class Run {
         this.cmd = cmd;
     }
 
+    public String getWorkdir() {
+        return workdir;
+    }
+
+    public void setWorkdir(String workdir) {
+        this.workdir = workdir;
+    }
+
+    @Override
+    public String toString() {
+        return "Run{" +
+                "user=" + user +
+                ", cmd=" + cmd +
+                ", workdir='" + workdir + '\'' +
+                '}';
+    }
 }

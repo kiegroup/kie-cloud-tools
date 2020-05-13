@@ -1,10 +1,12 @@
-package org.kie.cekit.image.descriptors.image;
+package org.kie.cekit.image.descriptors.common;
 
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import org.kie.cekit.image.descriptors.image.Install;
+import org.kie.cekit.image.descriptors.image.Repository;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({

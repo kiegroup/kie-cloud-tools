@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import org.kie.cekit.image.descriptors.common.Env;
 import org.kie.cekit.image.descriptors.common.Label;
+import org.kie.cekit.image.descriptors.common.Modules;
+import org.kie.cekit.image.descriptors.common.Packages;
 import org.kie.cekit.image.descriptors.common.Port;
 import org.kie.cekit.image.descriptors.common.Run;
 
