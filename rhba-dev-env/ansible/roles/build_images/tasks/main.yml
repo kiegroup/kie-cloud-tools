@@ -34,57 +34,57 @@
             var_rhdm_kieserver="rhdm-kieserver"
             var_rhdm_optaweb_employee_rostering="rhdm-optaweb-employee-rostering"
 
-- name: generetate md5 from rhpam-{{build_overrides_version}}.PAM-redhat-{{ build_overrides_nightly }}-business-central-eap7-deployable.zip
+- name: generetate md5 from rhpam-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-business-central-eap7-deployable.zip
   shell:
-    cmd: printf $(md5sum rhpam-{{build_overrides_version}}.PAM-redhat-{{ build_overrides_nightly }}-business-central-eap7-deployable.zip)
+    cmd: printf $(md5sum rhpam-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-business-central-eap7-deployable.zip)
     chdir: /tmp/build-overrides/nightly/{{build_overrides_nightly}}/{{build_overrides_version}} 
   when:
     - var_build_overrides_product == var_rhpam
   register: bc_md5
 
-- name: set md5 for rhpam-{{build_overrides_version}}.PAM-redhat-{{ build_overrides_nightly }}-business-central-eap7-deployable.zip
+- name: set md5 for rhpam-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-business-central-eap7-deployable.zip
   set_fact:
     business_central_distribution_md5: "{{ bc_md5.stdout }}"
   when: 
     - var_build_overrides_product == var_rhpam
     - bc_md5 | trim != ''
   
-- name: generetate md5 from rhpam-{{build_overrides_version}}.PAM-redhat-{{ build_overrides_nightly }}-add-ons.zip
+- name: generetate md5 from rhpam-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-add-ons.zip
   shell:
-    cmd: printf $(md5sum rhpam-{{build_overrides_version}}.PAM-redhat-{{ build_overrides_nightly }}-add-ons.zip)
+    cmd: printf $(md5sum rhpam-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-add-ons.zip)
     chdir: /tmp/build-overrides/nightly/{{build_overrides_nightly}}/{{build_overrides_version}} 
   when: var_build_overrides_product == var_rhpam
   register: add_on_md5
 
-- name: set md5 for rhpam-{{build_overrides_version}}.PAM-redhat-{{ build_overrides_nightly }}-add-ons.zip
+- name: set md5 for rhpam-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-add-ons.zip
   set_fact:
     add_ons_distribution_md5: "{{ add_on_md5.stdout }}"
   when: 
     - var_build_overrides_product == var_rhpam
     - add_on_md5 | trim != ''
 
-- name: generetate md5 from rhpam-{{build_overrides_version}}.PAM-redhat-{{ build_overrides_nightly }}-monitoring-ee7.zip
+- name: generetate md5 from rhpam-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-monitoring-ee7.zip
   shell:
-    cmd: printf $(md5sum rhpam-{{build_overrides_version}}.PAM-redhat-{{ build_overrides_nightly }}-monitoring-ee7.zip)
+    cmd: printf $(md5sum rhpam-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-monitoring-ee7.zip)
     chdir: /tmp/build-overrides/nightly/{{build_overrides_nightly}}/{{build_overrides_version}} 
   when: var_build_overrides_product == var_rhpam
   register: bc_monitor_md5
 
-- name: set md5 for rhpam-{{build_overrides_version}}.PAM-redhat-{{ build_overrides_nightly }}-monitoring-ee7.zip
+- name: set md5 for rhpam-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-monitoring-ee7.zip
   set_fact:
     business_central_monitoring_distribution_md5: "{{ bc_monitor_md5.stdout }}"
   when: 
     - var_build_overrides_product == var_rhpam
     - bc_monitor_md5 | trim != ''
 
-- name: generetate md5 from rhpam-{{build_overrides_version}}.PAM-redhat-{{ build_overrides_nightly }}-kie-server-ee8.zip
+- name: generetate md5 from rhpam-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-kie-server-ee8.zip
   shell:
-    cmd: printf $(md5sum rhpam-{{build_overrides_version}}.PAM-redhat-{{ build_overrides_nightly }}-kie-server-ee8.zip)
+    cmd: printf $(md5sum rhpam-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-kie-server-ee8.zip)
     chdir: /tmp/build-overrides/nightly/{{build_overrides_nightly}}/{{build_overrides_version}} 
   when: var_build_overrides_product == var_rhpam
   register: kie_md5
 
-- name: set md5 for rhpam-{{build_overrides_version}}.PAM-redhat-{{ build_overrides_nightly }}-kie-server-ee8.zip
+- name: set md5 for rhpam-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-kie-server-ee8.zip
   set_fact:
     kie_server_distribution_md5: "{{ kie_md5.stdout }}"
   when: 
@@ -171,42 +171,42 @@
     - var_build_overrides_product == var_rhpam
     - (var_build_product == var_rhpam_all) or (var_build_product == var_rhpam_smartrouter)
 
-- name: generetate md5 from rhdm-{{build_overrides_version}}.DM-redhat-{{ build_overrides_nightly }}-decision-central-eap7-deployable.zip
+- name: generetate md5 from rhdm-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-decision-central-eap7-deployable.zip
   shell:
-    cmd: printf $(md5sum rhdm-{{build_overrides_version}}.DM-redhat-{{ build_overrides_nightly }}-decision-central-eap7-deployable.zip)
+    cmd: printf $(md5sum rhdm-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-decision-central-eap7-deployable.zip)
     chdir: /tmp/build-overrides/nightly/{{build_overrides_nightly}}/{{build_overrides_version}} 
   when: var_build_overrides_product == var_rhdm
   register: dm_md5
 
-- name: set md5 for rhdm-{{build_overrides_version}}.DM-redhat-{{ build_overrides_nightly }}-decision-central-eap7-deployable.zip
+- name: set md5 for rhdm-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-decision-central-eap7-deployable.zip
   set_fact:
     decision_central_distribution_md5: "{{ dm_md5.stdout }}"
   when: 
     - var_build_overrides_product == var_rhdm
     - dm_md5 | trim != ''
   
-- name: generetate md5 from rhdm-{{build_overrides_version}}.DM-redhat-{{ build_overrides_nightly }}-add-ons.zip
+- name: generetate md5 from rhdm-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-add-ons.zip
   shell:
-    cmd: printf $(md5sum rhdm-{{build_overrides_version}}.DM-redhat-{{ build_overrides_nightly }}-add-ons.zip)
+    cmd: printf $(md5sum rhdm-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-add-ons.zip)
     chdir: /tmp/build-overrides/nightly/{{build_overrides_nightly}}/{{build_overrides_version}} 
   when: var_build_overrides_product == var_rhdm
   register: add_on_md5
 
-- name: set md5 for rhdm-{{build_overrides_version}}.DM-redhat-{{ build_overrides_nightly }}-add-ons.zip
+- name: set md5 for rhdm-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-add-ons.zip
   set_fact:
     kie_server_dm_distribution_md5: "{{ add_on_md5.stdout }}"
   when: 
     - var_build_overrides_product == var_rhdm
     - add_on_md5 | trim != ''
 
-- name: generetate md5 from rhdm-{{build_overrides_version}}.DM-redhat-{{ build_overrides_nightly }}-kie-server-ee8.zip
+- name: generetate md5 from rhdm-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-kie-server-ee8.zip
   shell:
-    cmd: printf $(md5sum rhdm-{{build_overrides_version}}.DM-redhat-{{ build_overrides_nightly }}-kie-server-ee8.zip)
+    cmd: printf $(md5sum rhdm-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-kie-server-ee8.zip)
     chdir: /tmp/build-overrides/nightly/{{build_overrides_nightly}}/{{build_overrides_version}} 
   when: var_build_overrides_product == var_rhdm
   register: kie_md_md5
 
-- name: set md5 for rhdm-{{build_overrides_version}}.DM-redhat-{{ build_overrides_nightly }}-kie-server-ee8.zip
+- name: set md5 for rhdm-{{build_overrides_version}}.redhat-{{ build_overrides_nightly }}-kie-server-ee8.zip
   set_fact:
     add_ons_dm_distribution_md5: "{{ kie_md_md5.stdout }}"
   when: 

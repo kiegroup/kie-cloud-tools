@@ -9,12 +9,12 @@ kerberos_username: my_kerberos_username
 kerberos_password: my_kerberos_password
 
 ### useful scripts ###
-build_overrides_version: '7.4.0'
+build_overrides_version: '7.9.0'
 build_overrides_product: 'rhpam'
-build_overrides_nightly: '20190726'
+build_overrides_nightly: '20200802'
 build_product: 'rhpam-all'
 
-git_branch_target: remotes/origin/7.4.x
+git_branch_target: remotes/origin/master
 
 ### rhpam product vars - don't change  ###
 rhpam_7_openshift_image_repo_dir: rhpam-7-openshift-image
@@ -35,13 +35,13 @@ rhdm_7_openshift_image_optaweb_employee_rostering_dir: optaweb-employee-rosterin
 my_images_overrides_file: my-images-overrides.yaml
 # cct_module
 cct_module_repo: https://github.com/jboss-openshift/cct_module.git
-cct_module_repo_ref: master
+cct_module_repo_ref: 0.39.0
 # jboss-eap-modules
 jboss_eap_modules_repo: https://github.com/jboss-container-images/jboss-eap-modules.git
-jboss_eap_modules_ref: master
+jboss_eap_modules_ref: EAP_LP_731_CR2
 # jboss-eap-7-image
 jboss_eap_7_image_repo: https://github.com/jboss-container-images/jboss-eap-7-image.git
-jboss_eap_7_image_ref: 7.2.x
+jboss_eap_7_image_ref: EAP_LP_731
 # rhpam-7-image
 rhpam_7_image_repo: https://github.com/jboss-container-images/rhpam-7-image.git
 rhpam_7_image_ref: master
