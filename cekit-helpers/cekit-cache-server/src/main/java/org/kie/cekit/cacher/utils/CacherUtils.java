@@ -2,6 +2,7 @@ package org.kie.cekit.cacher.utils;
 
 import io.quarkus.scheduler.Scheduled;
 import org.kie.cekit.cacher.builds.github.BuildDateUpdatesInterceptor;
+import org.kie.cekit.cacher.builds.github.GitRepository;
 import org.kie.cekit.cacher.objects.PlainArtifact;
 import org.kie.cekit.cacher.properties.CacherProperties;
 
@@ -24,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +44,9 @@ public class CacherUtils {
 
     @Inject
     BuildDateUpdatesInterceptor buildCallback;
+
+    @Inject
+    GitRepository gitRepository;
 
     /**
      * Clean 1 day old files under tmp directory
@@ -64,7 +69,6 @@ public class CacherUtils {
             e.printStackTrace();
         }
     }
-
 
     /**
      * Pre load artifacts to the cacher using a txt located on filesystem

@@ -27,7 +27,6 @@ import java.util.stream.Stream;
 public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
     private Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
     private Map<String, PlainArtifact> elements = new HashMap<>();
 
     @Inject
@@ -50,8 +49,8 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
     @Override
     public void onNewBuildReceived(PlainArtifact artifact) {
         try {
-            LocalDate upstreamBuildDate = LocalDate.parse(gitRepository.getCurrentProductBuildDate(artifact.getBranch()), formatter);
-            LocalDate buildDate = LocalDate.parse(artifact.getBuildDate(), formatter);
+            LocalDate upstreamBuildDate = LocalDate.parse(gitRepository.getCurrentProductBuildDate(artifact.getBranch()), cacherProperties.formatter);
+            LocalDate buildDate = LocalDate.parse(artifact.getBuildDate(), cacherProperties.formatter);
 
             if (buildDate.isAfter(upstreamBuildDate)) {
                 log.fine("File " + artifact.getFileName() + " received for PR.");
@@ -114,7 +113,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                     bcMonitoring.getArtifacts().stream().forEach(artifact -> {
                         if (artifact.getName().equals("BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP")) {
                             String bcMonitoringFileName = String.format("rhpam-%s.redhat-%s-monitoring-ee7.zip", version, buildDate);
-                            if (!version.equals("7.8.0")) {
+                            if (!version.equals("7.8.0") && !version.equals("7.9.0")) {
                                 bcMonitoringFileName = String.format("rhpam-%s.PAM-redhat-%s-monitoring-ee7.zip", version, buildDate);
                             }
                             String bcMonitoringCheckSum;
@@ -140,7 +139,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                     businessCentral.getArtifacts().stream().forEach(artifact -> {
                         if (artifact.getName().equals("BUSINESS_CENTRAL_DISTRIBUTION_ZIP")) {
                             String bcFileName = String.format("rhpam-%s.redhat-%s-business-central-eap7-deployable.zip", version, buildDate);
-                            if (!version.equals("7.8.0")) {
+                            if (!version.equals("7.8.0") && !version.equals("7.9.0")) {
                                 bcFileName = String.format("rhpam-%s.PAM-redhat-%s-business-central-eap7-deployable.zip", version, buildDate);
                             }
                             String bcCheckSum;
@@ -166,7 +165,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                     controller.getArtifacts().stream().forEach(artifact -> {
                         if (artifact.getName().equals("ADD_ONS_DISTRIBUTION_ZIP")) {
                             String controllerFileName = String.format("rhpam-%s.redhat-%s-add-ons.zip", version, buildDate);
-                            if (!version.equals("7.8.0")) {
+                            if (!version.equals("7.8.0") && !version.equals("7.9.0")) {
                                 controllerFileName = String.format("rhpam-%s.PAM-redhat-%s-add-ons.zip", version, buildDate);
                             }
                             String controllerCheckSum;
@@ -211,7 +210,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                     });
                     kieserver.getArtifacts().stream().forEach(artifact -> {
                         String kieServerFileName = String.format("rhpam-%s.redhat-%s-kie-server-ee8.zip", version, buildDate);
-                        if (!version.equals("7.8.0")) {
+                        if (!version.equals("7.8.0") && !version.equals("7.9.0")) {
                             kieServerFileName = String.format("rhpam-%s.PAM-redhat-%s-kie-server-ee8.zip", version, buildDate);
                         }
                         if (artifact.getName().equals("KIE_SERVER_DISTRIBUTION_ZIP")) {
@@ -230,7 +229,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
                         if (artifact.getName().equals("BUSINESS_CENTRAL_DISTRIBUTION_ZIP")) {
                             String bcFileName = String.format("rhpam-%s.redhat-%s-business-central-eap7-deployable.zip", version, buildDate);
-                            if (!version.equals("7.8.0")) {
+                            if (!version.equals("7.8.0") && !version.equals("7.9.0")) {
                                 bcFileName = String.format("rhpam-%s.PAM-redhat-%s-business-central-eap7-deployable.zip", version, buildDate);
                             }
                             String bcCheckSum;
@@ -272,7 +271,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                     smartrouter.getArtifacts().stream().forEach(artifact -> {
                         if (artifact.getName().equals("ADD_ONS_DISTRIBUTION_ZIP")) {
                             String smartrouterFileName = String.format("rhpam-%s.redhat-%s-add-ons.zip", version, buildDate);
-                            if (!version.equals("7.8.0")) {
+                            if (!version.equals("7.8.0") && !version.equals("7.9.0")) {
                                 smartrouterFileName = String.format("rhpam-%s.PAM-redhat-%s-add-ons.zip", version, buildDate);
                             }
                             String smartrouterCheckSum;
@@ -299,7 +298,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                     processMigration.getArtifacts().stream().forEach(artifact -> {
                         if (artifact.getName().equals("ADD_ONS_DISTRIBUTION_ZIP")) {
                             String processMigrationFileName = String.format("rhpam-%s.redhat-%s-add-ons.zip", version, buildDate);
-                            if (!version.equals("7.8.0")) {
+                            if (!version.equals("7.8.0") && !version.equals("7.9.0")) {
                                 processMigrationFileName = String.format("rhpam-%s.PAM-redhat-%s-add-ons.zip", version, buildDate);
                             }
                             String processMigrationCheckSum;
@@ -366,7 +365,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                     controller.getArtifacts().stream().forEach(artifact -> {
                         if (artifact.getName().equals("ADD_ONS_DISTRIBUTION_ZIP")) {
                             String controllerFileName = String.format("rhdm-%s.redhat-%s-add-ons.zip", version, buildDate);
-                            if (!version.equals("7.8.0")) {
+                            if (!version.equals("7.8.0") && !version.equals("7.9.0")) {
                                 controllerFileName = String.format("rhdm-%s.DM-redhat-%s-add-ons.zip", version, buildDate);
                             }
                             String controllerCheckSum;
@@ -403,7 +402,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                     decisionCentral.getArtifacts().stream().forEach(artifact -> {
                         if (artifact.getName().equals("DECISION_CENTRAL_DISTRIBUTION_ZIP")) {
                             String decisionCentralFileName = String.format("rhdm-%s.redhat-%s-decision-central-eap7-deployable.zip", version, buildDate);
-                            if (!version.equals("7.8.0")) {
+                            if (!version.equals("7.8.0") && !version.equals("7.9.0")) {
                                 decisionCentralFileName = String.format("rhdm-%s.DM-redhat-%s-decision-central-eap7-deployable.zip", version, buildDate);
                             }
                             try {
@@ -428,7 +427,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                     kieserver.getArtifacts().stream().forEach(artifact -> {
                         if (artifact.getName().equals("KIE_SERVER_DISTRIBUTION_ZIP")) {
                             String kieserverFileName = String.format("rhdm-%s.redhat-%s-kie-server-ee8.zip", version, buildDate);
-                            if (!version.equals("7.8.0")) {
+                            if (!version.equals("7.8.0") && !version.equals("7.9.0")) {
                                 kieserverFileName = String.format("rhdm-%s.DM-redhat-%s-kie-server-ee8.zip", version, buildDate);
                             }
                             String kieserverCheckSum;

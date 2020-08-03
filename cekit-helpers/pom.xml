@@ -24,13 +24,13 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <surefire-plugin.version>2.22.1</surefire-plugin.version>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <quarkus-plugin.version>1.4.2.Final</quarkus-plugin.version>
+        <quarkus-plugin.version>1.6.1.Final</quarkus-plugin.version>
         <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-        <quarkus.platform.version>1.4.2.Final</quarkus.platform.version>
-        <okhttp.version>3.14.2</okhttp.version>
+        <quarkus.platform.version>1.6.1.Final</quarkus.platform.version>
+        <okhttp.version>3.14.9</okhttp.version>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <jackson.version>2.10.3</jackson.version>
+        <jackson.version>2.11.0</jackson.version>
         <jandex.version>1.0.7</jandex.version>
     </properties>
 

@@ -5,6 +5,7 @@ import org.kie.cekit.cacher.properties.loader.CacherProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,6 +14,8 @@ import java.util.List;
  */
 @ApplicationScoped
 public class CacherProperties {
+
+    public final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.base.dir", required = true)

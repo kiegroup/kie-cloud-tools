@@ -141,10 +141,12 @@ public class GitRepository {
         gitRebase(branch);
 
         String rhdmFilter = String.format("# rhdm-%s.redhat", cacherProperties.version());
-        if (!cacherProperties.version().equals("7.8.0")) {
+        if (!cacherProperties.version().equals("7.8.0") && !cacherProperties.version().equals("7.9.0")) {
             rhdmFilter = String.format("# rhdm-%s.DM-redhat", cacherProperties.version());
         }
         String finalRhdmFilter = rhdmFilter;
+
+        log.fine("Using RHDM filter " + finalRhdmFilter);
         String rhdmKieServerDateBuild = yamlFilesHelper
                 .loadRawData(cacherProperties.getGitDir() + "/rhdm-7-image/kieserver/modules/kieserver/module.yaml")
                 .stream()
@@ -152,10 +154,12 @@ public class GitRepository {
                 .findFirst().get();
 
         String rhpamFilter = String.format("# rhpam-%s.redhat", cacherProperties.version());
-        if (!cacherProperties.version().equals("7.8.0")) {
+        if (!cacherProperties.version().equals("7.8.0") && !cacherProperties.version().equals("7.9.0")) {
             rhpamFilter = String.format("# rhpam-%s.PAM-redhat", cacherProperties.version());
         }
         String finalRhpamFilter = rhpamFilter;
+        log.fine("Using RHPAM filter " + finalRhpamFilter);
+
         String rhpamKieServerDateBuild = yamlFilesHelper
                 .loadRawData(cacherProperties.getGitDir() + "/rhpam-7-image/kieserver/modules/kieserver/module.yaml")
                 .stream()
@@ -166,7 +170,8 @@ public class GitRepository {
         Matcher rhpamMatcher = buildDatePattern.matcher(rhpamKieServerDateBuild);
         if (rhdmMatcher.find() && rhpamMatcher.find()) {
             log.fine("Matchers found... Proceeding with the groups validation...");
-            log.fine("rhdmMatcher group " + rhdmMatcher.group() + "  rhpamMatcher group " + rhpamMatcher.group());
+            log.fine("rhdmMatcher group " + rhdmMatcher.group() + " rhpamMatcher group " + rhpamMatcher.group());
+            log.warning("RHDM [" + rhdmMatcher.group() + "] and RHPAM [" + rhpamMatcher.group() +"], build dates differ, please adjust...");
             if (rhdmMatcher.group().equals(rhpamMatcher.group())) {
                 log.fine("Build date validation succeed, current build date is: " + rhdmMatcher.group());
                 return rhdmMatcher.group();

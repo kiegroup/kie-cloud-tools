@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 public class NightlyBuildsWatcher {
 
     private Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     @Inject
     CacherUtils cacherUtils;
@@ -101,13 +100,13 @@ public class NightlyBuildsWatcher {
 
                 while (rhpamCounter < 4) {
                     Properties rhpamProps = productPropertyFile(String.format(cacherProperties.rhpamUrl(),
-                            cacherProperties.version(), LocalDate.now().minusDays(rhpamCounter).format(formatter)));
+                            cacherProperties.version(), LocalDate.now().minusDays(rhpamCounter).format(cacherProperties.formatter)));
                     if (rhpamProps != null && rhpamProps.size() > 0) {
                         rhpamNightlyBuildDownloader(rhpamProps,
-                                LocalDate.now().minusDays(rhpamCounter).format(formatter),
+                                LocalDate.now().minusDays(rhpamCounter).format(cacherProperties.formatter),
                                 normalizedVersion,
                                 normalizedBranch);
-                        log.info("RHPAM - Nightly build found, latest is " + LocalDate.now().minusDays(rhpamCounter).format(formatter));
+                        log.info("RHPAM - Nightly build found, latest is " + LocalDate.now().minusDays(rhpamCounter).format(cacherProperties.formatter));
                         break;
                     }
                     rhpamCounter++;
@@ -115,14 +114,14 @@ public class NightlyBuildsWatcher {
 
                 while (rhdmCounter < 4) {
                     Properties rhdmProps = productPropertyFile(String.format(cacherProperties.rhdmUrl(),
-                            cacherProperties.version(), LocalDate.now().minusDays(rhdmCounter).format(formatter)));
+                            cacherProperties.version(), LocalDate.now().minusDays(rhdmCounter).format(cacherProperties.formatter)));
 
                     if (rhdmProps != null && rhdmProps.size() > 0) {
                         rhdmNightlyBuildDownloader(rhdmProps,
-                                LocalDate.now().minusDays(rhdmCounter).format(formatter),
+                                LocalDate.now().minusDays(rhdmCounter).format(cacherProperties.formatter),
                                 normalizedVersion,
                                 normalizedBranch);
-                        log.info("RHDM - Nightly build found, latest is " + LocalDate.now().minusDays(rhdmCounter).format(formatter));
+                        log.info("RHDM - Nightly build found, latest is " + LocalDate.now().minusDays(rhdmCounter).format(cacherProperties.formatter));
                         break;
                     }
                     rhdmCounter++;
