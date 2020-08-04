@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -47,9 +46,9 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
      * @param artifact
      */
     @Override
-    public void onNewBuildReceived(PlainArtifact artifact) {
+    public void onNewBuildReceived(PlainArtifact artifact, boolean force) {
         try {
-            LocalDate upstreamBuildDate = LocalDate.parse(gitRepository.getCurrentProductBuildDate(artifact.getBranch()), cacherProperties.formatter);
+            LocalDate upstreamBuildDate = LocalDate.parse(gitRepository.getCurrentProductBuildDate(artifact.getBranch(), force), cacherProperties.formatter);
             LocalDate buildDate = LocalDate.parse(artifact.getBuildDate(), cacherProperties.formatter);
 
             if (buildDate.isAfter(upstreamBuildDate)) {

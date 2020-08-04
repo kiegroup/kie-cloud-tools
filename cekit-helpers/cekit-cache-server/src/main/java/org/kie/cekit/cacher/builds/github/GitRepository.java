@@ -13,8 +13,10 @@ import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -132,7 +134,7 @@ public class GitRepository {
      *
      * @return {@link String currentBuildDate}
      */
-    public String getCurrentProductBuildDate(String branch) throws IOException, InterruptedException {
+    public String getCurrentProductBuildDate(String branch, boolean force) throws IOException, InterruptedException {
 
         Pattern buildDatePattern = Pattern.compile("(\\d{8})");
         // rebase before
@@ -175,6 +177,13 @@ public class GitRepository {
             if (rhdmMatcher.group().equals(rhpamMatcher.group())) {
                 log.fine("Build date validation succeed, current build date is: " + rhdmMatcher.group());
                 return rhdmMatcher.group();
+            } else {
+                log.fine("Looks like RHDM and RHDM are different, needs to be force to return the latest build date present on rhdm or rhpam.");
+                if (force) {
+                    String date = Collections.max(Arrays.asList(rhdmMatcher.group(), rhpamMatcher.group()));
+                    log.fine("Forcing build date to be returned, the latest from RHDM and RHPAM will be used -> [" + date + "].");
+                    return date;
+                }
             }
         }
         return "NONE";

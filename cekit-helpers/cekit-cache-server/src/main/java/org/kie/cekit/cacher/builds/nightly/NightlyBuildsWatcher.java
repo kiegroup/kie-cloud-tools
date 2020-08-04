@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -42,18 +41,26 @@ public class NightlyBuildsWatcher {
     BuildDateUpdatesInterceptor buildCallback;
 
     public void verifyNightlyBuild(Optional<String> version, Optional<String> branch, Optional<String> buildDate) {
-        tryBuildDate(version, branch, buildDate);
+        tryBuildDate(version, branch, buildDate, false);
     }
 
     /**
      * Nightly builds watcher
      * do not run on start up, runs every 12hours
-     * can be forced by calling /watcher/retry rest endpoint
      * or a specific buildDate can be specified using the /rest/buildDate endpoint
      */
     @Scheduled(every = "12h", delay = 12, delayUnit = TimeUnit.HOURS)
-    public void nightlyProductBuildsWatcher() {
-        tryBuildDate(Optional.empty(), Optional.empty(), Optional.empty());
+    public void nightlyProductBuildsWatcherScheduler() {
+        tryBuildDate(Optional.empty(), Optional.empty(), Optional.empty(), false);
+    }
+
+    /**
+     * Nightly builds watcher
+     * can be forced by calling /watcher/retry rest endpoint
+     * or a specific buildDate can be specified using the /rest/buildDate endpoint
+     */
+    public void nightlyProductBuildsWatcher(boolean force) {
+        tryBuildDate(Optional.empty(), Optional.empty(), Optional.empty(), force);
     }
 
     /**
@@ -71,7 +78,7 @@ public class NightlyBuildsWatcher {
      * @param branch
      * @param buildDate
      */
-    private void tryBuildDate(Optional<String> version, Optional<String> branch, Optional<String> buildDate) {
+    private void tryBuildDate(Optional<String> version, Optional<String> branch, Optional<String> buildDate, boolean force) {
         if (cacherProperties.isWatcherEnabled()) {
             String normalizedVersion = version.orElse(cacherProperties.version());
             String normalizedBranch = branch.orElse(cacherProperties.defaultBranch());
@@ -89,12 +96,14 @@ public class NightlyBuildsWatcher {
                         String.format(cacherProperties.rhpamUrl(), normalizedVersion, buildDate.get())),
                         buildDate.get(),
                         normalizedVersion,
-                        normalizedBranch);
+                        normalizedBranch,
+                        force);
                 rhdmNightlyBuildDownloader(productPropertyFile(
                         String.format(cacherProperties.rhdmUrl(), normalizedVersion, buildDate.get())),
                         buildDate.get(),
                         normalizedVersion,
-                        normalizedBranch);
+                        normalizedBranch,
+                        force);
 
             } else {
 
@@ -105,7 +114,8 @@ public class NightlyBuildsWatcher {
                         rhpamNightlyBuildDownloader(rhpamProps,
                                 LocalDate.now().minusDays(rhpamCounter).format(cacherProperties.formatter),
                                 normalizedVersion,
-                                normalizedBranch);
+                                normalizedBranch,
+                                force);
                         log.info("RHPAM - Nightly build found, latest is " + LocalDate.now().minusDays(rhpamCounter).format(cacherProperties.formatter));
                         break;
                     }
@@ -120,7 +130,8 @@ public class NightlyBuildsWatcher {
                         rhdmNightlyBuildDownloader(rhdmProps,
                                 LocalDate.now().minusDays(rhdmCounter).format(cacherProperties.formatter),
                                 normalizedVersion,
-                                normalizedBranch);
+                                normalizedBranch,
+                                force);
                         log.info("RHDM - Nightly build found, latest is " + LocalDate.now().minusDays(rhdmCounter).format(cacherProperties.formatter));
                         break;
                     }
@@ -141,7 +152,7 @@ public class NightlyBuildsWatcher {
      * @param version
      * @param branch
      */
-    private void rhpamNightlyBuildDownloader(Properties rhpamProp, String buildDate, String version, String branch) {
+    private void rhpamNightlyBuildDownloader(Properties rhpamProp, String buildDate, String version, String branch, boolean force) {
         cacherProperties.getRhpamFiles2DownloadPropName().stream().forEach(file -> {
             // make sure there is no rhpam already downloaded files
             if (!cacherUtils.fileExistsByNameExcludeTmp(UrlUtils.getFileName(rhpamProp.get(file).toString()))) {
@@ -150,7 +161,7 @@ public class NightlyBuildsWatcher {
                         "",
                         buildDate,
                         version,
-                        branch));
+                        branch), force);
                 new Thread(() -> {
                     log.info(cacherUtils.fetchFile(rhpamProp.get(file).toString()));
                 }).start();
@@ -166,7 +177,7 @@ public class NightlyBuildsWatcher {
      * @param version
      * @param branch
      */
-    private void rhdmNightlyBuildDownloader(Properties rhdmProp, String buildDate, String version, String branch) {
+    private void rhdmNightlyBuildDownloader(Properties rhdmProp, String buildDate, String version, String branch, boolean force) {
         cacherProperties.getRhdmFiles2DownloadPropName().stream().forEach(file -> {
             // make sure there is no rhdm already downloaded files
             if (!cacherUtils.fileExistsByNameExcludeTmp(UrlUtils.getFileName(rhdmProp.get(file).toString()))) {
@@ -175,7 +186,7 @@ public class NightlyBuildsWatcher {
                         "",
                         buildDate,
                         version,
-                        branch));
+                        branch), force);
                 new Thread(() -> {
                     log.info(cacherUtils.fetchFile(rhdmProp.get(file).toString()));
                 }).start();

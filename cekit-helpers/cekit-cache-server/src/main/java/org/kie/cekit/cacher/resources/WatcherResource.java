@@ -26,10 +26,10 @@ public class WatcherResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    @Path("/retry")
-    public Response forceWatcherRetry() {
+    @Path("/retry/{force}")
+    public Response forceWatcherRetry(@PathParam("force") boolean force) {
         if (cacherProperties.isWatcherEnabled()) {
-            nightlyBuildsWatcher.nightlyProductBuildsWatcher();
+            nightlyBuildsWatcher.nightlyProductBuildsWatcher(force);
             return Response.ok().entity("New retry on verifying nightly builds made, check the artifacts list to see if new artifacts will be added, try to reload the page").build();
         }
         return Response.ok().entity("Watcher is disabled").build();
