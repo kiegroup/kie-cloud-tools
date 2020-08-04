@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Holds all cacher's configurations
@@ -16,6 +17,7 @@ import java.util.List;
 public class CacherProperties {
 
     public final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+    public final Pattern buildDatePattern = Pattern.compile("(\\d{8})");
 
     @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.base.dir", required = true)

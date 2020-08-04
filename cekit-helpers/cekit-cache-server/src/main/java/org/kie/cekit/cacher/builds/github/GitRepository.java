@@ -134,7 +134,7 @@ public class GitRepository {
      */
     public String getCurrentProductBuildDate(String branch) throws IOException, InterruptedException {
 
-        Pattern buildDatePattern = Pattern.compile("(\\d{8})");
+
         // rebase before
         forceRebase = false;
         checkoutDesiredBranch(branch);
@@ -166,12 +166,12 @@ public class GitRepository {
                 .filter(line -> line.contains(finalRhpamFilter))
                 .findFirst().get();
 
-        Matcher rhdmMatcher = buildDatePattern.matcher(rhdmKieServerDateBuild);
-        Matcher rhpamMatcher = buildDatePattern.matcher(rhpamKieServerDateBuild);
+        Matcher rhdmMatcher = cacherProperties.buildDatePattern.matcher(rhdmKieServerDateBuild);
+        Matcher rhpamMatcher = cacherProperties.buildDatePattern.matcher(rhpamKieServerDateBuild);
         if (rhdmMatcher.find() && rhpamMatcher.find()) {
             log.fine("Matchers found... Proceeding with the groups validation...");
             log.fine("rhdmMatcher group " + rhdmMatcher.group() + " rhpamMatcher group " + rhpamMatcher.group());
-            log.warning("RHDM [" + rhdmMatcher.group() + "] and RHPAM [" + rhpamMatcher.group() +"], build dates differ, please adjust...");
+            log.warning("Not able to identify upstream build date, this is mostly caused by merging the PRs wrongly. RHPAM and RHDM should always be the same.");
             if (rhdmMatcher.group().equals(rhpamMatcher.group())) {
                 log.fine("Build date validation succeed, current build date is: " + rhdmMatcher.group());
                 return rhdmMatcher.group();

@@ -27,10 +27,17 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,11 +67,52 @@ public class CacherUtils {
                     .map(Path::toFile)
                     .forEach(file -> {
                         if (file.lastModified() <= elegibleForDeletion && file.isFile()) {
-                            if (file.delete()){
+                            if (file.delete()) {
                                 log.info("File Deleted --> " + file.getAbsolutePath());
                             }
                         }
                     });
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Clean RHPAM and RHDM nightly artifacts.
+     * If there is no artifacts persisted, nothing will be done.
+     * If there is one newer build date and all of the remaining ones are 3 days older than the most recent one, all
+     * of them will be deleted keeping only the most recent .
+     * Run once a day.
+     */
+    @Scheduled(every = "24h", delay = 12, delayUnit = TimeUnit.HOURS)
+    public void cleanOldProductNightlyArtifacts() throws IOException, InterruptedException {
+        log.fine("Trying to identify the latest nightly build based on filesystem artifacts to delete, this could take a while...");
+        try {
+            log.fine("Walking through data dir searching for old nightly product builds...");
+
+            Map<File, LocalDate> nightlyBuildArtifacts = new HashMap<>();
+            Files.walk(Paths.get(cacherProperties.getCacherArtifactsDir()))
+                    .map(Path::toFile)
+                    .filter(file -> cacherProperties.buildDatePattern.matcher(file.getName()).find())
+                    .filter(file -> file.getName().endsWith(".zip"))
+                    .forEach(file -> {
+                        Matcher test = cacherProperties.buildDatePattern.matcher(file.getName());
+                        if (test.find()) {
+                            LocalDate d = LocalDate.parse(test.group(0), cacherProperties.formatter);
+                            // collect all files that matches the build date pattern
+                            nightlyBuildArtifacts.put(file, d);
+                        }
+                    });
+
+            LocalDate mostRecentNightlyBuild = Collections.max(nightlyBuildArtifacts.values());
+            log.fine("Latest nightly build date is -> " + mostRecentNightlyBuild);
+
+            for (Map.Entry<File, LocalDate> entry : nightlyBuildArtifacts.entrySet()) {
+                if (entry.getValue().plusDays(3).isBefore(mostRecentNightlyBuild)) {
+                    log.fine("File [" + entry.getKey() + " is 3 days older than the latest build date [" + mostRecentNightlyBuild + "]. Deleting...");
+                    Files.delete(entry.getKey().toPath());
+                }
+            }
         } catch (final Exception e) {
             e.printStackTrace();
         }

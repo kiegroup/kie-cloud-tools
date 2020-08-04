@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -326,7 +325,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
                         String prTittle = "Updating RHPAM artifacts based on the latest nightly build " + buildDate;
                         String prDescription = "This PR was created automatically, please review carefully before merge, the" +
-                                " build date is " + buildDate;
+                                " build date is " + buildDate + ". Do not merge if RHDM and RHPAM does not have the same build date.";
                         pullRequestSender.performPullRequest("rhpam-7-image", baseBranch, branchName, prTittle, prDescription);
 
                         gitRepository.handleBranch(BranchOperation.DELETE_BRANCH, branchName, null, "rhpam-7-image");
@@ -460,7 +459,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
                         String prTittle = "Updating RHDM artifacts based on the latest nightly build  " + buildDate;
                         String prDescription = "This PR was created automatically, please review carefully before merge, the" +
-                                " base build date is " + buildDate;
+                                " base build date is " + buildDate + ". Do not merge if RHDM and RHPAM does not have the same build date.";
                         pullRequestSender.performPullRequest("rhdm-7-image", baseBranch, branchName, prTittle, prDescription);
 
                         gitRepository.handleBranch(BranchOperation.DELETE_BRANCH, branchName, null, "rhdm-7-image");

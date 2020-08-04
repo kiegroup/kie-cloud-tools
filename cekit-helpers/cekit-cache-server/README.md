@@ -90,7 +90,7 @@ With that said, we can disable those functionality telling this app to serve onl
 following properties:
 
     - org.kie.cekit.cacher.enable.nightly.watcher=false
-    - org.kie.cekit.cacher.enable.github.bo=false
+    - org.kie.cekit.cacher.enable.github.bot=false
 
 When the cacher is started, a log message will tell you that the github bot is disabled:
 ```
