@@ -3,6 +3,7 @@ package org.kie.cekit.cacher.builds.github;
 import org.kie.cekit.cacher.builds.yaml.YamlFilesHelper;
 import org.kie.cekit.cacher.objects.PlainArtifact;
 import org.kie.cekit.cacher.properties.CacherProperties;
+import org.kie.cekit.cacher.utils.CacherUtils;
 import org.kie.cekit.image.descriptors.module.Module;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -39,6 +40,9 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
     @Inject
     PullRequestSender pullRequestSender;
+
+    @Inject
+    CacherUtils cacherUtils;
 
     /**
      * {@link BuildDateUpdatesInterceptor}
@@ -198,10 +202,11 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                     });
 
                     // Prepare kieserver changes, jbpm-wb-kie-server-backend file
-                    String backendFileName = String.format("jbpm-wb-kie-server-backend-%s.redhat-%s.jar", version, buildDate);
+                    String jbpmWbKieServerBackendSourceFile = String.format("rhpam-%s.redhat-%s-business-central-eap7-deployable.zip", version, buildDate);
+                    String jbpmWbKieServerBackendVersion = cacherUtils.detectJarVersion("jbpm-wb-kie-server-backend", jbpmWbKieServerBackendSourceFile);
+                    String backendFileName = String.format("jbpm-wb-kie-server-backend-%s.redhat-%s.jar", jbpmWbKieServerBackendVersion, buildDate);
                     kieserver.getEnvs().stream().forEach(env -> {
                         if (env.getName().equals("JBPM_WB_KIE_SERVER_BACKEND_JAR")) {
-
                             log.fine(String.format("Update jbpm-wb-kie-server-backend file from [%s] to [%s]", env.getValue(), backendFileName));
                             env.setValue(backendFileName);
                             yamlFilesHelper.writeModule(kieserver, kieserverFile);

@@ -2,12 +2,12 @@ package org.kie.cekit.cacher.utils;
 
 import io.quarkus.scheduler.Scheduled;
 import org.kie.cekit.cacher.builds.github.BuildDateUpdatesInterceptor;
-import org.kie.cekit.cacher.builds.github.GitRepository;
 import org.kie.cekit.cacher.objects.PlainArtifact;
 import org.kie.cekit.cacher.properties.CacherProperties;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,19 +27,19 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 @ApplicationScoped
 public class CacherUtils {
@@ -51,9 +51,6 @@ public class CacherUtils {
 
     @Inject
     BuildDateUpdatesInterceptor buildCallback;
-
-    @Inject
-    GitRepository gitRepository;
 
     /**
      * Clean 1 day old files under tmp directory
@@ -166,7 +163,7 @@ public class CacherUtils {
     }
 
     /**
-     * Download te given file and persit it locally
+     * Download and persist the given file locally
      *
      * @param url
      * @return the result of the operation
@@ -342,4 +339,44 @@ public class CacherUtils {
         }
     }
 
+    /**
+     * @param jarName
+     * @param zipFileName
+     * @return
+     */
+    public String detectJarVersion(String jarName, String zipFileName) {
+
+        Pattern pattern = Pattern.compile("\\d.\\d{1,2}.\\d");
+        Optional<File> zipFile = Optional.empty();
+        try {
+            zipFile = Files.walk(Paths.get(cacherProperties.getCacherArtifactsDir()))
+                    .map(Path::toFile)
+                    .filter(file -> file.getName().equals(zipFileName))
+                    .findFirst();
+        } catch (final Exception e) {
+            e.printStackTrace();
+            return "NONE";
+        }
+
+        try (FileInputStream fis = new FileInputStream(zipFile.get().getAbsoluteFile());
+             BufferedInputStream bis = new BufferedInputStream(fis);
+             ZipInputStream stream = new ZipInputStream(bis)) {
+
+            ZipEntry entry;
+            while ((entry = stream.getNextEntry()) != null) {
+                if (entry.getName().endsWith(".jar") && entry.getName().contains(jarName)) {
+                    log.fine("Inspecting file [" + entry.getName() + "]");
+                    Matcher ma = pattern.matcher(entry.getName());
+                    if (ma.find()) {
+                        log.fine("Version found, regex match is -> " + ma.group());
+                        return ma.group();
+                    }
+                }
+            }
+        } catch (final Exception e) {
+            log.warning("Failed to detect jar [" + jarName + "] version: " + e.getMessage());
+        }
+
+        return "NONE";
+    }
 }
