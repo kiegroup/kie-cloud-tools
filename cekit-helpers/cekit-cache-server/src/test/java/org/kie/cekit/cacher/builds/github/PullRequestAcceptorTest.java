@@ -77,12 +77,12 @@ public class PullRequestAcceptorTest {
 
         // test rhpam kieserver
         String kieserverFile = cacherProperties.getGitDir() + "/rhpam-7-image/kieserver/modules/kieserver/module.yaml";
-        String buildDate = gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch());
+        String buildDate = gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch(), true);
         Module kieserver = yamlFilesHelper.load(kieserverFile);
 
         yamlFilesHelper.writeModule(kieserver, kieserverFile);
 
-        String backendFileName = String.format("jbpm-wb-kie-server-backend-7.8.0.redhat-%s.jar", buildDate);
+        String backendFileName = String.format("jbpm-wb-kie-server-backend-7.42.0.redhat-%s.jar", buildDate);
         prAcceptor.reAddComment(kieserverFile, String.format("  value: \"%s\"", backendFileName),
                 "# remember to also update \"JBPM_WB_KIE_SERVER_BACKEND_JAR\" value");
         Assertions.assertTrue(containsComment(kieserverFile, "# remember to also update \"JBPM_WB_KIE_SERVER_BACKEND_JAR\" value"));

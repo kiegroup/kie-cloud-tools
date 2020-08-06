@@ -15,12 +15,12 @@ public class CacherPropertiesTest {
 
     @Test
     public void verifyEmptyShortenedVersion() {
-        Assertions.assertEquals("7.8", cacherProperties.shortenedVersion(""));
+        Assertions.assertEquals("7.9", cacherProperties.shortenedVersion(""));
     }
 
     @Test
     public void verifyNullShortenedVersion() {
-        Assertions.assertEquals("7.8", cacherProperties.shortenedVersion(null));
+        Assertions.assertEquals("7.9", cacherProperties.shortenedVersion(null));
     }
 
     @Test

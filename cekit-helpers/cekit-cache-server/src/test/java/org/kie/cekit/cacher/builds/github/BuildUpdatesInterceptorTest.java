@@ -40,13 +40,13 @@ public class BuildUpdatesInterceptorTest {
     @Order(1)
     public void newBUildDateDetectedTest() {
         // add 7 files - number of the required files before submit a new pull request. build date is always plus one day
-        buildDateUpdatesInterceptor.onNewBuildReceived(new PlainArtifact("rhpam-7.5.0.PAM-redhat-" + buildDate + "-add-ons.zip", null, buildDate, null, null));
-        buildDateUpdatesInterceptor.onNewBuildReceived(new PlainArtifact("rhpam-7.5.0.PAM-redhat-" + buildDate + "-business-central-eap7-deployable.zip", null, buildDate,null, null));
-        buildDateUpdatesInterceptor.onNewBuildReceived(new PlainArtifact("rhpam-7.5.0.PAM-redhat-" + buildDate + "-monitoring-ee7.zip", null, buildDate,null, null));
-        buildDateUpdatesInterceptor.onNewBuildReceived(new PlainArtifact("rhpam-7.5.0.PAM-redhat-" + buildDate + "-kie-server-ee8.zip", null, buildDate,null, null));
-        buildDateUpdatesInterceptor.onNewBuildReceived(new PlainArtifact("rhdm-7.5.0.DM-redhat-" + buildDate + "-add-ons.zip", null, buildDate,null, null));
-        buildDateUpdatesInterceptor.onNewBuildReceived(new PlainArtifact("rhdm-7.5.0.DM-redhat-" + buildDate + "-decision-central-eap7-deployable.zip", null, buildDate,null, null));
-        buildDateUpdatesInterceptor.onNewBuildReceived(new PlainArtifact("rhdm-7.5.0.DM-redhat-" + buildDate + "-kie-server-ee8.zip", null, buildDate,null, null));
+        buildDateUpdatesInterceptor.onNewBuildReceived(new PlainArtifact("rhpam-7.5.0.PAM-redhat-" + buildDate + "-add-ons.zip", null, buildDate, null, null), false);
+        buildDateUpdatesInterceptor.onNewBuildReceived(new PlainArtifact("rhpam-7.5.0.PAM-redhat-" + buildDate + "-business-central-eap7-deployable.zip", null, buildDate,null, null), false);
+        buildDateUpdatesInterceptor.onNewBuildReceived(new PlainArtifact("rhpam-7.5.0.PAM-redhat-" + buildDate + "-monitoring-ee7.zip", null, buildDate,null, null), false);
+        buildDateUpdatesInterceptor.onNewBuildReceived(new PlainArtifact("rhpam-7.5.0.PAM-redhat-" + buildDate + "-kie-server-ee8.zip", null, buildDate,null, null), false);
+        buildDateUpdatesInterceptor.onNewBuildReceived(new PlainArtifact("rhdm-7.5.0.DM-redhat-" + buildDate + "-add-ons.zip", null, buildDate,null, null), false);
+        buildDateUpdatesInterceptor.onNewBuildReceived(new PlainArtifact("rhdm-7.5.0.DM-redhat-" + buildDate + "-decision-central-eap7-deployable.zip", null, buildDate,null, null), false);
+        buildDateUpdatesInterceptor.onNewBuildReceived(new PlainArtifact("rhdm-7.5.0.DM-redhat-" + buildDate + "-kie-server-ee8.zip", null, buildDate,null, null), false);
 
         Assertions.assertNotNull(prAcceptor.getElements());
         Assertions.assertTrue(prAcceptor.getElements().size() == 7);

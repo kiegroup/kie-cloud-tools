@@ -38,8 +38,8 @@ public class GitRepositoryTest {
      */
     @Test
     public void getCurrentProductBuildDateTest() throws IOException, InterruptedException {
-        Assertions.assertNotNull(gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch()));
-        Assertions.assertNotEquals("NONE", gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch()));
+        Assertions.assertNotNull(gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch(), false));
+        Assertions.assertNotEquals("NONE", gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch(), true));
     }
 
     @Test

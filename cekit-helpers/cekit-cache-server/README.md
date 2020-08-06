@@ -51,7 +51,7 @@ Note that, to run the tests, a few parameters will be needed, the tests will run
 
 ```bash
 export CACHER_BASE_DIR=/tmp/cacher/data; \
-export CACHER_PRODUCT_VERSION=7.8.0; \
+export CACHER_PRODUCT_VERSION=7.9.0; \
 export CACHER_ENABLE_GITHUB_BOT=true; \
 export CACHER_GITHUB_USERNAME=bsig-gh-bot; \
 export CACHER_GITHUB_PASSWORD=password; \
