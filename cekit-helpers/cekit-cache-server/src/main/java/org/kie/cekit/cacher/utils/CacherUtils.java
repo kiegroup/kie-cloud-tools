@@ -21,6 +21,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
@@ -307,9 +308,18 @@ public class CacherUtils {
 
         try {
             artifacts = Files.walk(path).filter(Files::isRegularFile)
-                    .map(p -> new PlainArtifact(p.getFileName().toString(), p.getParent().getFileName().toString(), null, null, null))
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
+                    .map(p -> {
+                        try {
+                            return new PlainArtifact(p.getFileName().toString(),
+                                    p.getParent().getFileName().toString(),
+                                    Files.getAttribute(p.toAbsolutePath(), "creationTime", LinkOption.NOFOLLOW_LINKS).toString(),
+                                    null, null, null);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                    }).collect(Collectors.toList());
+        } catch (final Exception e) {
             e.printStackTrace();
         }
         return artifacts;

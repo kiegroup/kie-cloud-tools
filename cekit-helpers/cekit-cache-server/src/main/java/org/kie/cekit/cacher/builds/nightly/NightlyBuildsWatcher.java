@@ -159,6 +159,7 @@ public class NightlyBuildsWatcher {
                 // Notify the git consumer that a new file is being downloaded.
                 buildCallback.onNewBuildReceived(new PlainArtifact(UrlUtils.getFileName(rhpamProp.get(file).toString()),
                         "",
+                        "",
                         buildDate,
                         version,
                         branch), force);
@@ -183,6 +184,7 @@ public class NightlyBuildsWatcher {
             if (!cacherUtils.fileExistsByNameExcludeTmp(UrlUtils.getFileName(rhdmProp.get(file).toString()))) {
                 // Notify the git consumer that a new file is being downloaded.
                 buildCallback.onNewBuildReceived(new PlainArtifact(UrlUtils.getFileName(rhdmProp.get(file).toString()),
+                        "",
                         "",
                         buildDate,
                         version,
