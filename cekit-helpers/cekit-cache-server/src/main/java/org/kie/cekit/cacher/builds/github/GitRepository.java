@@ -1,5 +1,6 @@
 package org.kie.cekit.cacher.builds.github;
 
+import com.fasterxml.jackson.core.Version;
 import io.quarkus.scheduler.Scheduled;
 import org.kie.cekit.cacher.builds.yaml.YamlFilesHelper;
 import org.kie.cekit.cacher.properties.CacherProperties;
@@ -136,6 +137,9 @@ public class GitRepository {
      */
     public String getCurrentProductBuildDate(String branch, boolean force) throws IOException, InterruptedException {
 
+        String v[] = cacherProperties.version().split("[.]");
+        Version version = new Version(Integer.parseInt(v[0]), Integer.parseInt(v[1]),
+                Integer.parseInt(v[2]), null, null, null);
 
         // rebase before
         forceRebase = false;
@@ -143,7 +147,7 @@ public class GitRepository {
         gitRebase(branch);
 
         String rhdmFilter = String.format("# rhdm-%s.redhat", cacherProperties.version());
-        if (!cacherProperties.version().equals("7.8.0") && !cacherProperties.version().equals("7.9.0")) {
+        if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
             rhdmFilter = String.format("# rhdm-%s.DM-redhat", cacherProperties.version());
         }
         String finalRhdmFilter = rhdmFilter;
@@ -156,7 +160,7 @@ public class GitRepository {
                 .findFirst().get();
 
         String rhpamFilter = String.format("# rhpam-%s.redhat", cacherProperties.version());
-        if (!cacherProperties.version().equals("7.8.0") && !cacherProperties.version().equals("7.9.0")) {
+        if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
             rhpamFilter = String.format("# rhpam-%s.PAM-redhat", cacherProperties.version());
         }
         String finalRhpamFilter = rhpamFilter;

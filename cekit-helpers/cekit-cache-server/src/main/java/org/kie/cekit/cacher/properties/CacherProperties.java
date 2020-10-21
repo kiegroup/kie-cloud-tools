@@ -1,5 +1,6 @@
 package org.kie.cekit.cacher.properties;
 
+import com.fasterxml.jackson.core.Version;
 import org.kie.cekit.cacher.exception.RequiredParameterMissingException;
 import org.kie.cekit.cacher.properties.loader.CacherProperty;
 
@@ -18,6 +19,7 @@ public class CacherProperties {
 
     public final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
     public final Pattern buildDatePattern = Pattern.compile("(\\d{8})");
+    public final Version versionBeforeDMPAMPrefix = new Version(7, 8, 0, null, null, null);
 
     @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.base.dir", required = true)
@@ -81,7 +83,7 @@ public class CacherProperties {
 
 
     /**
-     * RHPAM properties keys needed to download the nighlty builds artifacts
+     * RHPAM properties keys needed to download the nightly builds artifacts
      * These properties came from the product properties file.
      */
     private List<String> rhpamFiles2DownloadPropName = Arrays.asList(
@@ -92,7 +94,7 @@ public class CacherProperties {
     );
 
     /**
-     * RHM properties keys needed to download the nighlty builds artifacts
+     * RHM properties keys needed to download the nightly builds artifacts
      * These properties came from the product properties file.
      */
     private List<String> rhdmFiles2DownloadPropName = Arrays.asList(
@@ -195,10 +197,13 @@ public class CacherProperties {
      * @return rhpam/dm product shortened version
      */
     public String shortenedVersion(String customVersion) {
+        String[] ver;
         if (null == customVersion || customVersion.isEmpty()) {
-            return version.substring(0,3);
+            ver = version.split("[.]");
+            return ver[0] + "." + ver[1];
         }
-        return customVersion.substring(0,3);
+        ver = customVersion.split("[.]");
+        return ver[0] + "." + ver[1];
     }
 
     /**
@@ -249,6 +254,7 @@ public class CacherProperties {
 
     /**
      * Path used for download in progess files
+     *
      * @return cacher temporary files location
      */
     public String getArtifactsTmpDir() {
@@ -275,14 +281,14 @@ public class CacherProperties {
     }
 
     /**
-     * @return  properties key name for rhpam artifacts
+     * @return properties key name for rhpam artifacts
      */
-    public List<String> getRhpamFiles2DownloadPropName () {
+    public List<String> getRhpamFiles2DownloadPropName() {
         return rhpamFiles2DownloadPropName;
     }
 
     /**
-     * @return  properties key name for rhdm artifacts
+     * @return properties key name for rhdm artifacts
      */
     public List<String> getRhdmFiles2DownloadPropName() {
         return rhdmFiles2DownloadPropName;
