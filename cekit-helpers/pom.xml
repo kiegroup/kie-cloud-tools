@@ -1,21 +1,20 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kie</groupId>
     <artifactId>cekit-helpers</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>pom</packaging>
 
     <scm>
         <connection>scm:git:https://github.com/kiegroup/kie-cloud-tools.git</connection>
         <developerConnection>scm:git:https://github.com/kiegroup/kie-cloud-tools.git</developerConnection>
         <url>https://github.com/kiegroup/kie-cloud-tools.git</url>
-    </scm>
+      <tag>cekit-helpers-1.0</tag>
+  </scm>
 
     <properties>
-        <project.version></project.version>
+        <project.version />
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <maven.compiler.source>11</maven.compiler.source>
