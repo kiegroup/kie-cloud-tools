@@ -75,6 +75,15 @@ public class PullRequestAcceptorTest {
             }
         });
 
+        // test rhpam dashbuilder
+        String dashbuilderFile = cacherProperties.getGitDir() + "/rhpam-7-image/dashbuilder/modules/dashbuilder/module.yaml";
+        Module dashbuilder = yamlFilesHelper.load(dashbuilderFile);
+        yamlFilesHelper.writeModule(dashbuilder, dashbuilderFile);
+        prAcceptor.reAddComment(dashbuilderFile, "target: \"add_ons_distribution.zip\"",
+                String.format("  # %s", "rhpam-7.8.0.redhat-20191006-add-ons.zip"));
+        Assertions.assertTrue(containsComment(dashbuilderFile, String.format("  # %s", "rhpam-7.8.0.redhat-20191006-add-ons.zip")));
+
+
         // test rhpam kieserver
         String kieserverFile = cacherProperties.getGitDir() + "/rhpam-7-image/kieserver/modules/kieserver/module.yaml";
         String buildDate = gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch(), true);
@@ -82,7 +91,7 @@ public class PullRequestAcceptorTest {
 
         yamlFilesHelper.writeModule(kieserver, kieserverFile);
 
-        String backendFileName = String.format("jbpm-wb-kie-server-backend-7.45.0.redhat-%s.jar", buildDate);
+        String backendFileName = String.format("jbpm-wb-kie-server-backend-7.46.0.redhat-%s.jar", buildDate);
         prAcceptor.reAddComment(kieserverFile, String.format("  value: \"%s\"", backendFileName),
                 "# remember to also update \"JBPM_WB_KIE_SERVER_BACKEND_JAR\" value");
         Assertions.assertTrue(containsComment(kieserverFile, "# remember to also update \"JBPM_WB_KIE_SERVER_BACKEND_JAR\" value"));

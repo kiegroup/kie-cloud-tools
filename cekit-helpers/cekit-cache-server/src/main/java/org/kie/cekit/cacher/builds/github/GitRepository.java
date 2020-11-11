@@ -177,7 +177,6 @@ public class GitRepository {
         if (rhdmMatcher.find() && rhpamMatcher.find()) {
             log.fine("Matchers found... Proceeding with the groups validation...");
             log.fine("rhdmMatcher group " + rhdmMatcher.group() + " rhpamMatcher group " + rhpamMatcher.group());
-            log.warning("Not able to identify upstream build date, this is mostly caused by merging the PRs wrongly. RHPAM and RHDM should always be the same.");
             if (rhdmMatcher.group().equals(rhpamMatcher.group())) {
                 log.fine("Build date validation succeed, current build date is: " + rhdmMatcher.group());
                 return rhdmMatcher.group();
@@ -189,6 +188,8 @@ public class GitRepository {
                     return date;
                 }
             }
+        } else {
+            log.warning("Not able to identify upstream build date, this is mostly caused by merging the PRs wrongly. RHPAM and RHDM should always be the same.");
         }
         return "NONE";
     }

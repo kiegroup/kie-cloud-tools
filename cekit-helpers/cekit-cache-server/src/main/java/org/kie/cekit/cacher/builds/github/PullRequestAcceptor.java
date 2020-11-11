@@ -56,7 +56,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
             LocalDate upstreamBuildDate = LocalDate.parse(gitRepository.getCurrentProductBuildDate(artifact.getBranch(), force), cacherProperties.formatter);
             LocalDate buildDate = LocalDate.parse(artifact.getBuildDate(), cacherProperties.formatter);
 
-            if (buildDate.isAfter(upstreamBuildDate)) {
+            if (buildDate.isAfter(upstreamBuildDate) || force) {
                 log.fine("File " + artifact.getFileName() + " received for PR.");
                 elements.put(artifact.getFileName(), artifact);
             } else {
@@ -105,6 +105,9 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
                     String controllerFile = cacherProperties.getGitDir() + "/rhpam-7-image/controller/modules/controller/module.yaml";
                     Module controller = yamlFilesHelper.load(controllerFile);
+
+                    String dashbuilderFile = cacherProperties.getGitDir() + "/rhpam-7-image/dashbuilder/modules/dashbuilder/module.yaml";
+                    Module dashbuilder = yamlFilesHelper.load(dashbuilderFile);
 
                     String kieserverFile = cacherProperties.getGitDir() + "/rhpam-7-image/kieserver/modules/kieserver/module.yaml";
                     Module kieserver = yamlFilesHelper.load(kieserverFile);
@@ -200,6 +203,42 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                             // if the filename does not match the current shortened version, update it
                             if (!env.getValue().equals(controllerEE7Zip)) {
                                 env.setValue(controllerEE7Zip);
+                            }
+                        }
+                    });
+
+                    // Prepare controller Changes - artifacts
+                    dashbuilder.getArtifacts().stream().forEach(artifact -> {
+                        if (artifact.getName().equals("ADD_ONS_DISTRIBUTION_ZIP")) {
+                            String dashbuilderAddOnsFileName = String.format("rhpam-%s.redhat-%s-add-ons.zip", version, buildDate);
+                            if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
+                                dashbuilderAddOnsFileName = String.format("rhpam-%s.PAM-redhat-%s-add-ons.zip", version, buildDate);
+                            }
+                            try {
+                                String dashbuilderCheckSum = elements.get(dashbuilderAddOnsFileName).getChecksum();
+
+                                log.fine(String.format("Updating RHPAM Controller from [%s] to [%s]", artifact.getMd5(), dashbuilderCheckSum));
+                                artifact.setMd5(dashbuilderCheckSum);
+                                yamlFilesHelper.writeModule(dashbuilder, dashbuilderFile);
+
+                                // find target: "add_ons_distribution.zip"
+                                // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
+                                // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
+                                reAddComment(dashbuilderFile, "target: \"add_ons_distribution.zip\"",
+                                        String.format("  # %s", dashbuilderAddOnsFileName));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    // Prepare dashbuilder changes - envs
+                    dashbuilder.getEnvs().stream().forEach(env -> {
+                        if (env.getName().equals("DASHBUILDER_DISTRIBUTION_ZIP")) {
+                            // rhpam-${version}-dashbuilder-runtime.zip
+                            String dashbuilderEE7Zip = String.format("rhpam-%s-dashbuilder-runtime.zip", version.toString());
+                            // if the filename does not match the current shortened version, update it
+                            if (!env.getValue().equals(dashbuilderEE7Zip)) {
+                                env.setValue(dashbuilderEE7Zip);
                             }
                         }
                     });
