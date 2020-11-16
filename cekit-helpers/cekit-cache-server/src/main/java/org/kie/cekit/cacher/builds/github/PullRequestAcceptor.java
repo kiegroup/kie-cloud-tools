@@ -133,10 +133,10 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                                 artifact.setMd5(bcMonitoringCheckSum);
                                 yamlFilesHelper.writeModule(bcMonitoring, bcMonitoringFile);
 
-                                // find target: "business_central_monitoring_distribution.zip"
+                                // find name: "business_central_monitoring_distribution.zip"
                                 // and add comment on next line : rhpam-${version}.redhat-${buildDate}-monitoring-ee7.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-monitoring-ee7.zip depending on PAM version
-                                reAddComment(bcMonitoringFile, "target: \"business_central_monitoring_distribution.zip\"",
+                                reAddComment(bcMonitoringFile, "name: \"business_central_monitoring_distribution.zip\"",
                                         String.format("  # %s", bcMonitoringFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -159,10 +159,10 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                                 artifact.setMd5(bcCheckSum);
                                 yamlFilesHelper.writeModule(businessCentral, businessCentralFile);
 
-                                // find target: "business_central_distribution.zip"
+                                // find name: "business_central_distribution.zip"
                                 // and add comment on next line : rhpam-${version}.redhat-${buildDate}-business-central-eap7-deployable.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-business-central-eap7-deployable.zip depending on PAM version
-                                reAddComment(businessCentralFile, "target: \"business_central_distribution.zip\"",
+                                reAddComment(businessCentralFile, "name: \"business_central_distribution.zip\"",
                                         String.format("  # %s", bcFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -185,10 +185,10 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                                 artifact.setMd5(controllerCheckSum);
                                 yamlFilesHelper.writeModule(controller, controllerFile);
 
-                                // find target: "add_ons_distribution.zip"
+                                // find name: "add_ons_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
-                                reAddComment(controllerFile, "target: \"add_ons_distribution.zip\"",
+                                reAddComment(controllerFile, "name: \"add_ons_distribution.zip\"",
                                         String.format("  # %s", controllerFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -221,10 +221,10 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                                 artifact.setMd5(dashbuilderCheckSum);
                                 yamlFilesHelper.writeModule(dashbuilder, dashbuilderFile);
 
-                                // find target: "add_ons_distribution.zip"
+                                // find name: "add_ons_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
-                                reAddComment(dashbuilderFile, "target: \"add_ons_distribution.zip\"",
+                                reAddComment(dashbuilderFile, "name: \"add_ons_distribution.zip\"",
                                         String.format("  # %s", dashbuilderAddOnsFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -287,23 +287,23 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                                 yamlFilesHelper.writeModule(kieserver, kieserverFile);
 
                                 // Only add comments when the last write operation will be made.
-                                // find target: "business_central_distribution.zip"
+                                // find name: "business_central_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-business-central-eap7-deployable.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-business-central-eap7-deployable.zip depending on PAM version
-                                reAddComment(kieserverFile, "target: \"business_central_distribution.zip\"",
+                                reAddComment(kieserverFile, "name: \"business_central_distribution.zip\"",
                                         String.format("  # %s", bcFileName));
 
-                                // find target: "kie_server_distribution.zip"
+                                // find name: "kie_server_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.PAM-redhat-${buildDate}-kie-server-ee8.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-kie-server-ee8.zip depending on PAM version
-                                reAddComment(kieserverFile, "target: \"kie_server_distribution.zip\"",
+                                reAddComment(kieserverFile, "name: \"kie_server_distribution.zip\"",
                                         String.format("  # %s", kieServerFileName));
 
-                                // find target: "slf4j-simple.jar"
+                                // find name: "slf4j-simple.jar"
                                 // and add comment on next line :  slf4j-simple-1.7.22.redhat-2.jar
-                                reAddComment(kieserverFile, "target: \"slf4j-simple.jar\"", "  # slf4j-simple-1.7.22.redhat-2.jar");
+                                reAddComment(kieserverFile, "name: \"slf4j-simple.jar\"", "  # slf4j-simple-1.7.22.redhat-2.jar");
 
-                                // find target: "jbpm-wb-kie-server-backend-${version}.redhat-X.jar"
+                                // find value: "jbpm-wb-kie-server-backend-${version}.redhat-X.jar"
                                 // and add comment on next line : # remember to also update "JBPM_WB_KIE_SERVER_BACKEND_JAR" value
                                 reAddComment(kieserverFile, String.format("  value: \"%s\"", backendFileName),
                                         "# remember to also update \"JBPM_WB_KIE_SERVER_BACKEND_JAR\" value");
@@ -328,11 +328,11 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                                 artifact.setMd5(smartrouterCheckSum);
                                 yamlFilesHelper.writeModule(smartrouter, smartrouterFile);
 
-                                // find target: "add_ons_distribution.zip"
+                                // find name: "add_ons_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip
                                 // depending on PAM version
-                                reAddComment(smartrouterFile, "target: \"add_ons_distribution.zip\"",
+                                reAddComment(smartrouterFile, "name: \"add_ons_distribution.zip\"",
                                         String.format("  # %s", smartrouterFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -355,10 +355,10 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                                 artifact.setMd5(processMigrationCheckSum);
                                 yamlFilesHelper.writeModule(processMigration, processMigrationFile);
 
-                                // find target: "add_ons_distribution.zip"
+                                // find name: "add_ons_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
-                                reAddComment(processMigrationFile, "target: \"add_ons_distribution.zip\"",
+                                reAddComment(processMigrationFile, "name: \"add_ons_distribution.zip\"",
                                         String.format("  # %s", processMigrationFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -424,10 +424,10 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                                 artifact.setMd5(controllerCheckSum);
                                 yamlFilesHelper.writeModule(controller, controllerFile);
 
-                                // find target: "add_ons_distribution.zip"
+                                // find name: "add_ons_distribution.zip"
                                 // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-add-ons.zip
-                                // or rhdm-${version}.DM-redhat-${buildDate}-add-ons.zip depending on DM versin
-                                reAddComment(controllerFile, "target: \"add_ons_distribution.zip\"",
+                                // or rhdm-${version}.DM-redhat-${buildDate}-add-ons.zip depending on DM version
+                                reAddComment(controllerFile, "name: \"add_ons_distribution.zip\"",
                                         String.format("  # %s", controllerFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -460,10 +460,10 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                                 artifact.setMd5(decisionCentralCheckSum);
                                 yamlFilesHelper.writeModule(decisionCentral, decisionCentralFile);
 
-                                // find target: "decision_central_distribution.zip"
+                                // find name: "decision_central_distribution.zip"
                                 // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-decision-central-eap7-deployable.zip
                                 // or rhdm-${version}.DM-redhat-${buildDate}-decision-central-eap7-deployable.zip depending on DM version
-                                reAddComment(decisionCentralFile, "target: \"decision_central_distribution.zip\"",
+                                reAddComment(decisionCentralFile, "name: \"decision_central_distribution.zip\"",
                                         String.format("  # %s", decisionCentralFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -486,15 +486,15 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                                 artifact.setMd5(kieserverCheckSum);
                                 yamlFilesHelper.writeModule(kieserver, kieserverFile);
 
-                                // find target: "kie_server_distribution.zip"
+                                // find name: "kie_server_distribution.zip"
                                 // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-kie-server-ee8.zip
                                 // or rhdm-${version}.DM-redhat-${buildDate}-kie-server-ee8.zip depending on DM version
-                                reAddComment(kieserverFile, "target: \"kie_server_distribution.zip\"",
+                                reAddComment(kieserverFile, "name: \"kie_server_distribution.zip\"",
                                         String.format("  # %s", kieserverFileName));
 
-                                // find target: "slf4j-simple.jar"
+                                // find name: "slf4j-simple.jar"
                                 // and add comment on next line :  slf4j-simple-1.7.22.redhat-2.jar
-                                reAddComment(kieserverFile, "target: \"slf4j-simple.jar\"", "  # slf4j-simple-1.7.22.redhat-2.jar");
+                                reAddComment(kieserverFile, "name: \"slf4j-simple.jar\"", "  # slf4j-simple-1.7.22.redhat-2.jar");
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

@@ -44,7 +44,7 @@ public class PullRequestAcceptorTest {
         String bcMonitoringFile = cacherProperties.getGitDir() + "/rhpam-7-image/businesscentral-monitoring/modules/businesscentral-monitoring/module.yaml";
         Module bcMonitoring = yamlFilesHelper.load(bcMonitoringFile);
         yamlFilesHelper.writeModule(bcMonitoring, bcMonitoringFile);
-        prAcceptor.reAddComment(bcMonitoringFile, "target: \"business_central_monitoring_distribution.zip\"",
+        prAcceptor.reAddComment(bcMonitoringFile, "name: \"business_central_monitoring_distribution.zip\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-20191006-monitoring-ee7.zip"));
         Assertions.assertTrue(containsComment(bcMonitoringFile, String.format("  # %s", "rhpam-7.8.0.redhat-20191006-monitoring-ee7.zip")));
 
@@ -52,7 +52,7 @@ public class PullRequestAcceptorTest {
         String businessCentralFile = cacherProperties.getGitDir() + "/rhpam-7-image/businesscentral/modules/businesscentral/module.yaml";
         Module businessCentral = yamlFilesHelper.load(businessCentralFile);
         yamlFilesHelper.writeModule(businessCentral, businessCentralFile);
-        prAcceptor.reAddComment(businessCentralFile, "target: \"business_central_distribution.zip\"",
+        prAcceptor.reAddComment(businessCentralFile, "name: \"business_central_distribution.zip\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-20191006-business-central-eap7-deployable.zip"));
         Assertions.assertTrue(containsComment(businessCentralFile, String.format("  # %s", "rhpam-7.8.0.redhat-20191006-business-central-eap7-deployable.zip")));
 
@@ -60,7 +60,7 @@ public class PullRequestAcceptorTest {
         String controllerFile = cacherProperties.getGitDir() + "/rhpam-7-image/controller/modules/controller/module.yaml";
         Module controller = yamlFilesHelper.load(controllerFile);
         yamlFilesHelper.writeModule(controller, controllerFile);
-        prAcceptor.reAddComment(controllerFile, "target: \"add_ons_distribution.zip\"",
+        prAcceptor.reAddComment(controllerFile, "name: \"add_ons_distribution.zip\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-20191006-add-ons.zip"));
         Assertions.assertTrue(containsComment(controllerFile, String.format("  # %s", "rhpam-7.8.0.redhat-20191006-add-ons.zip")));
         controller.getEnvs().stream().forEach(env -> {
@@ -79,7 +79,7 @@ public class PullRequestAcceptorTest {
         String dashbuilderFile = cacherProperties.getGitDir() + "/rhpam-7-image/dashbuilder/modules/dashbuilder/module.yaml";
         Module dashbuilder = yamlFilesHelper.load(dashbuilderFile);
         yamlFilesHelper.writeModule(dashbuilder, dashbuilderFile);
-        prAcceptor.reAddComment(dashbuilderFile, "target: \"add_ons_distribution.zip\"",
+        prAcceptor.reAddComment(dashbuilderFile, "name: \"add_ons_distribution.zip\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-20191006-add-ons.zip"));
         Assertions.assertTrue(containsComment(dashbuilderFile, String.format("  # %s", "rhpam-7.8.0.redhat-20191006-add-ons.zip")));
 
@@ -96,15 +96,15 @@ public class PullRequestAcceptorTest {
                 "# remember to also update \"JBPM_WB_KIE_SERVER_BACKEND_JAR\" value");
         Assertions.assertTrue(containsComment(kieserverFile, "# remember to also update \"JBPM_WB_KIE_SERVER_BACKEND_JAR\" value"));
 
-        prAcceptor.reAddComment(kieserverFile, "target: \"slf4j-simple.jar\"", "  # slf4j-simple-1.7.22.redhat-2.jar");
+        prAcceptor.reAddComment(kieserverFile, "name: \"slf4j-simple.jar\"", "  # slf4j-simple-1.7.22.redhat-2.jar");
         Assertions.assertTrue(containsComment(kieserverFile,
                 String.format("  # %s", "slf4j-simple-1.7.22.redhat-2.jar")));
 
-        prAcceptor.reAddComment(kieserverFile, "target: \"kie_server_distribution.zip\"",
+        prAcceptor.reAddComment(kieserverFile, "name: \"kie_server_distribution.zip\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-20191006-kie-server-ee8.zip"));
         Assertions.assertTrue(containsComment(kieserverFile, String.format("  # %s", "rhpam-7.8.0.redhat-20191006-kie-server-ee8.zip")));
 
-        prAcceptor.reAddComment(kieserverFile, "target: \"business_central_distribution.zip\"",
+        prAcceptor.reAddComment(kieserverFile, "name: \"business_central_distribution.zip\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-20191006-business-central-eap7-deployable.zip"));
         Assertions.assertTrue(containsComment(kieserverFile, String.format("  # %s", "rhpam-7.8.0.redhat-20191006-business-central-eap7-deployable.zip")));
 
@@ -112,7 +112,7 @@ public class PullRequestAcceptorTest {
         String smartrouterFile = cacherProperties.getGitDir() + "/rhpam-7-image/smartrouter/modules/smartrouter/module.yaml";
         Module smartrouter = yamlFilesHelper.load(smartrouterFile);
         yamlFilesHelper.writeModule(smartrouter, smartrouterFile);
-        prAcceptor.reAddComment(smartrouterFile, "target: \"add_ons_distribution.zip\"",
+        prAcceptor.reAddComment(smartrouterFile, "name: \"add_ons_distribution.zip\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-20191006-add-ons.zip"));
         Assertions.assertTrue(containsComment(smartrouterFile, String.format("  # %s", "rhpam-7.8.0.redhat-20191006-add-ons.zip")));
 
@@ -120,7 +120,7 @@ public class PullRequestAcceptorTest {
         String processMigrationFile = cacherProperties.getGitDir() + "/rhpam-7-image/process-migration/modules/process-migration/module.yaml";
         Module processMigration = yamlFilesHelper.load(processMigrationFile);
         yamlFilesHelper.writeModule(processMigration, processMigrationFile);
-        prAcceptor.reAddComment(processMigrationFile, "target: \"add_ons_distribution.zip\"",
+        prAcceptor.reAddComment(processMigrationFile, "name: \"add_ons_distribution.zip\"",
                                 String.format("  # %s", "rhpam-7.8.0.redhat-20191006-add-ons.zip"));
         Assertions.assertTrue(containsComment(processMigrationFile, String.format("  # %s", "rhpam-7.8.0.redhat-20191006-add-ons.zip")));
 
@@ -132,7 +132,7 @@ public class PullRequestAcceptorTest {
         String controllerFile = cacherProperties.getGitDir() + "/rhdm-7-image/controller/modules/controller/module.yaml";
         Module controller = yamlFilesHelper.load(controllerFile);
         yamlFilesHelper.writeModule(controller, controllerFile);
-        prAcceptor.reAddComment(controllerFile, "target: \"add_ons_distribution.zip\"",
+        prAcceptor.reAddComment(controllerFile, "name: \"add_ons_distribution.zip\"",
                 String.format("  # %s", "rhdm-7.8.0.redhat-20191006-add-ons.zip"));
         Assertions.assertTrue(containsComment(controllerFile,
                 String.format("  # %s", "rhdm-7.8.0.redhat-20191006-add-ons.zip")));
@@ -153,7 +153,7 @@ public class PullRequestAcceptorTest {
         String decisionCentralFile = cacherProperties.getGitDir() + "/rhdm-7-image/decisioncentral/modules/decisioncentral/module.yaml";
         Module decisionCentral = yamlFilesHelper.load(decisionCentralFile);
         yamlFilesHelper.writeModule(decisionCentral, decisionCentralFile);
-        prAcceptor.reAddComment(decisionCentralFile, "target: \"decision_central_distribution.zip\"",
+        prAcceptor.reAddComment(decisionCentralFile, "name: \"decision_central_distribution.zip\"",
                 String.format("  # %s", "rhdm-7.8.0.redhat-20191006-decision-central-eap7-deployable.zip"));
         Assertions.assertTrue(containsComment(decisionCentralFile,
                 String.format("  # %s", "rhdm-7.8.0.redhat-20191006-decision-central-eap7-deployable.zip")));
@@ -162,9 +162,9 @@ public class PullRequestAcceptorTest {
         String kieserverFile = cacherProperties.getGitDir() + "/rhdm-7-image/kieserver/modules/kieserver/module.yaml";
         Module kieserver = yamlFilesHelper.load(kieserverFile);
         yamlFilesHelper.writeModule(kieserver, kieserverFile);
-        prAcceptor.reAddComment(kieserverFile, "target: \"kie_server_distribution.zip\"",
+        prAcceptor.reAddComment(kieserverFile, "name: \"kie_server_distribution.zip\"",
                 String.format("  # %s", "rhdm-7.8.0.redhat-20191006-kie-server-ee8.zip"));
-        prAcceptor.reAddComment(kieserverFile, "target: \"slf4j-simple.jar\"", "  # slf4j-simple-1.7.22.redhat-2.jar");
+        prAcceptor.reAddComment(kieserverFile, "name: \"slf4j-simple.jar\"", "  # slf4j-simple-1.7.22.redhat-2.jar");
         Assertions.assertTrue(containsComment(kieserverFile,
                 String.format("  # %s", "rhdm-7.8.0.redhat-20191006-kie-server-ee8.zip")));
         Assertions.assertTrue(containsComment(kieserverFile,
