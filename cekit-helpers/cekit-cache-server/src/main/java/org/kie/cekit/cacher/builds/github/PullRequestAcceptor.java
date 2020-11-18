@@ -120,7 +120,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
                     // Prepare Business Central Monitoring Changes
                     bcMonitoring.getArtifacts().stream().forEach(artifact -> {
-                        if (artifact.getName().equals("BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP")) {
+                        if (artifact.getName().equals("rhpam_business_central_monitoring_distribution.zip")) {
                             String bcMonitoringFileName = String.format("rhpam-%s.redhat-%s-monitoring-ee7.zip", version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
                                 bcMonitoringFileName = String.format("rhpam-%s.PAM-redhat-%s-monitoring-ee7.zip", version, buildDate);
@@ -129,14 +129,14 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                             try {
                                 bcMonitoringCheckSum = elements.get(bcMonitoringFileName).getChecksum();
 
-                                log.fine(String.format("Updating BC monitoring from [%s] to [%s]", artifact.getMd5(), bcMonitoringCheckSum));
+                                log.fine(String.format("Updating BC monitoring rhpam_business_central_monitoring_distribution.zip from [%s] to [%s]", artifact.getMd5(), bcMonitoringCheckSum));
                                 artifact.setMd5(bcMonitoringCheckSum);
                                 yamlFilesHelper.writeModule(bcMonitoring, bcMonitoringFile);
 
-                                // find name: "business_central_monitoring_distribution.zip"
+                                // find name: "rhpam_business_central_monitoring_distribution.zip"
                                 // and add comment on next line : rhpam-${version}.redhat-${buildDate}-monitoring-ee7.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-monitoring-ee7.zip depending on PAM version
-                                reAddComment(bcMonitoringFile, "name: \"business_central_monitoring_distribution.zip\"",
+                                reAddComment(bcMonitoringFile, "name: \"rhpam_business_central_monitoring_distribution.zip\"",
                                         String.format("  # %s", bcMonitoringFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -146,7 +146,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
                     // Prepare Business Central Changes
                     businessCentral.getArtifacts().stream().forEach(artifact -> {
-                        if (artifact.getName().equals("BUSINESS_CENTRAL_DISTRIBUTION_ZIP")) {
+                        if (artifact.getName().equals("rhpam_business_central_distribution.zip")) {
                             String bcFileName = String.format("rhpam-%s.redhat-%s-business-central-eap7-deployable.zip", version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
                                 bcFileName = String.format("rhpam-%s.PAM-redhat-%s-business-central-eap7-deployable.zip", version, buildDate);
@@ -155,14 +155,14 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                             try {
                                 bcCheckSum = elements.get(bcFileName).getChecksum();
 
-                                log.fine(String.format("Updating Business Central from [%s] to [%s]", artifact.getMd5(), bcCheckSum));
+                                log.fine(String.format("Updating Business Central rhpam_business_central_distribution.zip from [%s] to [%s]", artifact.getMd5(), bcCheckSum));
                                 artifact.setMd5(bcCheckSum);
                                 yamlFilesHelper.writeModule(businessCentral, businessCentralFile);
 
-                                // find name: "business_central_distribution.zip"
+                                // find name: "rhpam_business_central_distribution.zip"
                                 // and add comment on next line : rhpam-${version}.redhat-${buildDate}-business-central-eap7-deployable.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-business-central-eap7-deployable.zip depending on PAM version
-                                reAddComment(businessCentralFile, "name: \"business_central_distribution.zip\"",
+                                reAddComment(businessCentralFile, "name: \"rhpam_business_central_distribution.zip\"",
                                         String.format("  # %s", bcFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -172,7 +172,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
                     // Prepare controller Changes - artifacts
                     controller.getArtifacts().stream().forEach(artifact -> {
-                        if (artifact.getName().equals("ADD_ONS_DISTRIBUTION_ZIP")) {
+                        if (artifact.getName().equals("rhpam_add_ons_distribution.zip")) {
                             String controllerFileName = String.format("rhpam-%s.redhat-%s-add-ons.zip", version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
                                 controllerFileName = String.format("rhpam-%s.PAM-redhat-%s-add-ons.zip", version, buildDate);
@@ -181,14 +181,14 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                             try {
                                 controllerCheckSum = elements.get(controllerFileName).getChecksum();
 
-                                log.fine(String.format("Updating RHPAM Controller from [%s] to [%s]", artifact.getMd5(), controllerCheckSum));
+                                log.fine(String.format("Updating RHPAM Controller rhpam_add_ons_distribution.zip from [%s] to [%s]", artifact.getMd5(), controllerCheckSum));
                                 artifact.setMd5(controllerCheckSum);
                                 yamlFilesHelper.writeModule(controller, controllerFile);
 
-                                // find name: "add_ons_distribution.zip"
+                                // find name: "rhpam_add_ons_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
-                                reAddComment(controllerFile, "name: \"add_ons_distribution.zip\"",
+                                reAddComment(controllerFile, "name: \"rhpam_add_ons_distribution.zip\"",
                                         String.format("  # %s", controllerFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -207,9 +207,9 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                         }
                     });
 
-                    // Prepare controller Changes - artifacts
+                    // Prepare dashbuilder Changes - artifacts
                     dashbuilder.getArtifacts().stream().forEach(artifact -> {
-                        if (artifact.getName().equals("ADD_ONS_DISTRIBUTION_ZIP")) {
+                        if (artifact.getName().equals("rhpam_add_ons_distribution.zip")) {
                             String dashbuilderAddOnsFileName = String.format("rhpam-%s.redhat-%s-add-ons.zip", version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
                                 dashbuilderAddOnsFileName = String.format("rhpam-%s.PAM-redhat-%s-add-ons.zip", version, buildDate);
@@ -217,14 +217,14 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                             try {
                                 String dashbuilderCheckSum = elements.get(dashbuilderAddOnsFileName).getChecksum();
 
-                                log.fine(String.format("Updating RHPAM Controller from [%s] to [%s]", artifact.getMd5(), dashbuilderCheckSum));
+                                log.fine(String.format("Updating RHPAM Dashbuilder rhpam_add_ons_distribution.zip from [%s] to [%s]", artifact.getMd5(), dashbuilderCheckSum));
                                 artifact.setMd5(dashbuilderCheckSum);
                                 yamlFilesHelper.writeModule(dashbuilder, dashbuilderFile);
 
-                                // find name: "add_ons_distribution.zip"
+                                // find name: "rhpam_add_ons_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
-                                reAddComment(dashbuilderFile, "name: \"add_ons_distribution.zip\"",
+                                reAddComment(dashbuilderFile, "name: \"rhpam_add_ons_distribution.zip\"",
                                         String.format("  # %s", dashbuilderAddOnsFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -259,13 +259,13 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                         if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
                             kieServerFileName = String.format("rhpam-%s.PAM-redhat-%s-kie-server-ee8.zip", version, buildDate);
                         }
-                        if (artifact.getName().equals("KIE_SERVER_DISTRIBUTION_ZIP")) {
+                        if (artifact.getName().equals("rhpam_kie_server_distribution.zip")) {
 
                             String kieServerCheckSum;
                             try {
                                 kieServerCheckSum = elements.get(kieServerFileName).getChecksum();
 
-                                log.fine(String.format("Updating RHPAM kieserver KIE_SERVER_DISTRIBUTION_ZIP from [%s] to [%s]", artifact.getMd5(), kieServerCheckSum));
+                                log.fine(String.format("Updating RHPAM kieserver rhpam_kie_server_distribution.zip from [%s] to [%s]", artifact.getMd5(), kieServerCheckSum));
                                 artifact.setMd5(kieServerCheckSum);
                                 yamlFilesHelper.writeModule(kieserver, kieserverFile);
                             } catch (Exception e) {
@@ -273,7 +273,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                             }
                         }
 
-                        if (artifact.getName().equals("BUSINESS_CENTRAL_DISTRIBUTION_ZIP")) {
+                        if (artifact.getName().equals("rhpam_business_central_distribution.zip")) {
                             String bcFileName = String.format("rhpam-%s.redhat-%s-business-central-eap7-deployable.zip", version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
                                 bcFileName = String.format("rhpam-%s.PAM-redhat-%s-business-central-eap7-deployable.zip", version, buildDate);
@@ -282,21 +282,21 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                             try {
                                 bcCheckSum = elements.get(bcFileName).getChecksum();
 
-                                log.fine(String.format("Updating RHPAM kieserver BUSINESS_CENTRAL_DISTRIBUTION_ZIP from [%s] to [%s]", artifact.getMd5(), bcCheckSum));
+                                log.fine(String.format("Updating RHPAM kieserver rhpam_business_central_distribution.zip from [%s] to [%s]", artifact.getMd5(), bcCheckSum));
                                 artifact.setMd5(bcCheckSum);
                                 yamlFilesHelper.writeModule(kieserver, kieserverFile);
 
                                 // Only add comments when the last write operation will be made.
-                                // find name: "business_central_distribution.zip"
+                                // find name: "rhpam_business_central_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-business-central-eap7-deployable.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-business-central-eap7-deployable.zip depending on PAM version
-                                reAddComment(kieserverFile, "name: \"business_central_distribution.zip\"",
+                                reAddComment(kieserverFile, "name: \"rhpam_business_central_distribution.zip\"",
                                         String.format("  # %s", bcFileName));
 
-                                // find name: "kie_server_distribution.zip"
+                                // find name: "rhpam_kie_server_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.PAM-redhat-${buildDate}-kie-server-ee8.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-kie-server-ee8.zip depending on PAM version
-                                reAddComment(kieserverFile, "name: \"kie_server_distribution.zip\"",
+                                reAddComment(kieserverFile, "name: \"rhpam_kie_server_distribution.zip\"",
                                         String.format("  # %s", kieServerFileName));
 
                                 // find name: "slf4j-simple.jar"
@@ -315,7 +315,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
                     // Prepare smartrouter changes
                     smartrouter.getArtifacts().stream().forEach(artifact -> {
-                        if (artifact.getName().equals("ADD_ONS_DISTRIBUTION_ZIP")) {
+                        if (artifact.getName().equals("rhpam_add_ons_distribution.zip")) {
                             String smartrouterFileName = String.format("rhpam-%s.redhat-%s-add-ons.zip", version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
                                 smartrouterFileName = String.format("rhpam-%s.PAM-redhat-%s-add-ons.zip", version, buildDate);
@@ -324,15 +324,15 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                             try {
                                 smartrouterCheckSum = elements.get(smartrouterFileName).getChecksum();
 
-                                log.fine(String.format("Updating RHPAM smartrouter ADD_ONS_DISTRIBUTION_ZIP from [%s] to [%s]", artifact.getMd5(), smartrouterCheckSum));
+                                log.fine(String.format("Updating RHPAM smartrouter rhpam_add_ons_distribution.zip from [%s] to [%s]", artifact.getMd5(), smartrouterCheckSum));
                                 artifact.setMd5(smartrouterCheckSum);
                                 yamlFilesHelper.writeModule(smartrouter, smartrouterFile);
 
-                                // find name: "add_ons_distribution.zip"
+                                // find name: "rhpam_add_ons_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip
                                 // depending on PAM version
-                                reAddComment(smartrouterFile, "name: \"add_ons_distribution.zip\"",
+                                reAddComment(smartrouterFile, "name: \"rhpam_add_ons_distribution.zip\"",
                                         String.format("  # %s", smartrouterFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -342,7 +342,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
                     // Prepare process-migration changes
                     processMigration.getArtifacts().stream().forEach(artifact -> {
-                        if (artifact.getName().equals("ADD_ONS_DISTRIBUTION_ZIP")) {
+                        if (artifact.getName().equals("rhpam_add_ons_distribution.zip")) {
                             String processMigrationFileName = String.format("rhpam-%s.redhat-%s-add-ons.zip", version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
                                 processMigrationFileName = String.format("rhpam-%s.PAM-redhat-%s-add-ons.zip", version, buildDate);
@@ -351,14 +351,14 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                             try {
                                 processMigrationCheckSum = elements.get(processMigrationFileName).getChecksum();
 
-                                log.fine(String.format("Updating RHPAM process-migration ADD_ONS_DISTRIBUTION_ZIP from [%s] to [%s]", artifact.getMd5(), processMigrationCheckSum));
+                                log.fine(String.format("Updating RHPAM process-migration rhpam_add_ons_distribution.zip from [%s] to [%s]", artifact.getMd5(), processMigrationCheckSum));
                                 artifact.setMd5(processMigrationCheckSum);
                                 yamlFilesHelper.writeModule(processMigration, processMigrationFile);
 
-                                // find name: "add_ons_distribution.zip"
+                                // find name: "rhpam_add_ons_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
-                                reAddComment(processMigrationFile, "name: \"add_ons_distribution.zip\"",
+                                reAddComment(processMigrationFile, "name: \"rhpam_add_ons_distribution.zip\"",
                                         String.format("  # %s", processMigrationFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -411,7 +411,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
                     // Prepare controller Changes - artifacts
                     controller.getArtifacts().stream().forEach(artifact -> {
-                        if (artifact.getName().equals("ADD_ONS_DISTRIBUTION_ZIP")) {
+                        if (artifact.getName().equals("rhdm_add_ons_distribution.zip")) {
                             String controllerFileName = String.format("rhdm-%s.redhat-%s-add-ons.zip", version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
                                 controllerFileName = String.format("rhdm-%s.DM-redhat-%s-add-ons.zip", version, buildDate);
@@ -420,14 +420,14 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                             try {
                                 controllerCheckSum = elements.get(controllerFileName).getChecksum();
 
-                                log.fine(String.format("Updating RHDM Controller from [%s] to [%s]", artifact.getMd5(), controllerCheckSum));
+                                log.fine(String.format("Updating RHDM Controller rhdm_add_ons_distribution.zip from [%s] to [%s]", artifact.getMd5(), controllerCheckSum));
                                 artifact.setMd5(controllerCheckSum);
                                 yamlFilesHelper.writeModule(controller, controllerFile);
 
-                                // find name: "add_ons_distribution.zip"
+                                // find name: "rhdm_add_ons_distribution.zip"
                                 // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-add-ons.zip
                                 // or rhdm-${version}.DM-redhat-${buildDate}-add-ons.zip depending on DM version
-                                reAddComment(controllerFile, "name: \"add_ons_distribution.zip\"",
+                                reAddComment(controllerFile, "name: \"rhdm_add_ons_distribution.zip\"",
                                         String.format("  # %s", controllerFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -448,7 +448,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
                     // Prepare Decision Central changes
                     decisionCentral.getArtifacts().stream().forEach(artifact -> {
-                        if (artifact.getName().equals("DECISION_CENTRAL_DISTRIBUTION_ZIP")) {
+                        if (artifact.getName().equals("rhdm_decision_central_distribution.zip")) {
                             String decisionCentralFileName = String.format("rhdm-%s.redhat-%s-decision-central-eap7-deployable.zip", version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
                                 decisionCentralFileName = String.format("rhdm-%s.DM-redhat-%s-decision-central-eap7-deployable.zip", version, buildDate);
@@ -456,14 +456,14 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                             try {
                                 String decisionCentralCheckSum = elements.get(decisionCentralFileName).getChecksum();
 
-                                log.fine(String.format("Updating RHDM Decision Central from [%s] to [%s]", artifact.getMd5(), decisionCentralCheckSum));
+                                log.fine(String.format("Updating RHDM Decision Central rhdm_decision_central_distribution.zip from [%s] to [%s]", artifact.getMd5(), decisionCentralCheckSum));
                                 artifact.setMd5(decisionCentralCheckSum);
                                 yamlFilesHelper.writeModule(decisionCentral, decisionCentralFile);
 
-                                // find name: "decision_central_distribution.zip"
+                                // find name: "rhdm_decision_central_distribution.zip"
                                 // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-decision-central-eap7-deployable.zip
                                 // or rhdm-${version}.DM-redhat-${buildDate}-decision-central-eap7-deployable.zip depending on DM version
-                                reAddComment(decisionCentralFile, "name: \"decision_central_distribution.zip\"",
+                                reAddComment(decisionCentralFile, "name: \"rhdm_decision_central_distribution.zip\"",
                                         String.format("  # %s", decisionCentralFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -473,7 +473,7 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
 
                     // Prepare kieserver changes
                     kieserver.getArtifacts().stream().forEach(artifact -> {
-                        if (artifact.getName().equals("KIE_SERVER_DISTRIBUTION_ZIP")) {
+                        if (artifact.getName().equals("rhdm_kie_server_distribution.zip")) {
                             String kieserverFileName = String.format("rhdm-%s.redhat-%s-kie-server-ee8.zip", version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
                                 kieserverFileName = String.format("rhdm-%s.DM-redhat-%s-kie-server-ee8.zip", version, buildDate);
@@ -482,14 +482,14 @@ public class PullRequestAcceptor implements BuildDateUpdatesInterceptor {
                             try {
                                 kieserverCheckSum = elements.get(kieserverFileName).getChecksum();
 
-                                log.fine(String.format("Updating RHDM Decision Central from [%s] to [%s]", artifact.getMd5(), kieserverCheckSum));
+                                log.fine(String.format("Updating RHDM KieServer rhdm_kie_server_distribution.zip from [%s] to [%s]", artifact.getMd5(), kieserverCheckSum));
                                 artifact.setMd5(kieserverCheckSum);
                                 yamlFilesHelper.writeModule(kieserver, kieserverFile);
 
-                                // find name: "kie_server_distribution.zip"
+                                // find name: "rhdm_kie_server_distribution.zip"
                                 // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-kie-server-ee8.zip
                                 // or rhdm-${version}.DM-redhat-${buildDate}-kie-server-ee8.zip depending on DM version
-                                reAddComment(kieserverFile, "name: \"kie_server_distribution.zip\"",
+                                reAddComment(kieserverFile, "name: \"rhdm_kie_server_distribution.zip\"",
                                         String.format("  # %s", kieserverFileName));
 
                                 // find name: "slf4j-simple.jar"
