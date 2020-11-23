@@ -14,14 +14,12 @@ import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Holds all Git operations
@@ -147,7 +145,7 @@ public class GitRepository {
         gitRebase(branch);
 
         String rhdmFilter = String.format("# rhdm-%s.redhat", cacherProperties.version());
-        if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
+        if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
             rhdmFilter = String.format("# rhdm-%s.DM-redhat", cacherProperties.version());
         }
         String finalRhdmFilter = rhdmFilter;
@@ -160,7 +158,7 @@ public class GitRepository {
                 .findFirst().get();
 
         String rhpamFilter = String.format("# rhpam-%s.redhat", cacherProperties.version());
-        if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0 ) {
+        if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
             rhpamFilter = String.format("# rhpam-%s.PAM-redhat", cacherProperties.version());
         }
         String finalRhpamFilter = rhpamFilter;

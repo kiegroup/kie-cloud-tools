@@ -22,6 +22,7 @@ org.kie.cekit.cacher.enable.github.bot - enables github integration
 org.kie.cekit.cacher.github.username (required if github bot is enabled) - github account username
 org.kie.cekit.cacher.github.password (required if github bot is enabled) - github user password
 org.kie.cekit.cacher.github.email (required if github bot is enabled) - github user email
+org.kie.cekit.cacher.github.oauth-token (required if github bot is enabled) - github personal user token
 org.kie.cekit.cacher.github.reviewers (required if github bot is enabled) - The Google Chats user id, just use the ID in this field, ignore the "user/" prefix.
 
 # Forked repository will be based on the provided username.
@@ -55,6 +56,7 @@ export CACHER_PRODUCT_VERSION=7.10.0; \
 export CACHER_ENABLE_GITHUB_BOT=true; \
 export CACHER_GITHUB_USERNAME=bsig-gh-bot; \
 export CACHER_GITHUB_PASSWORD=password; \
+export CACHER_GITHUB_OAUTH_TOKEN=token; \
 export CACHER_GITHUB_EMAIL=emailg@emailh.com; \
 export CACHER_RHDM_URL=https://url; \
 export CACHER_RHPAM_URL=https://url; \

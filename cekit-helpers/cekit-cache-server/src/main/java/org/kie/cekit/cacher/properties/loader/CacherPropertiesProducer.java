@@ -21,7 +21,6 @@ public class CacherPropertiesProducer {
     private String PROPERTIES_FILE = "META-INF/resources/cekit-cacher.properties";
     final Properties prop = new Properties();
 
-    @Produces
     @Dependent
     @CacherProperty(name = "")
     public boolean findBotPropertyBoolean(InjectionPoint injectionPoint) {
@@ -34,7 +33,6 @@ public class CacherPropertiesProducer {
         return Boolean.parseBoolean(value);
     }
 
-    @Produces
     @Dependent
     @CacherProperty(name = "")
     public String findBotProperty(InjectionPoint injectionPoint) {

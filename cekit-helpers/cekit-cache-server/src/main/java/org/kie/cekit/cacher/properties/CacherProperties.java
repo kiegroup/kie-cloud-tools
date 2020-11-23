@@ -34,6 +34,10 @@ public class CacherProperties {
     String githubPassword;
 
     @Inject
+    @CacherProperty(name = "org.kie.cekit.cacher.github.oauth-token")
+    String oauthToken;
+
+    @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.github.email")
     String githubEmail;
 
@@ -118,6 +122,13 @@ public class CacherProperties {
     }
 
     /**
+     * @return github oauth token
+     */
+    public String oauthToken() {
+        return oauthToken;
+    }
+
+    /**
      * @return github user email
      */
     public String githubEmail() {
@@ -134,6 +145,9 @@ public class CacherProperties {
             }
             if (null == githubPassword || githubPassword.equals("")) {
                 throw new RequiredParameterMissingException("The parameter org.kie.cekit.cacher.github.password is required!");
+            }
+            if (null == oauthToken || oauthToken.equals("")) {
+                throw new RequiredParameterMissingException("The parameter org.kie.cekit.cacher.github.oauth-token is required!");
             }
             if (null == githubEmail || githubEmail.equals("")) {
                 throw new RequiredParameterMissingException("The parameter org.kie.cekit.cacher.github.email is required!");
@@ -293,4 +307,5 @@ public class CacherProperties {
     public List<String> getRhdmFiles2DownloadPropName() {
         return rhdmFiles2DownloadPropName;
     }
+
 }

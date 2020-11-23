@@ -1,6 +1,5 @@
 package org.kie.cekit.cacher.builds.github;
 
-import okhttp3.Credentials;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -68,8 +67,8 @@ public class PullRequestSender {
                 .build();
 
         Request request = new Request.Builder()
-                .addHeader("content-type", "application/json")
-                .addHeader("Authorization", Credentials.basic(cacherProperties.githubUsername(), cacherProperties.githubPassword()))
+                .addHeader("Accept", "application/vnd.github.v3+json")
+                .addHeader("Authorization", "token " + cacherProperties.oauthToken())
                 .post(body)
                 .url(url)
                 .build();
@@ -105,8 +104,8 @@ public class PullRequestSender {
             }
 
         } catch (final Exception e) {
-            notification.send("Failed to submit PR against " + repo + " - *reason: " + notification.bold(e.getMessage()),
-                    cacherProperties.gChatWebhook() + "*");
+            notification.send("Failed to submit PR against " + repo + " - reason: " + notification.bold(e.getMessage()),
+                    cacherProperties.gChatWebhook());
             e.printStackTrace();
             return false;
         }

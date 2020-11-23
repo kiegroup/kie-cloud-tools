@@ -169,7 +169,6 @@ public class PullRequestAcceptorTest {
                 String.format("  # %s", "rhdm-7.8.0.redhat-20191006-kie-server-ee8.zip")));
         Assertions.assertTrue(containsComment(kieserverFile,
                 String.format("  # %s", "slf4j-simple-1.7.22.redhat-2.jar")));
-
     }
 
     /**

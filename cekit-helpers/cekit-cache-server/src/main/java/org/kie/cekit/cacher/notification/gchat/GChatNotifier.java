@@ -1,5 +1,6 @@
 package org.kie.cekit.cacher.notification.gchat;
 
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -23,6 +24,7 @@ public class GChatNotifier implements Notification {
 
         String jsonPayload = "{\"text\" : \"" + message + "\" }";
         log.fine("Trying to notify " + webhook + " with payload " + jsonPayload);
+
         RequestBody body = RequestBody.create(JSON, jsonPayload);
 
         OkHttpClient client = new OkHttpClient.Builder()
@@ -30,10 +32,11 @@ public class GChatNotifier implements Notification {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
 
+        HttpUrl.Builder httpBuilder = HttpUrl.parse(webhook).newBuilder();
         Request request = new Request.Builder()
                 .addHeader("content-type", "application/json; charset=UTF-8")
                 .post(body)
-                .url(webhook)
+                .url(httpBuilder.build())
                 .build();
 
         try (Response response = client.newCall(request).execute()) {

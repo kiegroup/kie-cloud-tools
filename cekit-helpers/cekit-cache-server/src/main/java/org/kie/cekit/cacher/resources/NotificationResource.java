@@ -16,7 +16,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Array;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -60,7 +59,7 @@ public class NotificationResource {
                 message.getRecipients(),
                 message.getMessage()));
 
-        String[] recipients =  new String[message.getRecipients().size()];
+        String[] recipients = new String[message.getRecipients().size()];
         recipients = message.getRecipients().toArray(recipients);
 
         StringBuilder response = new StringBuilder();

@@ -1,6 +1,5 @@
 package org.kie.cekit.cacher.resources;
 
-
 import org.kie.cekit.cacher.builds.github.GitRepository;
 import org.kie.cekit.cacher.utils.CacherUtils;
 

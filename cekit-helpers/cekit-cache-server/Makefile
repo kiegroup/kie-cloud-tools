@@ -18,6 +18,7 @@ test:
 	export CACHER_GITHUB_USERNAME=bsig-gh-bot; \
 	export CACHER_GITHUB_PASSWORD=password; \
 	export CACHER_GITHUB_EMAIL=emailg@gmail.com; \
+	export CACHER_GITHUB_OAUTH_TOKEN=token; \
 	export CACHER_RHDM_URL=https://url; \
 	export CACHER_RHPAM_URL=https://url; \
 	export CACHER_RHDM_UPSTREAM=https://github.com/jboss-container-images/rhdm-7-image.git; \
