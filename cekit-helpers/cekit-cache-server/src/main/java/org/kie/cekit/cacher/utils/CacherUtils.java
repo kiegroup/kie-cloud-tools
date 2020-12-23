@@ -1,7 +1,8 @@
 package org.kie.cekit.cacher.utils;
 
 import io.quarkus.scheduler.Scheduled;
-import org.kie.cekit.cacher.builds.github.BuildDateUpdatesInterceptor;
+import org.kie.cekit.cacher.builds.cr.CRBuildInterceptor;
+import org.kie.cekit.cacher.builds.nightly.NightlyBuildUpdatesInterceptor;
 import org.kie.cekit.cacher.objects.PlainArtifact;
 import org.kie.cekit.cacher.properties.CacherProperties;
 
@@ -45,13 +46,16 @@ import java.util.zip.ZipInputStream;
 @ApplicationScoped
 public class CacherUtils {
 
-    private Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
+    private final Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     @Inject
     CacherProperties cacherProperties;
 
     @Inject
-    BuildDateUpdatesInterceptor buildCallback;
+    NightlyBuildUpdatesInterceptor nightlyBuildUpdatesInterceptor;
+
+    @Inject
+    CRBuildInterceptor crBuildInterceptor;
 
     /**
      * Clean 1 day old files under tmp directory
@@ -83,7 +87,7 @@ public class CacherUtils {
      * Run once a day.
      */
     @Scheduled(every = "24h", delay = 12, delayUnit = TimeUnit.HOURS)
-    public void cleanOldProductNightlyArtifacts() throws IOException, InterruptedException {
+    public void cleanOldProductNightlyArtifacts() {
         log.fine("Trying to identify the latest nightly build based on filesystem artifacts to delete, this could take a while...");
         try {
             log.fine("Walking through data dir searching for old nightly product builds...");
@@ -130,9 +134,7 @@ public class CacherUtils {
                 while ((line = br.readLine()) != null) {
                     String finalLine = line;
                     if (!fileExistsByNameExcludeTmp(UrlUtils.getFileName(finalLine))) {
-                        new Thread(() -> {
-                            log.info(fetchFile(finalLine));
-                        }).start();
+                        new Thread(() -> log.info(fetchFile(finalLine, Optional.empty(), 0))).start();
                     }
                 }
             } catch (IOException e) {
@@ -166,10 +168,10 @@ public class CacherUtils {
     /**
      * Download and persist the given file locally
      *
-     * @param url
+     * @param url artifact url address
      * @return the result of the operation
      */
-    public String fetchFile(String url) {
+    public String fetchFile(String url, Optional<String> type, int crBuild) {
 
         String fileName = UrlUtils.getFileName(url);
         String filePath = cacherProperties.getArtifactsTmpDir() + "/" + fileName;
@@ -214,14 +216,27 @@ public class CacherUtils {
             }
             return e.getMessage();
         }
-        buildCallback.onFilePersisted(fileName, fileChecksum);
+
+        switch (type.orElse("")) {
+            case "nightly":
+                nightlyBuildUpdatesInterceptor.onFilePersisted(fileName, fileChecksum);
+                break;
+
+            case "cr":
+                crBuildInterceptor.onFilePersisted(fileName, fileChecksum, crBuild);
+                break;
+
+            default:
+                log.finest("nothing has to be done.");
+
+        }
         return "File " + fileName + " persisted.";
     }
 
     /**
-     * If the given file exists, return its absolute pagh
+     * If the given file exists, return its absolute path
      *
-     * @param checksum
+     * @param checksum to be searched
      * @return file's absolute path
      */
     public Optional<Path> getFile(String checksum) {
@@ -239,7 +254,7 @@ public class CacherUtils {
     /**
      * verifies if the given checksum exists
      *
-     * @param checksum
+     * @param checksum for the given file
      * @return true if there is a directory with the given checksum
      */
     public boolean fileExists(String checksum) {
@@ -249,7 +264,7 @@ public class CacherUtils {
     /**
      * Verifies if the given file exists on the persisted files, excludes tmp dir from the search
      *
-     * @param fileName
+     * @param fileName of the file to be searched
      * @return true if the given file exists
      */
     public boolean fileExistsByNameExcludeTmp(String fileName) {
@@ -303,9 +318,9 @@ public class CacherUtils {
     /**
      * Generates the given file checksum
      *
-     * @param filePath
+     * @param filePath for the file on the filesystem.
      * @return file checksum
-     * @throws IOException
+     * @throws IOException for IO exceptions while calculating the md5 checksum
      */
     private String md5sum(String filePath) throws IOException {
         StringBuilder result = new StringBuilder();
@@ -347,7 +362,7 @@ public class CacherUtils {
                             return new PlainArtifact(p.getFileName().toString(),
                                     p.getParent().getFileName().toString(),
                                     Files.getAttribute(p.toAbsolutePath(), "creationTime", LinkOption.NOFOLLOW_LINKS).toString(),
-                                    null, null, null);
+                                    null, null, null, 0);
                         } catch (IOException e) {
                             e.printStackTrace();
                             return null;
@@ -362,7 +377,7 @@ public class CacherUtils {
     /**
      * delete artifacts by checksum
      *
-     * @param checksum
+     * @param checksum of the artifact to be deleted.
      * @return true if delete, otherwise return false.
      */
     public boolean deleteArtifact(String checksum) {
@@ -384,14 +399,15 @@ public class CacherUtils {
     }
 
     /**
-     * @param jarName
-     * @param zipFileName
-     * @return
+     * @param jarName the jar file to be searched
+     * @param zipFileName source file
+     * @return the version from the given .jar file
      */
     public String detectJarVersion(String jarName, String zipFileName) {
 
-        Pattern pattern = Pattern.compile("\\d.\\d{1,2}.\\d");
-        Optional<File> zipFile = Optional.empty();
+        Pattern versionp = Pattern.compile("\\d.\\d{1,2}.\\d");
+        Pattern identifierp = Pattern.compile("\\d.\\d{1,2}.\\d.Final-redhat-\\d{5}");
+        Optional<File> zipFile;
         try {
             zipFile = Files.walk(Paths.get(cacherProperties.getCacherArtifactsDir()))
                     .map(Path::toFile)
@@ -410,10 +426,17 @@ public class CacherUtils {
             while ((entry = stream.getNextEntry()) != null) {
                 if (entry.getName().endsWith(".jar") && entry.getName().contains(jarName)) {
                     log.fine("Inspecting file [" + entry.getName() + "]");
-                    Matcher ma = pattern.matcher(entry.getName());
-                    if (ma.find()) {
-                        log.fine("Version found, regex match is -> " + ma.group());
-                        return ma.group();
+
+                    Matcher identifierm = identifierp.matcher(entry.getName());
+                    if (identifierm.find()) {
+                        log.fine("Release Version found, regex match is -> " + identifierm.group());
+                        return identifierm.group();
+                    }
+
+                    Matcher versionm = versionp.matcher(entry.getName());
+                    if (versionm.find()) {
+                        log.fine("Nightly Version found, regex match is -> " + versionm.group());
+                        return versionm.group();
                     }
                 }
             }

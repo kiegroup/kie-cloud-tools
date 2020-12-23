@@ -8,17 +8,19 @@ public class PlainArtifact {
     private String buildDate;
     private String version;
     private String branch;
+    private int crBuild;
 
     public PlainArtifact() {
     }
 
-    public PlainArtifact(String fileName, String checksum, String timestamp, String buildDate, String version, String branch) {
+    public PlainArtifact(String fileName, String checksum, String timestamp, String buildDate, String version, String branch, int crBuild) {
         this.fileName = fileName;
         this.checksum = checksum;
         this.timestamp = timestamp;
         this.buildDate = buildDate;
         this.version = version;
         this.branch = branch;
+        this.crBuild = crBuild;
     }
 
     public PlainArtifact(String fileName, String checksum, String timestamp) {
@@ -78,6 +80,14 @@ public class PlainArtifact {
         this.branch = branch;
     }
 
+    public int getCrBuild() {
+        return crBuild;
+    }
+
+    public void setCrBuild(int crBuild) {
+        this.crBuild = crBuild;
+    }
+
     @Override
     public String toString() {
         return "PlainArtifact{" +
@@ -87,6 +97,7 @@ public class PlainArtifact {
                 ", buildDate='" + buildDate + '\'' +
                 ", version='" + version + '\'' +
                 ", branch='" + branch + '\'' +
+                ", crBuild=" + crBuild +
                 '}';
     }
 }

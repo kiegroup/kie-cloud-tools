@@ -14,5 +14,4 @@ public enum BranchOperation {
     DELETE_BRANCH,
     NEW_BRANCH,
     PUSH_BRANCH,
-    
 }

@@ -1,14 +1,23 @@
 package org.kie.cekit.cacher.properties;
 
 import com.fasterxml.jackson.core.Version;
+import okhttp3.ConnectionSpec;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.kie.cekit.cacher.exception.RequiredParameterMissingException;
 import org.kie.cekit.cacher.properties.loader.CacherProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -17,9 +26,11 @@ import java.util.regex.Pattern;
 @ApplicationScoped
 public class CacherProperties {
 
+    private Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
     public final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
     public final Pattern buildDatePattern = Pattern.compile("(\\d{8})");
     public final Version versionBeforeDMPAMPrefix = new Version(7, 8, 0, null, null, null);
+    public final Version pam710 = new Version(7, 10, 0, null, null, null);
 
     @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.base.dir", required = true)
@@ -70,6 +81,14 @@ public class CacherProperties {
     String rhdmUrl;
 
     @Inject
+    @CacherProperty(name = "org.kie.cekit.cacher.rhpam.cr.url")
+    String rhpamCRUrl;
+
+    @Inject
+    @CacherProperty(name = "org.kie.cekit.cacher.rhdm.cr.url")
+    String rhdmCRUrl;
+
+    @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.product.version")
     String version;
 
@@ -88,7 +107,7 @@ public class CacherProperties {
 
     /**
      * RHPAM properties keys needed to download the nightly builds artifacts
-     * These properties came from the product properties file.
+     * Thesehttps://github.com/mramendi/kie-docs/pull/130#discussion_r529607184 properties came from the product properties file.
      */
     private List<String> rhpamFiles2DownloadPropName = Arrays.asList(
             "rhpam.addons.latest.url",
@@ -207,6 +226,17 @@ public class CacherProperties {
         return rhdmUrl;
     }
 
+    public String rhpamCRUrl() {
+        return rhpamCRUrl;
+    }
+
+    /**
+     * @return the configure CR build properties for rhdm
+     */
+    public String rhdmCRUrl() {
+        return rhdmCRUrl;
+    }
+
     /**
      * @return rhpam/dm product shortened version
      */
@@ -308,4 +338,39 @@ public class CacherProperties {
         return rhdmFiles2DownloadPropName;
     }
 
+    /**
+     * fetch the RHDM/RHPAM build properties file.
+     *
+     * @param url
+     * @return parsed properties from target url
+     */
+    public Properties productPropertyFile(String url) {
+        log.info("Trying to get product properties file from " + url);
+        Properties p = new Properties();
+        OkHttpClient ok = new OkHttpClient.Builder()
+                // no https required.
+                .connectionSpecs(Arrays.asList(ConnectionSpec.CLEARTEXT))
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .build();
+
+        try (Response response = ok.newCall(request).execute()) {
+            if (response.code() == 404) {
+                log.info("RHDM/PAM properties file not found... url -> " + url);
+                return p;
+            }
+            try (final InputStream stream = Objects.requireNonNull(response.body()).byteStream()) {
+                p.load(stream);
+            }
+
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+
+        return p;
+    }
 }
+

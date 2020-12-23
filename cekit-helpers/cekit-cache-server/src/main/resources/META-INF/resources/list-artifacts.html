@@ -246,7 +246,7 @@
                 <button class="btn btn-default" type="button" onclick="Delete()">Delete Selected</button>
                 <button class="btn btn-default" type="button" onclick="retryNightlyBuild()">Retry Nightly Build</button>
                 <input type="checkbox" id="force" class="form-check-input" data-toggle="tooltip" data-placement="right"
-                       data-original-title="Useful when automated PRs are wrongly merged, it will force the cacher to create the PRs containing the latest artifacts."/>
+                       data-original-title="Useful when automated PRs for nightly builds are wrongly merged, it will force the cacher to create the PRs containing the latest artifacts."/>
                 <label class="form-check-label" for="force">Force PR?</label>
             </div>
             <div class="form-group"><b id="retryResult"></b></div>
@@ -352,7 +352,7 @@
                 type="submit">Retry Nightly Build
         </button>
         <input type="checkbox" id="force-1" class="form-check-input" data-toggle="tooltip" data-placement="right"
-               data-original-title="Useful when automated PRs are wrongly merged, it will force the cacher to create the PRs containing the latest artifacts."/>
+               data-original-title="Useful when automated PRs for nightly builds are wrongly merged, it will force the cacher to create the PRs containing the latest artifacts."/>
         <label class="form-check-label" for="force-1">Force PR?</label>
     </div>
     <b id="retryResult"></b>

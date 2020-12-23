@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 @ApplicationScoped
 public class CacherLifecyle {
 
-    private Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
+    private final Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     @Inject
     CacherUtils cacherUtils;

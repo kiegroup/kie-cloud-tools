@@ -289,8 +289,8 @@ public class GitRepository {
     /**
      * OS command executor, it executes commands on the base working dir
      *
-     * @param workDir
-     * @param command
+     * @param workDir base dir
+     * @param command git command to be executed
      */
     private void run(String workDir, String... command) throws IOException, InterruptedException {
 

@@ -20,12 +20,12 @@ import java.util.logging.Logger;
 @ApplicationScoped
 public class YamlFilesHelper {
 
-    private static Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
+    private final Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Receives a absolute file path or filename, it will first look on the classpath, if not found, if not found, look at filesystem.
      *
-     * @param {@link String} file
+     * @param file {@link String}
      * @return {@link Module}
      */
     public Module load(String file) {
@@ -50,7 +50,7 @@ public class YamlFilesHelper {
     /**
      * Receives a absolute file path or filename, it will first look on the classpath, if not found, look at filesystem.
      *
-     * @param {@link String} file
+     * @param file {@link String} file
      * @return raw InputStream
      */
     public List<String> loadRawData(String file) {
@@ -73,8 +73,8 @@ public class YamlFilesHelper {
     /**
      * Write the changes on the target yaml file.
      *
-     * @param module
-     * @param fileDestination
+     * @param module {@link Module}
+     * @param fileDestination {@link String}
      */
     public void writeModule(Module module, String fileDestination) {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());

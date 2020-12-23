@@ -17,12 +17,13 @@ import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.URLDecoder;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 @Path("/resource")
 public class CacherResource {
 
-    private Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
+    private final Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     @Inject
     CacherUtils cacherUtils;
@@ -36,7 +37,7 @@ public class CacherResource {
 
         StringBuilder responseMessage = new StringBuilder();
         if (UrlUtils.isUrlValid(url)) {
-            responseMessage.append(cacherUtils.fetchFile(url));
+            responseMessage.append(cacherUtils.fetchFile(url, Optional.empty(), 0));
         } else {
             responseMessage.append("Failed to fetch artifact, please check the url and try again");
         }
@@ -71,9 +72,9 @@ public class CacherResource {
         for (String ck : checksum) {
             log.info("file received for deletion " + ck);
             if (cacherUtils.deleteArtifact(ck)) {
-               response.append("File " + ck + " deleted.\n");
+               response.append("File ").append(ck).append(" deleted.\n");
             } else {
-                response.append("Fail to delete " + ck + ".\n");
+                response.append("Fail to delete ").append(ck).append(".\n");
             }
         }
         return Response.ok().entity(response.toString()).build();

@@ -1,11 +1,6 @@
 package org.kie.cekit.cacher.builds.nightly;
 
 import io.quarkus.scheduler.Scheduled;
-import okhttp3.ConnectionSpec;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.kie.cekit.cacher.builds.github.BuildDateUpdatesInterceptor;
 import org.kie.cekit.cacher.objects.PlainArtifact;
 import org.kie.cekit.cacher.properties.CacherProperties;
 import org.kie.cekit.cacher.utils.CacherUtils;
@@ -13,11 +8,8 @@ import org.kie.cekit.cacher.utils.UrlUtils;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +30,7 @@ public class NightlyBuildsWatcher {
     CacherProperties cacherProperties;
 
     @Inject
-    BuildDateUpdatesInterceptor buildCallback;
+    NightlyBuildUpdatesInterceptor buildCallback;
 
     public void verifyNightlyBuild(Optional<String> version, Optional<String> branch, Optional<String> buildDate) {
         tryBuildDate(version, branch, buildDate, false);
@@ -74,9 +66,9 @@ public class NightlyBuildsWatcher {
      * Otherwise, if the buildDate is older than the new files, the Pull Request process will start as soon all
      * needed files are persisted on the filesystem.
      *
-     * @param version
-     * @param branch
-     * @param buildDate
+     * @param version target version
+     * @param branch target branch
+     * @param buildDate new build date
      */
     private void tryBuildDate(Optional<String> version, Optional<String> branch, Optional<String> buildDate, boolean force) {
         if (cacherProperties.isWatcherEnabled()) {
@@ -92,13 +84,13 @@ public class NightlyBuildsWatcher {
                         normalizedBranch, normalizedVersion, buildDate.get()));
 
                 //Properties rhpamProp, String buildDate, String version, String branch
-                rhpamNightlyBuildDownloader(productPropertyFile(
+                rhpamNightlyBuildDownloader(cacherProperties.productPropertyFile(
                         String.format(cacherProperties.rhpamUrl(), normalizedVersion, buildDate.get())),
                         buildDate.get(),
                         normalizedVersion,
                         normalizedBranch,
                         force);
-                rhdmNightlyBuildDownloader(productPropertyFile(
+                rhdmNightlyBuildDownloader(cacherProperties.productPropertyFile(
                         String.format(cacherProperties.rhdmUrl(), normalizedVersion, buildDate.get())),
                         buildDate.get(),
                         normalizedVersion,
@@ -108,7 +100,7 @@ public class NightlyBuildsWatcher {
             } else {
 
                 while (rhpamCounter < 4) {
-                    Properties rhpamProps = productPropertyFile(String.format(cacherProperties.rhpamUrl(),
+                    Properties rhpamProps = cacherProperties.productPropertyFile(String.format(cacherProperties.rhpamUrl(),
                             cacherProperties.version(), LocalDate.now().minusDays(rhpamCounter).format(cacherProperties.formatter)));
                     if (rhpamProps != null && rhpamProps.size() > 0) {
                         rhpamNightlyBuildDownloader(rhpamProps,
@@ -123,7 +115,7 @@ public class NightlyBuildsWatcher {
                 }
 
                 while (rhdmCounter < 4) {
-                    Properties rhdmProps = productPropertyFile(String.format(cacherProperties.rhdmUrl(),
+                    Properties rhdmProps = cacherProperties.productPropertyFile(String.format(cacherProperties.rhdmUrl(),
                             cacherProperties.version(), LocalDate.now().minusDays(rhdmCounter).format(cacherProperties.formatter)));
 
                     if (rhdmProps != null && rhdmProps.size() > 0) {
@@ -162,10 +154,9 @@ public class NightlyBuildsWatcher {
                         "",
                         buildDate,
                         version,
-                        branch), force);
-                new Thread(() -> {
-                    log.info(cacherUtils.fetchFile(rhpamProp.get(file).toString()));
-                }).start();
+                        branch,
+                        0), force);
+                new Thread(() -> log.info(cacherUtils.fetchFile(rhpamProp.get(file).toString(), Optional.of("nightly"), 0))).start();
             }
         });
     }
@@ -188,46 +179,11 @@ public class NightlyBuildsWatcher {
                         "",
                         buildDate,
                         version,
-                        branch), force);
-                new Thread(() -> {
-                    log.info(cacherUtils.fetchFile(rhdmProp.get(file).toString()));
-                }).start();
+                        branch,
+                        0), force);
+                new Thread(() -> log.info(cacherUtils.fetchFile(rhdmProp.get(file).toString(), Optional.of("nightly"), 0))).start();
             }
         });
     }
 
-    /**
-     * fetch the RHDM/RHPAM build properties file.
-     *
-     * @param url
-     * @return
-     */
-    private Properties productPropertyFile(String url) {
-        log.info("Trying to get the properties file from " + url);
-        Properties p = new Properties();
-        OkHttpClient ok = new OkHttpClient.Builder()
-                // no https required.
-                .connectionSpecs(Arrays.asList(ConnectionSpec.CLEARTEXT))
-                .build();
-
-        Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .build();
-
-        try (Response response = ok.newCall(request).execute()) {
-            if (response.code() == 404) {
-                log.info("Nightly build not found... url -> " + url);
-                return p;
-            }
-            try (final InputStream stream = Objects.requireNonNull(response.body()).byteStream()) {
-                p.load(stream);
-            }
-
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-
-        return p;
-    }
 }

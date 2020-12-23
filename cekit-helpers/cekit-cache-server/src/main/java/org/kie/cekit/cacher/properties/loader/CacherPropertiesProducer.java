@@ -4,7 +4,6 @@ import org.kie.cekit.cacher.exception.RequiredParameterMissingException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
@@ -16,9 +15,9 @@ import java.util.regex.Pattern;
 @ApplicationScoped
 public class CacherPropertiesProducer {
 
-    private static Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
+    private static final Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
 
-    private String PROPERTIES_FILE = "META-INF/resources/cekit-cacher.properties";
+    private final String PROPERTIES_FILE = "META-INF/resources/cekit-cacher.properties";
     final Properties prop = new Properties();
 
     @Dependent
@@ -58,7 +57,7 @@ public class CacherPropertiesProducer {
      */
     private String readSysProperty(String propName) {
         Pattern pattern = Pattern.compile("\\$\\{.*?\\}");
-        String property = null;
+        String property;
 
         String value = System.getProperty(propName);
         if (null != value) {

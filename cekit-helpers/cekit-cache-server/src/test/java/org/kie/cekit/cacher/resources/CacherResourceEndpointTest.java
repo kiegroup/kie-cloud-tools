@@ -58,7 +58,7 @@ public class CacherResourceEndpointTest {
                 .when().get("/resource/query/quarkus")
                 .then()
                 .statusCode(200)
-                .body(containsString("[{\"checksum\":\"bccc8db65cb5eae41084222c82a6131c\",\"fileName\":\"quarkus-arc-0.15.0-javadoc.jar\",\"timestamp\""));
+                .body(containsString("[{\"checksum\":\"bccc8db65cb5eae41084222c82a6131c\",\"crBuild\":0,\"fileName\":\"quarkus-arc-0.15.0-javadoc.jar\",\"timestamp\""));
 
         given()
                 .when().get("/resource/query/test")

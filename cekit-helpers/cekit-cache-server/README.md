@@ -14,8 +14,8 @@ org.kie.cekit.cacher.preload.file - configure it with a txt file containing the 
 # Product Nightly Builds properties
 org.kie.cekit.cacher.enable.nightly.watcher - enables the nightly builds watcher
 org.kie.cekit.cacher.product.version (requiresd if watcher is enabled) - rhpam/rhdm product version
-org.kie.cekit.cacher.rhdm.url (requiresd if watcher is enabled) - RHDM build properties url
-org.kie.cekit.cacher.rhpam.url (requiresd if watcher is enabled) - RHPAM build properties url
+org.kie.cekit.cacher.rhdm.url (requiresd if watcher is enabled) - RHDM nightly build properties url
+org.kie.cekit.cacher.rhpam.url (requiresd if watcher is enabled) - RHPAM nightly build properties url
 
 ## Github integration info
 org.kie.cekit.cacher.enable.github.bot - enables github integration
@@ -34,6 +34,10 @@ org.kie.cekit.cacher.github.default.branch - rhpam and rhdm upstream default bra
 # be sure to scape special characters
 org.kie.cekit.cacher.gchat.webhook - The Google Chat webhook for a target room or chat, can be obtained on the room.
 that you want to send notification.
+
+# Product CR builds
+org.kie.cekit.cacher.rhpam.cr.url -  RHPAM CR build properties url
+org.kie.cekit.cacher.rhdm.cr.url -  RHDM CR build properties url
 ```
 
 Note that, the cekit-cacher.properties also supports configuration using environment variables with the `${ENV_NAME}` pattern, example:
@@ -194,3 +198,7 @@ The Cacher exposes a few actions through rest API, you see all of them with the 
 **Retry specific build date** - there is a endpoint for this purpose:  `GET /watcher/{buildDate}`
 
 **Retry specific build date with custom branch and version** - `GET /watcher/try/{version}/{branch}/{buildDate}`
+
+**Update CR builds** - `GET /crbuild/use/{version}/{releaseBranch}/{crBuild}`
+ - Example: `http://localhost:8080/crbuild/use/7.9.1/7.9.x/2`
+ - Requires the target repositories to be already updated for release.
