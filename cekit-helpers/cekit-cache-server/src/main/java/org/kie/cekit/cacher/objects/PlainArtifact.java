@@ -21,6 +21,12 @@ public class PlainArtifact {
         this.branch = branch;
     }
 
+    public PlainArtifact(String fileName, String checksum, String timestamp) {
+        this.fileName = fileName;
+        this.checksum = checksum;
+        this.timestamp = timestamp;
+    }
+
     public String getFileName() {
         return fileName;
     }

@@ -88,4 +88,16 @@ public class CacherResource {
         return cacherUtils.getPersistedArtifacts().toArray(new PlainArtifact[0]);
     }
 
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    @Path("/query/{name}")
+    public Response queryArtifacts(@PathParam("name") String artifactName) {
+
+        List<PlainArtifact> found = cacherUtils.getFilesByName(artifactName);
+        if (found.isEmpty()) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
+        return Response.ok(found).build();
+    }
+
 }

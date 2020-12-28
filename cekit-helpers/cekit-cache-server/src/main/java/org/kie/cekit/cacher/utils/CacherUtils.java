@@ -267,6 +267,40 @@ public class CacherUtils {
     }
 
     /**
+     * Verifies if the given file exists on the persisted files, excludes tmp dir from the search
+     *
+     * @param fileName to be searched
+     * @return List of found {@link PlainArtifact}
+     */
+    public List<PlainArtifact> getFilesByName(String fileName) {
+        Path path = FileSystems.getDefault().getPath(cacherProperties.getCacherArtifactsDir());
+
+        List<PlainArtifact> artifacts = new ArrayList<>();
+
+        try {
+            artifacts = Files.walk(path)
+                    .filter(Files::isRegularFile)
+                    .filter(file -> file.getFileName().toString().contains(fileName))
+                    .map(p -> {
+                        try {
+                            return new PlainArtifact(p.getFileName().toString(),
+                                    p.getParent().getFileName().toString(),
+                                    Files.getAttribute(p.toAbsolutePath(), "creationTime", LinkOption.NOFOLLOW_LINKS).toString());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return new PlainArtifact(p.getFileName().toString(),
+                                    p.getParent().getFileName().toString(), "00");
+                        }
+
+                    }).collect(Collectors.toList());
+        } catch (final Exception e) {
+            e.printStackTrace();
+
+        }
+        return artifacts;
+    }
+
+    /**
      * Generates the given file checksum
      *
      * @param filePath

@@ -54,6 +54,16 @@ public class CacherResourceEndpointTest {
                 .statusCode(200)
                 .body(is("Failed to fetch artifact, please check the url and try again"));
 
+       given()
+                .when().get("/resource/query/quarkus")
+                .then()
+                .statusCode(200)
+                .body(containsString("[{\"checksum\":\"bccc8db65cb5eae41084222c82a6131c\",\"fileName\":\"quarkus-arc-0.15.0-javadoc.jar\",\"timestamp\""));
+
+        given()
+                .when().get("/resource/query/test")
+                .then()
+                .statusCode(204);
 
         Assertions.assertTrue(cacherUtils.fileExists("bccc8db65cb5eae41084222c82a6131c"));
 
