@@ -9,6 +9,7 @@ import org.kie.cekit.cacher.objects.PlainArtifact;
 import org.kie.cekit.cacher.properties.CacherProperties;
 import org.kie.cekit.cacher.utils.BuildUtils;
 import org.kie.cekit.cacher.utils.CacherUtils;
+import org.kie.cekit.image.descriptors.module.Module;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -97,8 +98,16 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
 
                     gitRepository.handleBranch(BranchOperation.NEW_BRANCH, branchName, baseBranch, "rhpam-7-image");
 
+                    Module bcMonitoring = yamlFilesHelper.load(buildUtils.bcMonitoringFile());
+                    Module businessCentral = yamlFilesHelper.load(buildUtils.businessCentralFile());
+                    Module pamController = yamlFilesHelper.load(buildUtils.pamControllerFile());
+                    Module dashbuilder = yamlFilesHelper.load(buildUtils.dashbuilderFile());
+                    Module pamKieserver = yamlFilesHelper.load(buildUtils.pamKieserverFile());
+                    Module smartrouter = yamlFilesHelper.load(buildUtils.smartrouterFile());
+                    Module processMigration = yamlFilesHelper.load(buildUtils.processMigrationFile());
+
                     // Prepare Business Central Monitoring Changes
-                    buildUtils.bcMonitoring().getArtifacts().forEach(artifact -> {
+                    bcMonitoring.getArtifacts().forEach(artifact -> {
                         if (artifact.getName().equals(buildUtils.RHPAM_BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP)) {
                             String bcMonitoringFileName = String.format(buildUtils.RHPAM_MONITORING_EE7_NIGHTLY_ZIP, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
@@ -114,7 +123,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                         bcMonitoringCheckSum));
 
                                 artifact.setMd5(bcMonitoringCheckSum);
-                                yamlFilesHelper.writeModule(buildUtils.bcMonitoring(), buildUtils.bcMonitoringFile());
+                                yamlFilesHelper.writeModule(bcMonitoring, buildUtils.bcMonitoringFile());
 
                                 // find name: "rhpam_business_central_monitoring_distribution.zip"
                                 // and add comment on next line : rhpam-${version}.redhat-${buildDate}-monitoring-ee7.zip
@@ -128,7 +137,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     });
 
                     // Prepare Business Central Changes
-                    buildUtils.businessCentral().getArtifacts().forEach(artifact -> {
+                    businessCentral.getArtifacts().forEach(artifact -> {
                         if (artifact.getName().equals(buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP)) {
                             String bcFileName = String.format(buildUtils.RHPAM_BUSINESS_CENTRAL_EAP7_DEPLOYABLE_NIGHTLY_ZIP, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
@@ -144,7 +153,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                         bcCheckSum));
 
                                 artifact.setMd5(bcCheckSum);
-                                yamlFilesHelper.writeModule(buildUtils.businessCentral(), buildUtils.businessCentralFile());
+                                yamlFilesHelper.writeModule(businessCentral, buildUtils.businessCentralFile());
 
                                 // find name: "rhpam_business_central_distribution.zip"
                                 // and add comment on next line : rhpam-${version}.redhat-${buildDate}-business-central-eap7-deployable.zip
@@ -158,7 +167,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     });
 
                     // Prepare controller Changes - artifacts
-                    buildUtils.pamController().getArtifacts().forEach(artifact -> {
+                    pamController.getArtifacts().forEach(artifact -> {
                         if (artifact.getName().equals(buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP)) {
                             String controllerFileName = String.format(buildUtils.RHPAM_ADD_ONS_NIGHTLY_ZIP, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
@@ -174,7 +183,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                         controllerCheckSum));
 
                                 artifact.setMd5(controllerCheckSum);
-                                yamlFilesHelper.writeModule(buildUtils.pamController(), buildUtils.pamControllerFile());
+                                yamlFilesHelper.writeModule(pamController, buildUtils.pamControllerFile());
 
                                 // find name: "rhpam_add_ons_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
@@ -188,7 +197,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     });
 
                     // Prepare controller changes - envs
-                    buildUtils.pamController().getEnvs().forEach(env -> {
+                    pamController.getEnvs().forEach(env -> {
                         if (env.getName().equals("CONTROLLER_DISTRIBUTION_ZIP")) {
                             // rhpam-${shortenedVersion}-controller-ee7.zip
                             String controllerEE7Zip = String.format("rhpam-%s-controller-ee7.zip", cacherProperties.shortenedVersion(version.toString()));
@@ -200,7 +209,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     });
 
                     // Prepare dashbuilder Changes - artifacts
-                    buildUtils.dashbuilder().getArtifacts().forEach(artifact -> {
+                    dashbuilder.getArtifacts().forEach(artifact -> {
                         if (artifact.getName().equals(buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP)) {
                             String dashbuilderAddOnsFileName = String.format(buildUtils.RHPAM_ADD_ONS_NIGHTLY_ZIP, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
@@ -215,7 +224,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                         dashbuilderCheckSum));
 
                                 artifact.setMd5(dashbuilderCheckSum);
-                                yamlFilesHelper.writeModule(buildUtils.dashbuilder(), buildUtils.dashbuilderFile());
+                                yamlFilesHelper.writeModule(dashbuilder, buildUtils.dashbuilderFile());
 
                                 // find name: "rhpam_add_ons_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
@@ -229,7 +238,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     });
 
                     // Prepare dashbuilder changes - envs
-                    buildUtils.dashbuilder().getEnvs().forEach(env -> {
+                    dashbuilder.getEnvs().forEach(env -> {
                         if (env.getName().equals("DASHBUILDER_DISTRIBUTION_ZIP")) {
                             // rhpam-${version}-dashbuilder-runtime.zip
                             String dashbuilderEE7Zip = String.format("rhpam-%s-dashbuilder-runtime.zip", version.toString());
@@ -244,14 +253,14 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     String jbpmWbKieServerBackendSourceFile = String.format(buildUtils.RHPAM_BUSINESS_CENTRAL_EAP7_DEPLOYABLE_NIGHTLY_ZIP, version, buildDate);
                     String jbpmWbKieServerBackendVersion = cacherUtils.detectJarVersion("jbpm-wb-kie-server-backend", jbpmWbKieServerBackendSourceFile);
                     String backendFileName = String.format("jbpm-wb-kie-server-backend-%s.redhat-%s.jar", jbpmWbKieServerBackendVersion, buildDate);
-                    buildUtils.pamKieserver().getEnvs().forEach(env -> {
+                    pamKieserver.getEnvs().forEach(env -> {
                         if (env.getName().equals("JBPM_WB_KIE_SERVER_BACKEND_JAR")) {
                             log.fine(String.format("Update jbpm-wb-kie-server-backend file from [%s] to [%s]", env.getValue(), backendFileName));
                             env.setValue(backendFileName);
-                            yamlFilesHelper.writeModule(buildUtils.pamKieserver(), buildUtils.pamKieserverFile());
+                            yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
                         }
                     });
-                    buildUtils.pamKieserver().getArtifacts().forEach(artifact -> {
+                    pamKieserver.getArtifacts().forEach(artifact -> {
                         String kieServerFileName = String.format(buildUtils.RHPAM_KIE_SERVER_EE8_NIGHTLY_ZIP, version, buildDate);
                         if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
                             kieServerFileName = String.format("rhpam-%s.PAM-redhat-%s-kie-server-ee8.zip", version, buildDate);
@@ -268,7 +277,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                         kieServerCheckSum));
 
                                 artifact.setMd5(kieServerCheckSum);
-                                yamlFilesHelper.writeModule(buildUtils.pamKieserver(), buildUtils.pamKieserverFile());
+                                yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -289,7 +298,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                         bcCheckSum));
 
                                 artifact.setMd5(bcCheckSum);
-                                yamlFilesHelper.writeModule(buildUtils.pamKieserver(), buildUtils.pamKieserverFile());
+                                yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
 
                                 // Only add comments when the last write operation will be made.
                                 // find name: "rhpam_business_central_distribution.zip"
@@ -319,7 +328,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     });
 
                     // Prepare smartrouter changes
-                    buildUtils.smartrouter().getArtifacts().forEach(artifact -> {
+                    smartrouter.getArtifacts().forEach(artifact -> {
                         if (artifact.getName().equals(buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP)) {
                             String smartrouterFileName = String.format(buildUtils.RHPAM_ADD_ONS_NIGHTLY_ZIP, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
@@ -335,7 +344,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                         smartrouterCheckSum));
 
                                 artifact.setMd5(smartrouterCheckSum);
-                                yamlFilesHelper.writeModule(buildUtils.smartrouter(), buildUtils.smartrouterFile());
+                                yamlFilesHelper.writeModule(smartrouter, buildUtils.smartrouterFile());
 
                                 // find name: "rhpam_add_ons_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
@@ -350,7 +359,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     });
 
                     // Prepare process-migration changes
-                    buildUtils.processMigration().getArtifacts().forEach(artifact -> {
+                    processMigration.getArtifacts().forEach(artifact -> {
                         if (artifact.getName().equals(buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP)) {
                             String processMigrationFileName = String.format(buildUtils.RHPAM_ADD_ONS_NIGHTLY_ZIP, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
@@ -366,7 +375,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                         processMigrationCheckSum));
 
                                 artifact.setMd5(processMigrationCheckSum);
-                                yamlFilesHelper.writeModule(buildUtils.processMigration(), buildUtils.processMigrationFile());
+                                yamlFilesHelper.writeModule(processMigration, buildUtils.processMigrationFile());
 
                                 // find name: "rhpam_add_ons_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
@@ -411,8 +420,12 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
 
                     gitRepository.handleBranch(BranchOperation.NEW_BRANCH, branchName, baseBranch, "rhdm-7-image");
 
+                    Module dmController = yamlFilesHelper.load(buildUtils.dmControllerFile());
+                    Module decisionCentral = yamlFilesHelper.load(buildUtils.decisionCentralFile());
+                    Module dmKieserver = yamlFilesHelper.load(buildUtils.dmKieserverFile());
+
                     // Prepare controller Changes - artifacts
-                    buildUtils.dmController().getArtifacts().forEach(artifact -> {
+                    dmController.getArtifacts().forEach(artifact -> {
                         if (artifact.getName().equals(buildUtils.RHDM_ADD_ONS_DISTRIBUTION_ZIP)) {
                             String controllerFileName = String.format(buildUtils.RHDM_ADD_ONS_NIGHTLY_ZIP, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
@@ -428,7 +441,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                         controllerCheckSum));
 
                                 artifact.setMd5(controllerCheckSum);
-                                yamlFilesHelper.writeModule(buildUtils.dmController(), buildUtils.dmControllerFile());
+                                yamlFilesHelper.writeModule(dmController, buildUtils.dmControllerFile());
 
                                 // find name: "rhdm_add_ons_distribution.zip"
                                 // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-add-ons.zip
@@ -441,7 +454,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                         }
                     });
                     // Prepare controller changes - envs
-                    buildUtils.dmController().getEnvs().forEach(env -> {
+                    dmController.getEnvs().forEach(env -> {
                         if (env.getName().equals("CONTROLLER_DISTRIBUTION_ZIP")) {
                             // rhdm-${shortenedVersion}-controller-ee7.zip
                             String controllerEE7Zip = String.format("rhdm-%s-controller-ee7.zip", cacherProperties.shortenedVersion(version.toString()));
@@ -453,7 +466,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     });
 
                     // Prepare Decision Central changes
-                    buildUtils.decisionCentral().getArtifacts().forEach(artifact -> {
+                    decisionCentral.getArtifacts().forEach(artifact -> {
                         if (artifact.getName().equals(buildUtils.RHDM_DECISION_CENTRAL_DISTRIBUTION_ZIP)) {
                             String decisionCentralFileName = String.format(buildUtils.RHDM_DECISION_CENTRAL_EAP7_DEPLOYABLE_NIGHTLY_ZIP, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
@@ -468,7 +481,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                         decisionCentralCheckSum));
 
                                 artifact.setMd5(decisionCentralCheckSum);
-                                yamlFilesHelper.writeModule(buildUtils.decisionCentral(), buildUtils.decisionCentralFile());
+                                yamlFilesHelper.writeModule(decisionCentral, buildUtils.decisionCentralFile());
 
                                 // find name: "rhdm_decision_central_distribution.zip"
                                 // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-decision-central-eap7-deployable.zip
@@ -482,7 +495,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     });
 
                     // Prepare kieserver changes
-                    buildUtils.dmKieserver().getArtifacts().forEach(artifact -> {
+                    dmKieserver.getArtifacts().forEach(artifact -> {
                         if (artifact.getName().equals(buildUtils.RHDM_KIE_SERVER_DISTRIBUTION_ZIP)) {
                             String kieserverFileName = String.format(buildUtils.RHDM_KIE_SERVER_EE8_NIGHTLY_ZIP, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
@@ -498,7 +511,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                         kieserverCheckSum));
 
                                 artifact.setMd5(kieserverCheckSum);
-                                yamlFilesHelper.writeModule(buildUtils.dmKieserver(), buildUtils.dmKieserverFile());
+                                yamlFilesHelper.writeModule(dmKieserver, buildUtils.dmKieserverFile());
 
                                 // find name: "rhdm_kie_server_distribution.zip"
                                 // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-kie-server-ee8.zip

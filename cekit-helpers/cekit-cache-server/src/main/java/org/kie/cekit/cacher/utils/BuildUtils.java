@@ -58,82 +58,50 @@ public class BuildUtils {
     CacherProperties cacherProperties;
 
     @Inject
-    YamlFilesHelper yamlFilesHelper;
-
-    @Inject
     CacherUtils cacherUtils;
 
     // RHPAM artifact files, shared between nightly and CR builds
     public String bcMonitoringFile() {
         return cacherProperties.getGitDir() + "/rhpam-7-image/businesscentral-monitoring/modules/businesscentral-monitoring/module.yaml";
     }
-    public Module bcMonitoring() {
-        return yamlFilesHelper.load(bcMonitoringFile());
-    }
 
     public String businessCentralFile() {
         return cacherProperties.getGitDir() + "/rhpam-7-image/businesscentral/modules/businesscentral/module.yaml";
-    }
-    public Module businessCentral() {
-        return yamlFilesHelper.load(businessCentralFile());
     }
 
     public String pamControllerFile() {
         return cacherProperties.getGitDir() + "/rhpam-7-image/controller/modules/controller/module.yaml";
     }
-    public Module pamController() {
-        return yamlFilesHelper.load(pamControllerFile());
-    }
 
     public String dashbuilderFile() {
         return cacherProperties.getGitDir() + "/rhpam-7-image/dashbuilder/modules/dashbuilder/module.yaml";
-    }
-    public Module dashbuilder() {
-        return yamlFilesHelper.load(dashbuilderFile());
     }
 
     public String pamKieserverFile() {
         return cacherProperties.getGitDir() + "/rhpam-7-image/kieserver/modules/kieserver/module.yaml";
     }
-    public Module pamKieserver() {
-        return yamlFilesHelper.load(pamKieserverFile());
-    }
 
     public String smartrouterFile() {
         return cacherProperties.getGitDir() + "/rhpam-7-image/smartrouter/modules/smartrouter/module.yaml";
     }
-    public Module smartrouter() {
-        return yamlFilesHelper.load(smartrouterFile());
-    }
 
     public String processMigrationFile() {
         return cacherProperties.getGitDir() + "/rhpam-7-image/process-migration/modules/process-migration/module.yaml";
-    }
-    public Module processMigration() {
-        return yamlFilesHelper.load(processMigrationFile());
     }
 
     // RHDM artifact files. Share between nightly and CR builds
     public String dmControllerFile() {
         return cacherProperties.getGitDir() + "/rhdm-7-image/controller/modules/controller/module.yaml";
     }
-    public Module dmController() {
-        return yamlFilesHelper.load(dmControllerFile());
-    }
 
     public String decisionCentralFile() {
          return cacherProperties.getGitDir() + "/rhdm-7-image/decisioncentral/modules/decisioncentral/module.yaml";
-    }
-    public Module decisionCentral() {
-        return yamlFilesHelper.load(decisionCentralFile());
     }
 
     public String dmKieserverFile() {
         return cacherProperties.getGitDir() + "/rhdm-7-image/kieserver/modules/kieserver/module.yaml";
     }
-    public Module dmKieserver() {
-        return yamlFilesHelper.load(dmKieserverFile());
-    }
+
 
     /**
      * Extract the jar version from busineses central zip file.
