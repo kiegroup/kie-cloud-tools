@@ -13,6 +13,7 @@ import org.kie.cekit.image.descriptors.module.Module;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -55,8 +56,15 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
     @Override
     public void onNewBuildReceived(PlainArtifact artifact, boolean force) {
         try {
-            LocalDate upstreamBuildDate = LocalDate.parse(gitRepository.getCurrentProductBuildDate(artifact.getBranch(), force), cacherProperties.formatter);
-            LocalDate buildDate = LocalDate.parse(artifact.getBuildDate(), cacherProperties.formatter);
+            Version version = buildUtils.getVersion(artifact.getVersion().split("[.]"));
+            String bDate = gitRepository.getCurrentProductBuildDate(artifact.getBranch(), force);
+
+            // for upstream compare the build date size to make sure the correct formatter is being used
+            LocalDate upstreamBuildDate = LocalDate.parse(
+                    bDate,
+                    buildUtils.formatter(bDate));
+
+            LocalDate buildDate = LocalDate.parse(artifact.getBuildDate(), buildUtils.formatter(version));
 
             if (buildDate.isAfter(upstreamBuildDate) || force) {
                 log.fine("File " + artifact.getFileName() + " received for PR.");
@@ -118,9 +126,9 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 bcMonitoringCheckSum = elements.get(bcMonitoringFileName).getChecksum();
 
                                 log.fine(String.format("Updating BC monitoring %s from [%s] to [%s]",
-                                        buildUtils.RHPAM_BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP,
-                                        artifact.getMd5(),
-                                        bcMonitoringCheckSum));
+                                                       buildUtils.RHPAM_BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP,
+                                                       artifact.getMd5(),
+                                                       bcMonitoringCheckSum));
 
                                 artifact.setMd5(bcMonitoringCheckSum);
                                 yamlFilesHelper.writeModule(bcMonitoring, buildUtils.bcMonitoringFile());
@@ -129,7 +137,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // and add comment on next line : rhpam-${version}.redhat-${buildDate}-monitoring-ee7.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-monitoring-ee7.zip depending on PAM version
                                 buildUtils.reAddComment(buildUtils.bcMonitoringFile(), "name: \"" + buildUtils.RHPAM_BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP + "\"",
-                                        String.format("  # %s", bcMonitoringFileName));
+                                                        String.format("  # %s", bcMonitoringFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -148,9 +156,9 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 bcCheckSum = elements.get(bcFileName).getChecksum();
 
                                 log.fine(String.format("Updating Business Central %s from [%s] to [%s]",
-                                        buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP,
-                                        artifact.getMd5(),
-                                        bcCheckSum));
+                                                       buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP,
+                                                       artifact.getMd5(),
+                                                       bcCheckSum));
 
                                 artifact.setMd5(bcCheckSum);
                                 yamlFilesHelper.writeModule(businessCentral, buildUtils.businessCentralFile());
@@ -159,7 +167,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // and add comment on next line : rhpam-${version}.redhat-${buildDate}-business-central-eap7-deployable.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-business-central-eap7-deployable.zip depending on PAM version
                                 buildUtils.reAddComment(buildUtils.businessCentralFile(), "name: \"" + buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP + "\"",
-                                        String.format("  # %s", bcFileName));
+                                                        String.format("  # %s", bcFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -178,9 +186,9 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 controllerCheckSum = elements.get(controllerFileName).getChecksum();
 
                                 log.fine(String.format("Updating RHPAM Controller %s from [%s] to [%s]",
-                                        buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
-                                        artifact.getMd5(),
-                                        controllerCheckSum));
+                                                       buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
+                                                       artifact.getMd5(),
+                                                       controllerCheckSum));
 
                                 artifact.setMd5(controllerCheckSum);
                                 yamlFilesHelper.writeModule(pamController, buildUtils.pamControllerFile());
@@ -189,7 +197,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
                                 buildUtils.reAddComment(buildUtils.pamControllerFile(), "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
-                                        String.format("  # %s", controllerFileName));
+                                                        String.format("  # %s", controllerFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -219,9 +227,9 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 String dashbuilderCheckSum = elements.get(dashbuilderAddOnsFileName).getChecksum();
 
                                 log.fine(String.format("Updating RHPAM Dashbuilder %s from [%s] to [%s]",
-                                        buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
-                                        artifact.getMd5(),
-                                        dashbuilderCheckSum));
+                                                       buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
+                                                       artifact.getMd5(),
+                                                       dashbuilderCheckSum));
 
                                 artifact.setMd5(dashbuilderCheckSum);
                                 yamlFilesHelper.writeModule(dashbuilder, buildUtils.dashbuilderFile());
@@ -230,7 +238,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
                                 buildUtils.reAddComment(buildUtils.dashbuilderFile(), "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
-                                        String.format("  # %s", dashbuilderAddOnsFileName));
+                                                        String.format("  # %s", dashbuilderAddOnsFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -272,9 +280,9 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 kieServerCheckSum = elements.get(kieServerFileName).getChecksum();
 
                                 log.fine(String.format("Updating RHPAM kieserver %s from [%s] to [%s]",
-                                        buildUtils.RHPAM_KIE_SERVER_DISTRIBUTION_ZIP,
-                                        artifact.getMd5(),
-                                        kieServerCheckSum));
+                                                       buildUtils.RHPAM_KIE_SERVER_DISTRIBUTION_ZIP,
+                                                       artifact.getMd5(),
+                                                       kieServerCheckSum));
 
                                 artifact.setMd5(kieServerCheckSum);
                                 yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
@@ -293,9 +301,9 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 bcCheckSum = elements.get(bcFileName).getChecksum();
 
                                 log.fine(String.format("Updating RHPAM kieserver %s from [%s] to [%s]",
-                                        buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP,
-                                        artifact.getMd5(),
-                                        bcCheckSum));
+                                                       buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP,
+                                                       artifact.getMd5(),
+                                                       bcCheckSum));
 
                                 artifact.setMd5(bcCheckSum);
                                 yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
@@ -305,13 +313,13 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-business-central-eap7-deployable.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-business-central-eap7-deployable.zip depending on PAM version
                                 buildUtils.reAddComment(buildUtils.pamKieserverFile(), "name: \"" + buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP + "\"",
-                                        String.format("  # %s", bcFileName));
+                                                        String.format("  # %s", bcFileName));
 
                                 // find name: "rhpam_kie_server_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.PAM-redhat-${buildDate}-kie-server-ee8.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-kie-server-ee8.zip depending on PAM version
                                 buildUtils.reAddComment(buildUtils.pamKieserverFile(), "name: \"" + buildUtils.RHPAM_KIE_SERVER_DISTRIBUTION_ZIP + "\"",
-                                        String.format("  # %s", kieServerFileName));
+                                                        String.format("  # %s", kieServerFileName));
 
                                 // find name: "slf4j-simple.jar"
                                 // and add comment on next line :  slf4j-simple-1.7.22.redhat-2.jar
@@ -320,7 +328,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // find value: "jbpm-wb-kie-server-backend-${version}.redhat-X.jar"
                                 // and add comment on next line : # remember to also update "JBPM_WB_KIE_SERVER_BACKEND_JAR" value
                                 buildUtils.reAddComment(buildUtils.pamKieserverFile(), String.format("  value: \"%s\"", backendFileName),
-                                        "# remember to also update \"JBPM_WB_KIE_SERVER_BACKEND_JAR\" value");
+                                                        "# remember to also update \"JBPM_WB_KIE_SERVER_BACKEND_JAR\" value");
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -339,9 +347,9 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 smartrouterCheckSum = elements.get(smartrouterFileName).getChecksum();
 
                                 log.fine(String.format("Updating RHPAM smartrouter %s from [%s] to [%s]",
-                                        buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
-                                        artifact.getMd5(),
-                                        smartrouterCheckSum));
+                                                       buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
+                                                       artifact.getMd5(),
+                                                       smartrouterCheckSum));
 
                                 artifact.setMd5(smartrouterCheckSum);
                                 yamlFilesHelper.writeModule(smartrouter, buildUtils.smartrouterFile());
@@ -351,7 +359,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip
                                 // depending on PAM version
                                 buildUtils.reAddComment(buildUtils.smartrouterFile(), "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
-                                        String.format("  # %s", smartrouterFileName));
+                                                        String.format("  # %s", smartrouterFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -370,9 +378,9 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 processMigrationCheckSum = elements.get(processMigrationFileName).getChecksum();
 
                                 log.fine(String.format("Updating RHPAM process-migration %s from [%s] to [%s]",
-                                        buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
-                                        artifact.getMd5(),
-                                        processMigrationCheckSum));
+                                                       buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
+                                                       artifact.getMd5(),
+                                                       processMigrationCheckSum));
 
                                 artifact.setMd5(processMigrationCheckSum);
                                 yamlFilesHelper.writeModule(processMigration, buildUtils.processMigrationFile());
@@ -381,7 +389,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
                                 buildUtils.reAddComment(buildUtils.processMigrationFile(), "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
-                                        String.format("  # %s", processMigrationFileName));
+                                                        String.format("  # %s", processMigrationFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -436,9 +444,9 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 controllerCheckSum = elements.get(controllerFileName).getChecksum();
 
                                 log.fine(String.format("Updating RHDM Controller %s from [%s] to [%s]",
-                                        buildUtils.RHDM_ADD_ONS_DISTRIBUTION_ZIP,
-                                        artifact.getMd5(),
-                                        controllerCheckSum));
+                                                       buildUtils.RHDM_ADD_ONS_DISTRIBUTION_ZIP,
+                                                       artifact.getMd5(),
+                                                       controllerCheckSum));
 
                                 artifact.setMd5(controllerCheckSum);
                                 yamlFilesHelper.writeModule(dmController, buildUtils.dmControllerFile());
@@ -447,7 +455,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-add-ons.zip
                                 // or rhdm-${version}.DM-redhat-${buildDate}-add-ons.zip depending on DM version
                                 buildUtils.reAddComment(buildUtils.dmControllerFile(), "name: \"" + buildUtils.RHDM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
-                                        String.format("  # %s", controllerFileName));
+                                                        String.format("  # %s", controllerFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -476,9 +484,9 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 String decisionCentralCheckSum = elements.get(decisionCentralFileName).getChecksum();
 
                                 log.fine(String.format("Updating RHDM Decision Central %s from [%s] to [%s]",
-                                        buildUtils.RHDM_DECISION_CENTRAL_DISTRIBUTION_ZIP,
-                                        artifact.getMd5(),
-                                        decisionCentralCheckSum));
+                                                       buildUtils.RHDM_DECISION_CENTRAL_DISTRIBUTION_ZIP,
+                                                       artifact.getMd5(),
+                                                       decisionCentralCheckSum));
 
                                 artifact.setMd5(decisionCentralCheckSum);
                                 yamlFilesHelper.writeModule(decisionCentral, buildUtils.decisionCentralFile());
@@ -487,7 +495,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-decision-central-eap7-deployable.zip
                                 // or rhdm-${version}.DM-redhat-${buildDate}-decision-central-eap7-deployable.zip depending on DM version
                                 buildUtils.reAddComment(buildUtils.decisionCentralFile(), "name: \"" + buildUtils.RHDM_DECISION_CENTRAL_DISTRIBUTION_ZIP + "\"",
-                                        String.format("  # %s", decisionCentralFileName));
+                                                        String.format("  # %s", decisionCentralFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -506,9 +514,9 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 kieserverCheckSum = elements.get(kieserverFileName).getChecksum();
 
                                 log.fine(String.format("Updating RHDM KieServer %s from [%s] to [%s]",
-                                        buildUtils.RHDM_KIE_SERVER_DISTRIBUTION_ZIP,
-                                        artifact.getMd5(),
-                                        kieserverCheckSum));
+                                                       buildUtils.RHDM_KIE_SERVER_DISTRIBUTION_ZIP,
+                                                       artifact.getMd5(),
+                                                       kieserverCheckSum));
 
                                 artifact.setMd5(kieserverCheckSum);
                                 yamlFilesHelper.writeModule(dmKieserver, buildUtils.dmKieserverFile());
@@ -517,7 +525,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-kie-server-ee8.zip
                                 // or rhdm-${version}.DM-redhat-${buildDate}-kie-server-ee8.zip depending on DM version
                                 buildUtils.reAddComment(buildUtils.dmKieserverFile(), "name: \"" + buildUtils.RHDM_KIE_SERVER_DISTRIBUTION_ZIP + "\"",
-                                        String.format("  # %s", kieserverFileName));
+                                                        String.format("  # %s", kieserverFileName));
 
                                 // find name: "slf4j-simple.jar"
                                 // and add comment on next line :  slf4j-simple-1.7.22.redhat-2.jar
@@ -547,7 +555,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     removeItems("rhdm");
                 }
             } else {
-                log.info("File " + fileName + " not found on the elements map. ignoring...");
+                log.info("File " + fileName + " not found on the nightly build elements map. ignoring...");
             }
         } catch (final Exception e) {
             e.printStackTrace();
@@ -565,5 +573,4 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
     public Map<String, PlainArtifact> getElements() {
         return elements;
     }
-
 }

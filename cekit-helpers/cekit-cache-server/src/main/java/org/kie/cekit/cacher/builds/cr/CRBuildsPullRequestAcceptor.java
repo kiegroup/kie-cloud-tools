@@ -421,7 +421,7 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
                 }
 
             } else {
-                log.info("File " + fileName + " not found on the elements map. ignoring...");
+                log.info("File " + fileName + " not found on the cr build elements map. ignoring...");
             }
 
         } catch (

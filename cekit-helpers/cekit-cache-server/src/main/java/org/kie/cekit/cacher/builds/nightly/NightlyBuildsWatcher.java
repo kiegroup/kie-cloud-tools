@@ -3,11 +3,13 @@ package org.kie.cekit.cacher.builds.nightly;
 import io.quarkus.scheduler.Scheduled;
 import org.kie.cekit.cacher.objects.PlainArtifact;
 import org.kie.cekit.cacher.properties.CacherProperties;
+import org.kie.cekit.cacher.utils.BuildUtils;
 import org.kie.cekit.cacher.utils.CacherUtils;
 import org.kie.cekit.cacher.utils.UrlUtils;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -25,6 +27,9 @@ public class NightlyBuildsWatcher {
 
     @Inject
     CacherUtils cacherUtils;
+
+    @Inject
+    BuildUtils builderUtils;
 
     @Inject
     CacherProperties cacherProperties;
@@ -66,8 +71,8 @@ public class NightlyBuildsWatcher {
      * Otherwise, if the buildDate is older than the new files, the Pull Request process will start as soon all
      * needed files are persisted on the filesystem.
      *
-     * @param version target version
-     * @param branch target branch
+     * @param version   target version
+     * @param branch    target branch
      * @param buildDate new build date
      */
     private void tryBuildDate(Optional<String> version, Optional<String> branch, Optional<String> buildDate, boolean force) {
@@ -77,60 +82,70 @@ public class NightlyBuildsWatcher {
             int rhpamCounter = 0;
             int rhdmCounter = 0;
 
-
             if (buildDate.isPresent()) {
 
                 log.fine(String.format("new manual build tried, params: branch-> %s, version-> %s, buildDate-> %s",
-                        normalizedBranch, normalizedVersion, buildDate.get()));
+                                       normalizedBranch, normalizedVersion, buildDate.get()));
 
                 //Properties rhpamProp, String buildDate, String version, String branch
                 rhpamNightlyBuildDownloader(cacherProperties.productPropertyFile(
                         String.format(cacherProperties.rhpamUrl(), normalizedVersion, buildDate.get())),
-                        buildDate.get(),
-                        normalizedVersion,
-                        normalizedBranch,
-                        force);
+                                            buildDate.get(),
+                                            normalizedVersion,
+                                            normalizedBranch,
+                                            force);
                 rhdmNightlyBuildDownloader(cacherProperties.productPropertyFile(
                         String.format(cacherProperties.rhdmUrl(), normalizedVersion, buildDate.get())),
-                        buildDate.get(),
-                        normalizedVersion,
-                        normalizedBranch,
-                        force);
-
+                                           buildDate.get(),
+                                           normalizedVersion,
+                                           normalizedBranch,
+                                           force);
             } else {
 
                 while (rhpamCounter < 4) {
-                    Properties rhpamProps = cacherProperties.productPropertyFile(String.format(cacherProperties.rhpamUrl(),
-                            cacherProperties.version(), LocalDate.now().minusDays(rhpamCounter).format(cacherProperties.formatter)));
+                    Properties rhpamProps = cacherProperties.productPropertyFile(
+                            String.format(cacherProperties.rhpamUrl(),
+                                          cacherProperties.version(),
+                                          LocalDate.now().minusDays(rhpamCounter).format(
+                                                  builderUtils.formatter(cacherProperties.getFormattedVersion()))));
+
                     if (rhpamProps != null && rhpamProps.size() > 0) {
                         rhpamNightlyBuildDownloader(rhpamProps,
-                                LocalDate.now().minusDays(rhpamCounter).format(cacherProperties.formatter),
-                                normalizedVersion,
-                                normalizedBranch,
-                                force);
-                        log.info("RHPAM - Nightly build found, latest is " + LocalDate.now().minusDays(rhpamCounter).format(cacherProperties.formatter));
+                                                    LocalDate.now().minusDays(rhpamCounter).format(
+                                                            builderUtils.formatter(cacherProperties.getFormattedVersion())),
+                                                    normalizedVersion,
+                                                    normalizedBranch,
+                                                    force);
+                        log.info("RHPAM - Nightly build found, latest is " +
+                                         LocalDate.now().minusDays(rhpamCounter).format
+                                                 (builderUtils.formatter(cacherProperties.getFormattedVersion())));
                         break;
                     }
                     rhpamCounter++;
                 }
 
                 while (rhdmCounter < 4) {
-                    Properties rhdmProps = cacherProperties.productPropertyFile(String.format(cacherProperties.rhdmUrl(),
-                            cacherProperties.version(), LocalDate.now().minusDays(rhdmCounter).format(cacherProperties.formatter)));
+                    Properties rhdmProps = cacherProperties.productPropertyFile(
+                            String.format(cacherProperties.rhdmUrl(),
+                                          cacherProperties.version(),
+                                          LocalDate.now().minusDays(rhdmCounter).format(
+                                                  builderUtils.formatter(cacherProperties.getFormattedVersion()))));
 
                     if (rhdmProps != null && rhdmProps.size() > 0) {
                         rhdmNightlyBuildDownloader(rhdmProps,
-                                LocalDate.now().minusDays(rhdmCounter).format(cacherProperties.formatter),
-                                normalizedVersion,
-                                normalizedBranch,
-                                force);
-                        log.info("RHDM - Nightly build found, latest is " + LocalDate.now().minusDays(rhdmCounter).format(cacherProperties.formatter));
+                                                   LocalDate.now().minusDays(rhdmCounter).format(
+                                                           builderUtils.formatter(cacherProperties.getFormattedVersion())),
+                                                   normalizedVersion,
+                                                   normalizedBranch,
+                                                   force);
+                        log.info("RHDM - Nightly build found, latest is " +
+                                         LocalDate.now().minusDays(rhdmCounter).format(
+                                                 builderUtils.formatter(cacherProperties.getFormattedVersion())));
                         break;
                     }
                     rhdmCounter++;
                 }
             }
-
         } else {
             log.info("Watcher disabled.");
         }
@@ -150,12 +165,12 @@ public class NightlyBuildsWatcher {
             if (!cacherUtils.fileExistsByNameExcludeTmp(UrlUtils.getFileName(rhpamProp.get(file).toString()))) {
                 // Notify the git consumer that a new file is being downloaded.
                 buildCallback.onNewBuildReceived(new PlainArtifact(UrlUtils.getFileName(rhpamProp.get(file).toString()),
-                        "",
-                        "",
-                        buildDate,
-                        version,
-                        branch,
-                        0), force);
+                                                                   "",
+                                                                   "",
+                                                                   buildDate,
+                                                                   version,
+                                                                   branch,
+                                                                   0), force);
                 new Thread(() -> log.info(cacherUtils.fetchFile(rhpamProp.get(file).toString(), Optional.of("nightly"), 0))).start();
             }
         });
@@ -175,15 +190,14 @@ public class NightlyBuildsWatcher {
             if (!cacherUtils.fileExistsByNameExcludeTmp(UrlUtils.getFileName(rhdmProp.get(file).toString()))) {
                 // Notify the git consumer that a new file is being downloaded.
                 buildCallback.onNewBuildReceived(new PlainArtifact(UrlUtils.getFileName(rhdmProp.get(file).toString()),
-                        "",
-                        "",
-                        buildDate,
-                        version,
-                        branch,
-                        0), force);
+                                                                   "",
+                                                                   "",
+                                                                   buildDate,
+                                                                   version,
+                                                                   branch,
+                                                                   0), force);
                 new Thread(() -> log.info(cacherUtils.fetchFile(rhdmProp.get(file).toString(), Optional.of("nightly"), 0))).start();
             }
         });
     }
-
 }

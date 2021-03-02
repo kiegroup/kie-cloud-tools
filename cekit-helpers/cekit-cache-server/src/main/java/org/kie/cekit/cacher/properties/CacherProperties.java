@@ -7,6 +7,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.kie.cekit.cacher.exception.RequiredParameterMissingException;
 import org.kie.cekit.cacher.properties.loader.CacherProperty;
+import org.kie.cekit.cacher.utils.BuildUtils;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -27,10 +28,13 @@ import java.util.regex.Pattern;
 public class CacherProperties {
 
     private Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
-    public final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-    public final Pattern buildDatePattern = Pattern.compile("(\\d{8})");
+
     public final Version versionBeforeDMPAMPrefix = new Version(7, 8, 0, null, null, null);
     public final Version pam710 = new Version(7, 10, 0, null, null, null);
+    public final Version pam711 = new Version(7, 11, 0, null, null, null);
+
+    @Inject
+    BuildUtils buildUtils;
 
     @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.base.dir", required = true)
@@ -255,6 +259,11 @@ public class CacherProperties {
      */
     public String version() {
         return version;
+    }
+
+    public Version getFormattedVersion() {
+        Version fVersion = buildUtils.getVersion(version.split("[.]"));
+        return fVersion;
     }
 
     /**

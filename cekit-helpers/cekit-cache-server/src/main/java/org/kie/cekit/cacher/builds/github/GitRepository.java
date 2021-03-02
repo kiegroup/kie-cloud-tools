@@ -1,12 +1,5 @@
 package org.kie.cekit.cacher.builds.github;
 
-import com.fasterxml.jackson.core.Version;
-import io.quarkus.scheduler.Scheduled;
-import org.kie.cekit.cacher.builds.yaml.YamlFilesHelper;
-import org.kie.cekit.cacher.properties.CacherProperties;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -20,6 +13,15 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import com.fasterxml.jackson.core.Version;
+import io.quarkus.scheduler.Scheduled;
+import org.kie.cekit.cacher.builds.yaml.YamlFilesHelper;
+import org.kie.cekit.cacher.properties.CacherProperties;
+import org.kie.cekit.cacher.utils.BuildUtils;
 
 /**
  * Holds all Git operations
@@ -36,6 +38,9 @@ public class GitRepository {
 
     @Inject
     CacherProperties cacherProperties;
+
+    @Inject
+    BuildUtils buildUtils;
 
     /**
      * Take care of the git repositories.
@@ -135,9 +140,7 @@ public class GitRepository {
      */
     public String getCurrentProductBuildDate(String branch, boolean force) throws IOException, InterruptedException {
 
-        String v[] = cacherProperties.version().split("[.]");
-        Version version = new Version(Integer.parseInt(v[0]), Integer.parseInt(v[1]),
-                Integer.parseInt(v[2]), null, null, null);
+        Version version = cacherProperties.getFormattedVersion();
 
         // rebase before
         forceRebase = false;
@@ -170,8 +173,19 @@ public class GitRepository {
                 .filter(line -> line.contains(finalRhpamFilter))
                 .findFirst().get();
 
-        Matcher rhdmMatcher = cacherProperties.buildDatePattern.matcher(rhdmKieServerDateBuild);
-        Matcher rhpamMatcher = cacherProperties.buildDatePattern.matcher(rhpamKieServerDateBuild);
+        Matcher rhdmMatcher;
+        Matcher rhpamMatcher;
+
+        try {
+            log.fine("version is < 7.11, using legacy date pattern 'd{8}'" + rhdmKieServerDateBuild);
+            rhdmMatcher = buildUtils.legacyBuildDatePattern.matcher(rhdmKieServerDateBuild);
+            rhpamMatcher = buildUtils.legacyBuildDatePattern.matcher(rhpamKieServerDateBuild);
+        } catch (IllegalStateException e) {
+            log.fine("version is >= 7.11, using date pattern 'd{6}'" + rhdmKieServerDateBuild);
+            rhdmMatcher = buildUtils.buildDatePattern.matcher(rhdmKieServerDateBuild);
+            rhpamMatcher = buildUtils.buildDatePattern.matcher(rhpamKieServerDateBuild);
+        }
+
         if (rhdmMatcher.find() && rhpamMatcher.find()) {
             log.fine("Matchers found... Proceeding with the groups validation...");
             log.fine("rhdmMatcher group " + rhdmMatcher.group() + " rhpamMatcher group " + rhpamMatcher.group());

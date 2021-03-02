@@ -8,15 +8,18 @@ import org.kie.cekit.image.descriptors.module.Module;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,6 +27,11 @@ import java.util.stream.Stream;
 public class BuildUtils {
 
     private final Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
+
+    public final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
+    public final DateTimeFormatter legacyFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+    public final Pattern buildDatePattern =  Pattern.compile("(\\d{6})");
+    public final Pattern legacyBuildDatePattern = Pattern.compile("(\\d{8})");
 
     // artifacts and zip file names used on Nightly and CR builds
     public String RHDM_ADD_ONS_DISTRIBUTION_ZIP = "rhdm_add_ons_distribution.zip";
@@ -46,7 +54,7 @@ public class BuildUtils {
     public String RHPAM_BUSINESS_CENTRAL_EAP7_DEPLOYABLE_NIGHTLY_ZIP = "rhpam-%s.redhat-%s-business-central-eap7-deployable.zip";
     public String RHPAM_BUSINESS_CENTRAL_EAP7_DEPLOYABLE_ZIP = "rhpam-%s-business-central-eap7-deployable.zip";
 
-    public String RHPAM_ADD_ONS_DISTRIBUTION_ZIP =  "rhpam_add_ons_distribution.zip";
+    public String RHPAM_ADD_ONS_DISTRIBUTION_ZIP = "rhpam_add_ons_distribution.zip";
     public String RHPAM_ADD_ONS_NIGHTLY_ZIP = "rhpam-%s.redhat-%s-add-ons.zip";
     public String RHPAM_ADD_ONS_ZIP = "rhpam-%s-add-ons.zip";
 
@@ -95,19 +103,18 @@ public class BuildUtils {
     }
 
     public String decisionCentralFile() {
-         return cacherProperties.getGitDir() + "/rhdm-7-image/decisioncentral/modules/decisioncentral/module.yaml";
+        return cacherProperties.getGitDir() + "/rhdm-7-image/decisioncentral/modules/decisioncentral/module.yaml";
     }
 
     public String dmKieserverFile() {
         return cacherProperties.getGitDir() + "/rhdm-7-image/kieserver/modules/kieserver/module.yaml";
     }
 
-
     /**
      * Extract the jar version from busineses central zip file.
      *
      * @param jbpmWbKieServerBackendSourceFile source file from where the jar will be extracted from
-     * @param buildDate for nightly builds
+     * @param buildDate                        for nightly builds
      * @return jbpm-wb-kie-server-backend version
      */
     public String getJbpmWbKieBackendVersion(String jbpmWbKieServerBackendSourceFile, Optional<String> buildDate) {
@@ -118,10 +125,9 @@ public class BuildUtils {
         if (buildDate.isPresent()) {
             //nightly build
             return String.format("jbpm-wb-kie-server-backend-%s.redhat-%s.jar", jbpmWbKieServerBackendVersion, buildDate.get());
-
         } else {
-           // CR builds
-           return  String.format("jbpm-wb-kie-server-backend-%s.jar", jbpmWbKieServerBackendVersion);
+            // CR builds
+            return String.format("jbpm-wb-kie-server-backend-%s.jar", jbpmWbKieServerBackendVersion);
         }
     }
 
@@ -169,21 +175,22 @@ public class BuildUtils {
 
     /**
      * parses string version to {@link Version}
+     *
      * @param v String array with version
      * @return {@link Version}
      */
     public Version getVersion(String[] v) {
         log.fine("Trying to parse the version " + Arrays.deepToString(v));
         return new Version(Integer.parseInt(v[0]), Integer.parseInt(v[1]),
-                Integer.parseInt(v[2]), null,null, null);
+                           Integer.parseInt(v[2]), null, null, null);
     }
 
     /**
      * Re-add comments on the module.yaml file.
      *
-     * @param fileName file name
+     * @param fileName    file name
      * @param linePattern patter to search
-     * @param comment comment that should be added
+     * @param comment     comment that should be added
      */
     public void reAddComment(String fileName, String linePattern, String comment) {
         try (Stream<String> lines = Files.lines(Paths.get(fileName))) {
@@ -194,4 +201,37 @@ public class BuildUtils {
             e.printStackTrace();
         }
     }
+
+    /**
+     * returns the right build date formatter according the target version.
+     *
+     * @param version
+     * @return DateTimeFormatter
+     */
+    public DateTimeFormatter formatter(Version version) {
+        // build date for nightly build has changed from yyyyDDmm to yyDDmm on pam >= 7.11.0
+        if (version.compareTo(cacherProperties.pam711) >= 0) {
+            log.fine("version is >= 7.11, returning date formatter 'yyMMdd'");
+            return formatter;
+        }
+        log.fine("version is < 7.11, returning date formatter 'yyyyMMdd'");
+        return legacyFormatter;
+    }
+
+
+    /**
+     * returns the right build date formatter according the target current build date.
+     *
+     * @param bdate - current build date
+     * @return DateTimeFormatter
+     */
+    public DateTimeFormatter formatter(String bdate) {
+        if (bdate.length() == 6) {
+            log.fine("version is >= 7.11, returning date formatter 'yyMMdd'");
+            return formatter;
+        }
+        log.fine("version is < 7.11, returning date formatter 'yyyyMMdd'");
+        return legacyFormatter;
+    }
+
 }

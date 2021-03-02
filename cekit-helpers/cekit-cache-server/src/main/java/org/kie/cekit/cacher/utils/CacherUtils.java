@@ -52,10 +52,14 @@ public class CacherUtils {
     CacherProperties cacherProperties;
 
     @Inject
+    BuildUtils buildUtils;
+
+    @Inject
     NightlyBuildUpdatesInterceptor nightlyBuildUpdatesInterceptor;
 
     @Inject
     CRBuildInterceptor crBuildInterceptor;
+
 
     /**
      * Clean 1 day old files under tmp directory
@@ -95,12 +99,12 @@ public class CacherUtils {
             Map<File, LocalDate> nightlyBuildArtifacts = new HashMap<>();
             Files.walk(Paths.get(cacherProperties.getCacherArtifactsDir()))
                     .map(Path::toFile)
-                    .filter(file -> cacherProperties.buildDatePattern.matcher(file.getName()).find())
+                    .filter(file -> buildUtils.buildDatePattern.matcher(file.getName()).find())
                     .filter(file -> file.getName().endsWith(".zip"))
                     .forEach(file -> {
-                        Matcher test = cacherProperties.buildDatePattern.matcher(file.getName());
+                        Matcher test = buildUtils.buildDatePattern.matcher(file.getName());
                         if (test.find()) {
-                            LocalDate d = LocalDate.parse(test.group(0), cacherProperties.formatter);
+                            LocalDate d = LocalDate.parse(test.group(0), buildUtils.formatter(cacherProperties.getFormattedVersion()));
                             // collect all files that matches the build date pattern
                             nightlyBuildArtifacts.put(file, d);
                         }
