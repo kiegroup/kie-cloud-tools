@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package org.kie.cekit.image.descriptors.image;
+package org.kie.cekit.image.descriptors.packages;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -22,37 +22,23 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "name",
-        "branch"
+        "repository"
 })
 @RegisterForReflection
-public class RepositoryOsbs {
+public class Url {
 
-    @JsonProperty("name")
-    private String name;
-    @JsonProperty("branch")
-    private String branch;
+    @JsonProperty("repository")
+    private String repository;
 
-    public RepositoryOsbs(){}
+    public Url(){}
 
-    @JsonProperty("name")
-    public String getName() {
-        return name;
+    @JsonProperty("repository")
+    public String getRepository() {
+        return repository;
     }
 
-    @JsonProperty("name")
-    public void setName(String name) {
-        this.name = name;
+    @JsonProperty("repository")
+    public void setRepository(String repository) {
+        this.repository = repository;
     }
-
-    @JsonProperty("branch")
-    public String getBranch() {
-        return branch;
-    }
-
-    @JsonProperty("branch")
-    public void setBranch(String branch) {
-        this.branch = branch;
-    }
-
 }

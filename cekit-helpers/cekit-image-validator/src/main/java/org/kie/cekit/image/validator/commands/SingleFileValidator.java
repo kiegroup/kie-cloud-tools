@@ -2,7 +2,7 @@ package org.kie.cekit.image.validator.commands;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.kie.cekit.image.descriptors.ContentSets;
+import org.kie.cekit.image.descriptors.packages.ContentSets;
 import org.kie.cekit.image.descriptors.container.Container;
 import org.kie.cekit.image.descriptors.image.Image;
 import org.kie.cekit.image.descriptors.module.Module;

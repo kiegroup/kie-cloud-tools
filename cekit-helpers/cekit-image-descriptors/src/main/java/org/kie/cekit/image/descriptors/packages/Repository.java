@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package org.kie.cekit.image.descriptors.image;
+package org.kie.cekit.image.descriptors.packages;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,17 +23,26 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "name",
-        "branch"
+        "rpm",
+        "id",
+        "description",
+        "url"
 })
 @RegisterForReflection
-public class RepositoryOsbs {
+public class Repository {
 
     @JsonProperty("name")
     private String name;
-    @JsonProperty("branch")
-    private String branch;
+    @JsonProperty("rpm")
+    private String rpm;
+    @JsonProperty("id")
+    private String id;
+    @JsonProperty("description")
+    private String description;
+    @JsonProperty("url")
+    private Url url;
 
-    public RepositoryOsbs(){}
+    public Repository(){}
 
     @JsonProperty("name")
     public String getName() {
@@ -45,14 +54,43 @@ public class RepositoryOsbs {
         this.name = name;
     }
 
-    @JsonProperty("branch")
-    public String getBranch() {
-        return branch;
+    @JsonProperty("rpm")
+    public String getRpm() {
+        return rpm;
     }
 
-    @JsonProperty("branch")
-    public void setBranch(String branch) {
-        this.branch = branch;
+    @JsonProperty("rpm")
+    public void setRpm(String rpm) {
+        this.rpm = rpm;
     }
 
+    @JsonProperty("id")
+    public String getId() {
+        return id;
+    }
+
+    @JsonProperty("id")
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @JsonProperty("description")
+    public String getDescription() {
+        return description;
+    }
+
+    @JsonProperty("description")
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @JsonProperty("url")
+    public Url getUrl() {
+        return url;
+    }
+
+    @JsonProperty("url")
+    public void setUrl(Url url) {
+        this.url = url;
+    }
 }
