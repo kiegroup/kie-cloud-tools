@@ -30,8 +30,7 @@ public class BuildUtils {
 
     public final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
     public final DateTimeFormatter legacyFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-    public final Pattern buildDatePattern =  Pattern.compile("(\\d{6})");
-    public final Pattern legacyBuildDatePattern = Pattern.compile("(\\d{8})");
+    public final Pattern buildDatePattern =  Pattern.compile("(\\d{8})|(\\d{6})");
 
     // artifacts and zip file names used on Nightly and CR builds
     public String RHDM_ADD_ONS_DISTRIBUTION_ZIP = "rhdm_add_ons_distribution.zip";

@@ -10,7 +10,7 @@
         <connection>scm:git:https://github.com/kiegroup/kie-cloud-tools.git</connection>
         <developerConnection>scm:git:https://github.com/kiegroup/kie-cloud-tools.git</developerConnection>
         <url>https://github.com/kiegroup/kie-cloud-tools.git</url>
-      <tag>v${releaseVersion}</tag>
+        <tag>v${releaseVersion}</tag>
   </scm>
 
     <properties>

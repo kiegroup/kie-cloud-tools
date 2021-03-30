@@ -173,17 +173,14 @@ public class GitRepository {
                 .filter(line -> line.contains(finalRhpamFilter))
                 .findFirst().get();
 
-        Matcher rhdmMatcher;
-        Matcher rhpamMatcher;
+        Matcher rhdmMatcher = null;
+        Matcher rhpamMatcher = null;
 
         try {
-            log.fine("version is < 7.11, using legacy date pattern 'd{8}'" + rhdmKieServerDateBuild);
-            rhdmMatcher = buildUtils.legacyBuildDatePattern.matcher(rhdmKieServerDateBuild);
-            rhpamMatcher = buildUtils.legacyBuildDatePattern.matcher(rhpamKieServerDateBuild);
-        } catch (IllegalStateException e) {
-            log.fine("version is >= 7.11, using date pattern 'd{6}'" + rhdmKieServerDateBuild);
             rhdmMatcher = buildUtils.buildDatePattern.matcher(rhdmKieServerDateBuild);
             rhpamMatcher = buildUtils.buildDatePattern.matcher(rhpamKieServerDateBuild);
+        } catch (final Exception e) {
+            log.warning("Failed to parse date pattern for " + rhdmKieServerDateBuild + " or " + rhpamKieServerDateBuild);
         }
 
         if (rhdmMatcher.find() && rhpamMatcher.find()) {
@@ -207,10 +204,10 @@ public class GitRepository {
     }
 
     /**
-     * Add the file changes to be commited.
+     * Add the file changes to be committed.
      *
      * @param repo - git repository name
-     * @return true if the git add command was successfully executed, otherwise, fase.
+     * @return true if the git add command was successfully executed, otherwise, false.
      */
     public boolean addChanges(String repo) {
         try {
@@ -223,7 +220,7 @@ public class GitRepository {
     }
 
     /**
-     * commit the changes to the current branch and push the commit to GitHUb
+     * commit the changes to the current branch and push the commit to GitHub
      *
      * @param repo    - git repository name
      * @param message - Commit message
@@ -246,7 +243,7 @@ public class GitRepository {
      * @param operation
      * @param branchName - branch  name
      * @param baseBranch - base branch to push a pull request
-     * @param repo       target repository, available are rhpam-7-image and rhdm-7-image
+     * @param repo       - target repository, available are rhpam-7-image and rhdm-7-image
      */
     public void handleBranch(BranchOperation operation, String branchName, String baseBranch, String repo) throws IOException, InterruptedException {
 
