@@ -1,10 +1,15 @@
 package org.kie.cekit.cacher.resources;
 
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.kie.cekit.cacher.objects.CacherUploadedFile;
 import org.kie.cekit.cacher.objects.PlainArtifact;
 import org.kie.cekit.cacher.utils.CacherUtils;
 import org.kie.cekit.cacher.utils.UrlUtils;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -13,9 +18,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -72,13 +85,12 @@ public class CacherResource {
         for (String ck : checksum) {
             log.info("file received for deletion " + ck);
             if (cacherUtils.deleteArtifact(ck)) {
-               response.append("File ").append(ck).append(" deleted.\n");
+                response.append("File ").append(ck).append(" deleted.\n");
             } else {
                 response.append("Fail to delete ").append(ck).append(".\n");
             }
         }
         return Response.ok().entity(response.toString()).build();
-
     }
 
     @GET
@@ -101,4 +113,10 @@ public class CacherResource {
         return Response.ok(found).build();
     }
 
+    @POST
+    @Path("/file/upload")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response fileUpload(@MultipartForm CacherUploadedFile inputFile) {
+        return Response.ok(cacherUtils.writeFileToDisk(inputFile)).build();
+    }
 }

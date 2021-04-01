@@ -202,3 +202,8 @@ The Cacher exposes a few actions through rest API, you see all of them with the 
 **Update CR builds** - `GET /crbuild/use/{version}/{releaseBranch}/{crBuild}`
  - Example: `http://localhost:8080/crbuild/use/7.9.1/7.9.x/2`
  - Requires the target repositories to be already updated for release.
+
+**Upload artifacts** - It can be done through the UI or using command line, e.g.:
+ - ```bash
+   $ curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/tmp/test.log" -F "fileName=test.log" http://localhost:8080/resource/file/upload
+   ```

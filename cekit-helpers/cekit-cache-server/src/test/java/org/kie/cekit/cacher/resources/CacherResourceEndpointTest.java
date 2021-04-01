@@ -1,11 +1,15 @@
 package org.kie.cekit.cacher.resources;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.Header;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.kie.cekit.cacher.utils.CacherUtils;
 
 import javax.inject.Inject;
+
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,6 +31,7 @@ public class CacherResourceEndpointTest {
     final String wrongUrl = "test.testing";
 
     @Test
+    @Order(1)
     public void testCacherEndpoints() throws URISyntaxException, UnsupportedEncodingException {
         URI uri = new URI(url);
 
@@ -54,7 +59,7 @@ public class CacherResourceEndpointTest {
                 .statusCode(200)
                 .body(is("Failed to fetch artifact, please check the url and try again"));
 
-       given()
+        given()
                 .when().get("/resource/query/quarkus")
                 .then()
                 .statusCode(200)
@@ -79,6 +84,32 @@ public class CacherResourceEndpointTest {
                 .body(containsString("File bccc8db65cb5eae41084222c82a6131c deleted."));
 
         Assertions.assertFalse(cacherUtils.fileExists("bccc8db65cb5eae41084222c82a6131c"));
+    }
+
+    @Test
+    @Order(2)
+    public void testUploadFile() {
+        given()
+                .header(new Header("content-type", "multipart/form-data"))
+                .multiPart("file", new File(getClass().getClassLoader().getResource("pre-load-test.txt").getFile()))
+                .formParam("fileName", "pre-load-test.txt")
+                .when().post("/resource/file/upload")
+                .then()
+                .statusCode(200)
+                .body(containsString("File persisted, checksum is: 1b983479e22fedd1b6dde4cb1fb83d2d"));
+
+        Assertions.assertTrue(cacherUtils.fileExists("1b983479e22fedd1b6dde4cb1fb83d2d"));
+
+        given()
+                .header(new Header("content-type", "multipart/form-data"))
+                .multiPart("file", new File(getClass().getClassLoader().getResource("pre-load-test.txt").getFile()))
+                .formParam("fileName", "pre-load-test.txt")
+                .when().post("/resource/file/upload")
+                .then()
+                .statusCode(200)
+                .body(containsString("File pre-load-test.txt already exists"));
+
+        cacherUtils.deleteArtifact("1b983479e22fedd1b6dde4cb1fb83d2d");
     }
 
 }

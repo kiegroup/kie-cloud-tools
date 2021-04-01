@@ -3,11 +3,13 @@ package org.kie.cekit.cacher.utils;
 import io.quarkus.scheduler.Scheduled;
 import org.kie.cekit.cacher.builds.cr.CRBuildInterceptor;
 import org.kie.cekit.cacher.builds.nightly.NightlyBuildUpdatesInterceptor;
+import org.kie.cekit.cacher.objects.CacherUploadedFile;
 import org.kie.cekit.cacher.objects.PlainArtifact;
 import org.kie.cekit.cacher.properties.CacherProperties;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -59,7 +61,6 @@ public class CacherUtils {
 
     @Inject
     CRBuildInterceptor crBuildInterceptor;
-
 
     /**
      * Clean 1 day old files under tmp directory
@@ -144,7 +145,6 @@ public class CacherUtils {
             } catch (IOException e) {
                 log.warning("Failed to read file: " + e.getCause());
             }
-
         } else {
             log.info("File " + cacherProperties.preLoadFileLocation() + " not found.");
         }
@@ -196,7 +196,6 @@ public class CacherUtils {
             try {
                 Files.createDirectory(Paths.get(cacherProperties.getCacherArtifactsDir() + "/" + fileChecksum));
                 Files.move(Paths.get(filePath), Paths.get(cacherProperties.getCacherArtifactsDir() + "/" + fileChecksum + "/" + fileName));
-
             } catch (FileAlreadyExistsException e) {
                 try {
                     Files.delete(Paths.get(filePath));
@@ -204,12 +203,10 @@ public class CacherUtils {
                     //ignore
                 }
                 return "File " + fileName + " already exists.";
-
             } finally {
                 readableByteChannel.close();
                 fileOutputStream.close();
             }
-
         } catch (final IOException e) {
             e.printStackTrace();
             try {
@@ -232,7 +229,6 @@ public class CacherUtils {
 
             default:
                 log.finest("nothing has to be done.");
-
         }
         return "File " + fileName + " persisted.";
     }
@@ -303,18 +299,16 @@ public class CacherUtils {
                     .map(p -> {
                         try {
                             return new PlainArtifact(p.getFileName().toString(),
-                                    p.getParent().getFileName().toString(),
-                                    Files.getAttribute(p.toAbsolutePath(), "creationTime", LinkOption.NOFOLLOW_LINKS).toString());
+                                                     p.getParent().getFileName().toString(),
+                                                     Files.getAttribute(p.toAbsolutePath(), "creationTime", LinkOption.NOFOLLOW_LINKS).toString());
                         } catch (IOException e) {
                             e.printStackTrace();
                             return new PlainArtifact(p.getFileName().toString(),
-                                    p.getParent().getFileName().toString(), "00");
+                                                     p.getParent().getFileName().toString(), "00");
                         }
-
                     }).collect(Collectors.toList());
         } catch (final Exception e) {
             e.printStackTrace();
-
         }
         return artifacts;
     }
@@ -341,7 +335,6 @@ public class CacherUtils {
                 for (byte b : messageDigest.digest()) {
                     result.append(String.format("%02x", b));
                 }
-
             }
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -364,9 +357,9 @@ public class CacherUtils {
                     .map(p -> {
                         try {
                             return new PlainArtifact(p.getFileName().toString(),
-                                    p.getParent().getFileName().toString(),
-                                    Files.getAttribute(p.toAbsolutePath(), "creationTime", LinkOption.NOFOLLOW_LINKS).toString(),
-                                    null, null, null, 0);
+                                                     p.getParent().getFileName().toString(),
+                                                     Files.getAttribute(p.toAbsolutePath(), "creationTime", LinkOption.NOFOLLOW_LINKS).toString(),
+                                                     null, null, null, 0);
                         } catch (IOException e) {
                             e.printStackTrace();
                             return null;
@@ -403,7 +396,7 @@ public class CacherUtils {
     }
 
     /**
-     * @param jarName the jar file to be searched
+     * @param jarName     the jar file to be searched
      * @param zipFileName source file
      * @return the version from the given .jar file
      */
@@ -449,5 +442,39 @@ public class CacherUtils {
         }
 
         return "NONE";
+    }
+
+    public String writeFileToDisk(CacherUploadedFile input) {
+
+        String tmpFileLocation = cacherProperties.getArtifactsTmpDir() + "/" + input.fileName;
+        String checksum = "";
+
+        try (ReadableByteChannel readableByteChannel = Channels.newChannel(input.file);
+             FileOutputStream fos = new FileOutputStream(tmpFileLocation)) {
+
+            fos.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+
+            checksum = md5sum(tmpFileLocation);
+
+            try {
+                Files.createDirectory(Paths.get(cacherProperties.getCacherArtifactsDir() + "/" + checksum));
+                Files.move(Paths.get(tmpFileLocation),
+                           Paths.get(cacherProperties.getCacherArtifactsDir() + "/" + checksum + "/" + input.fileName));
+            } catch (FileAlreadyExistsException e) {
+                Files.delete(Paths.get(tmpFileLocation));
+                return "File " + input.fileName + " already exists";
+            }
+
+        } catch (final Exception e) {
+            try {
+                Files.delete(Paths.get(tmpFileLocation));
+                Files.delete(Paths.get(cacherProperties.getCacherArtifactsDir() + "/" + checksum));
+            } catch (IOException ex) {
+                // ignore
+            }
+            return e.getMessage();
+        }
+
+        return "File persisted, checksum is: " + checksum;
     }
 }

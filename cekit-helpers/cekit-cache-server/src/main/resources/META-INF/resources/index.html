@@ -2,11 +2,13 @@
 <head>
     <meta charset="utf-8"/>
     <title>Quarkus CEKit Cacher</title>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly-additions.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/4.0.0-rc.1/css/patternfly.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/4.0.0-rc.1/css/patternfly-additions.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/js/patternfly.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/patternfly/4.0.0-rc.1/js/patternfly.min.js"></script>
     <!-- Load AngularJS -->
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 
@@ -15,7 +17,6 @@
 
         //Controller Part
         app.controller("CacherManagementController", function ($scope, $http) {
-
 
             //HTTP POST/PUT methods for add new artifact
             $scope.fetch = function () {
@@ -34,6 +35,30 @@
                 });
             };
         });
+
+        function validate() {
+
+            var formData = new FormData();
+            var display_result = document.getElementById('response');
+            var file = document.getElementById("upload");
+
+            if (file.files.length != 0) {
+                fileName = file.files[0].name;
+                console.log("fileName ", fileName);
+                console.log("file ", file.files[0]);
+
+                formData.append('file', file.files[0]);
+                formData.append('fileName', fileName);
+
+                fetch("/resource/file/upload", {
+                    method: "POST",
+                    body: formData,
+
+                }).then(async res => {
+                    display_result.innerHTML = await res.text() || res.statusText;
+                });
+            }
+        }
     </script>
 
 </head>
@@ -66,13 +91,38 @@
     <form class="form-horizontal" ng-submit="fetch()">
         <h2>Fetch Artifact from URL</h2>
         <h4>{{fetchResult}}</h4>
-        <div class=" form-sm-3">
+        <div class="form-sm-3">
             <label class="col-md-1 control-label" for="artifactLink">Artifact link</label>
             <label class="col-md-5 control-label"><input type="url" class="form-control" id="artifactLink"
                                                          ng-model="form.url"
                                                          placeholder="Enter the artifact link"></label>
         </div>
         <button type="submit" class="btn btn-primary">Fetch Artifact</button>
+    </form>
+</div>
+
+
+<div class="container-fluid">
+    <h2>Upload Artifact from filesystem</h2>
+    <form class="form-horizontal" onsubmit="return validate();">
+        <div class="form-sm-3">
+            <table align="left" class=" table-hover">
+
+                <tr>
+                    <label class="col-md-1 control-label">Choose file to be uploaded: </label>
+                    <td>
+                        <input type="file" name="file" id="upload">
+                    </td>
+                </tr>
+                <tr>
+                    <td id="response" class="response"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <input class="btn btn-primary" type="submit" name="submit" value="Submit">
+                </tr>
+            </table>
+        </div>
     </form>
 </div>
 
