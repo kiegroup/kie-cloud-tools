@@ -142,6 +142,11 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
                                 // and add comment on next line :  slf4j-simple-1.7.22.redhat-2.jar
                                 buildUtils.reAddComment(buildUtils.dmKieserverFile(), "name: \"slf4j-simple.jar\"",
                                         "  # slf4j-simple-1.7.22.redhat-2.jar");
+
+                                // find name: "jbpm-event-emitters-kafka-7.x.Final.jar"
+                                // and add comment on next line :  jbpm-event-emitters-kafka-7.52.0.Final-redhat-00004.jar
+                                buildUtils.reAddComment(buildUtils.dmKieserverFile(), "name: \"jbpm-event-emitters-kafka-7.x.Final.jar\"",
+                                        "  # jbpm-event-emitters-kafka-7.52.0.Final-redhat-00004.jar");
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
