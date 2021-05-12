@@ -23,6 +23,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @JsonPropertyOrder({
         "name",
         "url",
+        "dest",
         "target",
         "md5"
 })
@@ -33,6 +34,7 @@ public class Artifact {
     private String url;
     private String target;
     private String md5;
+    private String dest;
 
     public Artifact() {
     }
@@ -69,11 +71,20 @@ public class Artifact {
         this.md5 = md5;
     }
 
+    public String getDest() {
+        return dest;
+    }
+
+    public void setDest(String dest) {
+        this.dest = dest;
+    }
+
     @Override
     public String toString() {
         return "Artifact{" +
                 "name='" + name + '\'' +
                 ", url='" + url + '\'' +
+                ", dest='" + dest + '\'' +
                 ", target='" + target + '\'' +
                 ", md5='" + md5 + '\'' +
                 '}';
