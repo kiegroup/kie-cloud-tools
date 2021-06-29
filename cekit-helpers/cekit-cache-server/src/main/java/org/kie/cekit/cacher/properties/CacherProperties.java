@@ -1,25 +1,22 @@
 package org.kie.cekit.cacher.properties;
 
-import com.fasterxml.jackson.core.Version;
-import okhttp3.ConnectionSpec;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.kie.cekit.cacher.exception.RequiredParameterMissingException;
-import org.kie.cekit.cacher.properties.loader.CacherProperty;
-import org.kie.cekit.cacher.utils.BuildUtils;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import com.fasterxml.jackson.core.Version;
+import okhttp3.Response;
+import org.kie.cekit.cacher.exception.RequiredParameterMissingException;
+import org.kie.cekit.cacher.properties.loader.CacherProperty;
+import org.kie.cekit.cacher.utils.BuildUtils;
+import org.kie.cekit.cacher.utils.HttpRequestHandler;
 
 /**
  * Holds all cacher's configurations
@@ -93,6 +90,10 @@ public class CacherProperties {
     String rhdmCRUrl;
 
     @Inject
+    @CacherProperty(name = "org.kie.cekit.cacher.nightly.maven.repo")
+    String nightlyMavenRepo;
+
+    @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.product.version")
     String version;
 
@@ -108,10 +109,15 @@ public class CacherProperties {
     @CacherProperty(name = "org.kie.cekit.cacher.preload.file")
     String preLoadFileLocation;
 
+    /**
+     * Value will set during runtime while CR or Nightly build watcher is run, it comes from
+     * the build properties file from the property "KIE_VERSION"
+     */
+    private String kieVersion;
 
     /**
      * RHPAM properties keys needed to download the nightly builds artifacts
-     * Thesehttps://github.com/mramendi/kie-docs/pull/130#discussion_r529607184 properties came from the product properties file.
+     * These properties came from the product properties file.
      */
     private List<String> rhpamFiles2DownloadPropName = Arrays.asList(
             "rhpam.addons.latest.url",
@@ -242,6 +248,14 @@ public class CacherProperties {
     }
 
     /**
+     * @return the nightly maven repo to fetch information
+     * about the standalone jars needed by the KIE Server image
+     */
+    public String nightlyMavenRepo() {
+        return nightlyMavenRepo;
+    }
+
+    /**
      * @return rhpam/dm product shortened version
      */
     public String shortenedVersion(String customVersion) {
@@ -333,6 +347,17 @@ public class CacherProperties {
         );
     }
 
+    public String getKieVersion() {
+        return kieVersion;
+    }
+
+    public void setKieVersion(String kieVersion) {
+        if (null == kieVersion || kieVersion.isEmpty()) {
+            kieVersion = "not-able-to-find-please-check";
+        }
+        this.kieVersion = kieVersion;
+    }
+
     /**
      * @return properties key name for rhpam artifacts
      */
@@ -356,17 +381,8 @@ public class CacherProperties {
     public Properties productPropertyFile(String url) {
         log.info("Trying to get product properties file from " + url);
         Properties p = new Properties();
-        OkHttpClient ok = new OkHttpClient.Builder()
-                // no https required.
-                .connectionSpecs(Arrays.asList(ConnectionSpec.CLEARTEXT))
-                .build();
 
-        Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .build();
-
-        try (Response response = ok.newCall(request).execute()) {
+        try (Response response = HttpRequestHandler.executeHttpCall(url)) {
             if (response.code() == 404) {
                 log.info("RHDM/PAM properties file not found... url -> " + url);
                 return p;
@@ -374,7 +390,6 @@ public class CacherProperties {
             try (final InputStream stream = Objects.requireNonNull(response.body()).byteStream()) {
                 p.load(stream);
             }
-
         } catch (final Exception e) {
             e.printStackTrace();
         }

@@ -8,6 +8,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.invoke.MethodHandles;
@@ -38,10 +39,11 @@ public class WatcherResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{buildDate}")
-    public Response retryNightlyBuild(@PathParam("buildDate") String buildDate) {
+    public Response retryNightlyBuild(@PathParam("buildDate") String buildDate,
+                                      @QueryParam("force") boolean force) {
 
         if (cacherProperties.isWatcherEnabled()) {
-            nightlyBuildsWatcher.verifyNightlyBuild(Optional.empty(), Optional.empty(), Optional.of(buildDate));
+            nightlyBuildsWatcher.verifyNightlyBuild(Optional.empty(), Optional.empty(), Optional.of(buildDate), force);
             return Response.ok().entity(responseMessage(buildDate)).build();
         }
         return Response.ok().entity("Watcher is disabled").build();
@@ -55,7 +57,7 @@ public class WatcherResource {
                                                 @PathParam("buildDate") String buildDate) {
 
         if (cacherProperties.isWatcherEnabled()) {
-            nightlyBuildsWatcher.verifyNightlyBuild(Optional.of(version), Optional.of(branch), Optional.of(buildDate));
+            nightlyBuildsWatcher.verifyNightlyBuild(Optional.of(version), Optional.of(branch), Optional.of(buildDate), false);
             return Response.ok().entity(responseMessage(buildDate)).build();
         }
         return Response.ok().entity("Watcher is disabled").build();

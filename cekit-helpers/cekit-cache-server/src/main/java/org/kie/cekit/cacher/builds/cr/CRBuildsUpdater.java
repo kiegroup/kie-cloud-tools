@@ -55,6 +55,9 @@ public class CRBuildsUpdater {
             return propsResponse.toString();
         }
 
+        // set the kieVersion
+        cacherProperties.setKieVersion(rhpamCRProps.get("KIE_VERSION").toString());
+
         // Download rhpam and rhdm artifacts
         cacherProperties.getRhdmFiles2DownloadPropName().forEach(fileProp -> {
             callback.onRequestReceived(new PlainArtifact(
@@ -69,6 +72,8 @@ public class CRBuildsUpdater {
             new Thread(() -> log.info(cacherUtils.fetchFile(rhdmCRProps.get(fileProp).toString(), Optional.of("cr"), crBuild))).start();
         });
 
+        // set the kieVersion
+        cacherProperties.setKieVersion(rhdmCRProps.get("KIE_VERSION").toString());
         cacherProperties.getRhpamFiles2DownloadPropName().forEach(fileProp -> {
             callback.onRequestReceived(new PlainArtifact(
                     UrlUtils.getFileName(rhpamCRProps.get(fileProp).toString()),

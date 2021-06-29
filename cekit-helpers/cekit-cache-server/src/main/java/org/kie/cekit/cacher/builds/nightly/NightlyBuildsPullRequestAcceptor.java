@@ -1,5 +1,16 @@
 package org.kie.cekit.cacher.builds.nightly;
 
+import java.lang.invoke.MethodHandles;
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Logger;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import com.fasterxml.jackson.core.Version;
 import org.kie.cekit.cacher.builds.github.BranchOperation;
 import org.kie.cekit.cacher.builds.github.GitRepository;
@@ -10,16 +21,6 @@ import org.kie.cekit.cacher.properties.CacherProperties;
 import org.kie.cekit.cacher.utils.BuildUtils;
 import org.kie.cekit.cacher.utils.CacherUtils;
 import org.kie.cekit.image.descriptors.module.Module;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import java.lang.invoke.MethodHandles;
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * this class holds all operations related with nightly rhdm/rhpam files changes
@@ -58,6 +59,8 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
         try {
             Version version = buildUtils.getVersion(artifact.getVersion().split("[.]"));
             String bDate = gitRepository.getCurrentProductBuildDate(artifact.getBranch(), force);
+
+            log.fine("KIE_VERSION retrieve from Nightly properties file --> " + cacherProperties.getKieVersion());
 
             // for upstream compare the build date size to make sure the correct formatter is being used
             LocalDate upstreamBuildDate = LocalDate.parse(
@@ -288,6 +291,51 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
                             } catch (Exception e) {
                                 e.printStackTrace();
+                            }
+                        }
+
+
+                        // compare the name without the string placeholder
+                        // handle services-jbpm-cluster jar
+                        String jbpmClusterJarPrefix = buildUtils.KIE_SEVER_SERVICES_JBPM_CLUSTER_JAR.split("-%s")[0];
+                        if (artifact.getName().contains(jbpmClusterJarPrefix)) {
+                            String newJarName = String.format(buildUtils.KIE_SEVER_SERVICES_JBPM_CLUSTER_JAR, cacherProperties.getKieVersion());
+                            String checksum = buildUtils.checkStandaloneJarChecksum(jbpmClusterJarPrefix,
+                                                                                    cacherProperties.getKieVersion(),
+                                                                                    artifact.getMd5(),
+                                                                                    Optional.of("nightly"),
+                                                                                    0);
+
+                            if (checksum != artifact.getMd5()) {
+                                artifact.setName(newJarName);
+                                artifact.setMd5(checksum);
+                                log.info("Found " + newJarName + " updating checksum to " + checksum);
+
+                                yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
+                            } else {
+                                log.info("Artifact " + jbpmClusterJarPrefix + " wil not be update, checksum didn't change. Check for previous errors if it is something not expected.");
+                            }
+                        }
+
+                        // compare the name without the string placeholder
+                        // handle jbpm-kafka-emitter jar
+                        String jbpmEmitterKafkaJarPrefix = buildUtils.JBPM_EVENTS_EMITTERS_KAFKA_JAR.split("-%s")[0];
+                        if (artifact.getName().contains(jbpmEmitterKafkaJarPrefix)) {
+                            String newJarName = String.format(buildUtils.JBPM_EVENTS_EMITTERS_KAFKA_JAR, cacherProperties.getKieVersion());
+                            String checksum = buildUtils.checkStandaloneJarChecksum(jbpmEmitterKafkaJarPrefix,
+                                                                                    cacherProperties.getKieVersion(),
+                                                                                    artifact.getMd5(),
+                                                                                    Optional.of("nightly"),
+                                                                                    0);
+
+                            if (checksum != artifact.getMd5()) {
+                                artifact.setName(newJarName);
+                                artifact.setMd5(checksum);
+                                log.info("Found " + newJarName + " updating checksum to " + checksum);
+
+                                yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
+                            } else {
+                                log.info("Artifact " + jbpmEmitterKafkaJarPrefix + " wil not be update, checksum didn't change.");
                             }
                         }
 

@@ -195,7 +195,8 @@ The Cacher exposes a few actions through rest API, you see all of them with the 
 
 **Temp files** - there is a timer that runs once a day which will remove all files older than 1 day.
 
-**Retry specific build date** - there is a endpoint for this purpose:  `GET /watcher/{buildDate}`
+**Retry specific build date** - there is an endpoint for this purpose:  `GET /watcher/{buildDate}`. Update can be force 
+by using the `force=true` query parameter.
 
 **Retry specific build date with custom branch and version** - `GET /watcher/try/{version}/{branch}/{buildDate}`
 

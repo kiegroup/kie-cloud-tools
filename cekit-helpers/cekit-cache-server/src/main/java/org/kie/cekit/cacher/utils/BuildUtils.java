@@ -1,14 +1,5 @@
 package org.kie.cekit.cacher.utils;
 
-import com.fasterxml.jackson.core.Version;
-import org.kie.cekit.cacher.builds.yaml.YamlFilesHelper;
-import org.kie.cekit.cacher.objects.PlainArtifact;
-import org.kie.cekit.cacher.properties.CacherProperties;
-import org.kie.cekit.image.descriptors.module.Module;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -23,6 +14,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import com.fasterxml.jackson.core.Version;
+import okhttp3.Response;
+import org.kie.cekit.cacher.objects.PlainArtifact;
+import org.kie.cekit.cacher.properties.CacherProperties;
+
 @ApplicationScoped
 public class BuildUtils {
 
@@ -30,7 +29,7 @@ public class BuildUtils {
 
     public final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
     public final DateTimeFormatter legacyFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-    public final Pattern buildDatePattern =  Pattern.compile("(\\d{8})|(\\d{6})");
+    public final Pattern buildDatePattern = Pattern.compile("(\\d{8})|(\\d{6})");
 
     // artifacts and zip file names used on Nightly and CR builds
     public String RHDM_ADD_ONS_DISTRIBUTION_ZIP = "rhdm_add_ons_distribution.zip";
@@ -60,6 +59,9 @@ public class BuildUtils {
     public String RHPAM_KIE_SERVER_DISTRIBUTION_ZIP = "rhpam_kie_server_distribution.zip";
     public String RHPAM_KIE_SERVER_EE8_NIGHTLY_ZIP = "rhpam-%s.redhat-%s-kie-server-ee8.zip";
     public String RHPAM_KIE_SERVER_EE8_ZIP = "rhpam-%s-kie-server-ee8.zip";
+    // for both jars, version will be added during nightly or CR builds update
+    public String KIE_SEVER_SERVICES_JBPM_CLUSTER_JAR = "kie-server-services-jbpm-cluster-%s.jar";
+    public String JBPM_EVENTS_EMITTERS_KAFKA_JAR = "jbpm-event-emitters-kafka-%s.jar";
 
     @Inject
     CacherProperties cacherProperties;
@@ -217,7 +219,6 @@ public class BuildUtils {
         return legacyFormatter;
     }
 
-
     /**
      * returns the right build date formatter according the target current build date.
      *
@@ -233,4 +234,66 @@ public class BuildUtils {
         return legacyFormatter;
     }
 
+    /**
+     * @param standaloneJarName jar name without version
+     * @param version desired version to fetch info
+     * @param currentChecksum current checksum to compare with the new, if found, otherwise the old will be returned and
+     *                        no update will be performed
+     * @param crBuild in case, the update is a CR build, its number must be provided.
+     * @return
+     */
+    public String checkStandaloneJarChecksum(String standaloneJarName, String version, String currentChecksum, Optional<String> type, int crBuild) {
+        log.fine("Trying to fetch the standalone jar checksum " + standaloneJarName);
+        String nightlyMavenRepo = cacherProperties.nightlyMavenRepo();
+        if (null == nightlyMavenRepo || nightlyMavenRepo.isEmpty()) {
+            log.warning("Property 'org.kie.cekit.cacher.nightly.maven.repo'  not set, falling back to the current checksum");
+            return currentChecksum;
+        }
+
+        String requestJarUrl = buildUrl(nightlyMavenRepo, standaloneJarName, version);
+        String md5ChecksumUrl = requestJarUrl + ".md5";
+        log.fine("Trying to get the artifact's checksum using the url --> " + md5ChecksumUrl);
+        try (Response response = HttpRequestHandler.executeHttpCall(md5ChecksumUrl)) {
+            if (response.code() == 404) {
+                log.warning("The artifact " + standaloneJarName + " was not found , url used: " + md5ChecksumUrl);
+                return currentChecksum;
+            }
+
+            String newChecksum = response.body().string();
+
+            if (null != newChecksum || !newChecksum.isEmpty()) {
+                log.fine("Checksum for artifact " + standaloneJarName + " found, new value is " + newChecksum);
+                log.fine("found new artifact " + standaloneJarName + ", requesting cacher do fetch it.");
+                // do not make it async
+                cacherUtils.fetchFile(requestJarUrl, type, crBuild);
+            }
+            return newChecksum;
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+        return currentChecksum;
+    }
+
+    /**
+     * @param mavenRepoURL      the maven repo from where the info will be pulled off
+     * @param standaloneJarName the standalone jar name without version and suffix
+     * @param version           the current jar version
+     * @return the formatted URL
+     */
+    private String buildUrl(String mavenRepoURL, String standaloneJarName, String version) {
+        StringBuilder urlBuilder = new StringBuilder(mavenRepoURL);
+        if (!urlBuilder.toString().endsWith("/")) {
+            urlBuilder.append("/");
+        }
+        if (standaloneJarName.contains("kie-server-services-jbpm-cluster")) {
+            urlBuilder.append("org/kie/server/").append(standaloneJarName).append("/");
+            urlBuilder.append(version).append("/");
+            urlBuilder.append(String.format(KIE_SEVER_SERVICES_JBPM_CLUSTER_JAR, version));
+        } else if (standaloneJarName.contains("jbpm-event-emitters-kafka")) {
+            urlBuilder.append("org/jbpm/").append(standaloneJarName).append("/");
+            urlBuilder.append(version).append("/");
+            urlBuilder.append(String.format(JBPM_EVENTS_EMITTERS_KAFKA_JAR, version));
+        }
+        return urlBuilder.toString();
+    }
 }

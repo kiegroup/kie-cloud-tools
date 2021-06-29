@@ -37,8 +37,8 @@ public class NightlyBuildsWatcher {
     @Inject
     NightlyBuildUpdatesInterceptor buildCallback;
 
-    public void verifyNightlyBuild(Optional<String> version, Optional<String> branch, Optional<String> buildDate) {
-        tryBuildDate(version, branch, buildDate, false);
+    public void verifyNightlyBuild(Optional<String> version, Optional<String> branch, Optional<String> buildDate, boolean force) {
+        tryBuildDate(version, branch, buildDate, force);
     }
 
     /**
@@ -160,6 +160,8 @@ public class NightlyBuildsWatcher {
      * @param branch
      */
     private void rhpamNightlyBuildDownloader(Properties rhpamProp, String buildDate, String version, String branch, boolean force) {
+        // set the kieVersion
+        cacherProperties.setKieVersion(rhpamProp.get("KIE_VERSION").toString());
         cacherProperties.getRhpamFiles2DownloadPropName().stream().forEach(file -> {
             // make sure there is no rhpam already downloaded files
             if (!cacherUtils.fileExistsByNameExcludeTmp(UrlUtils.getFileName(rhpamProp.get(file).toString()))) {
@@ -185,6 +187,8 @@ public class NightlyBuildsWatcher {
      * @param branch
      */
     private void rhdmNightlyBuildDownloader(Properties rhdmProp, String buildDate, String version, String branch, boolean force) {
+        // set the kieVersion
+        cacherProperties.setKieVersion(rhdmProp.get("KIE_VERSION").toString());
         cacherProperties.getRhdmFiles2DownloadPropName().stream().forEach(file -> {
             // make sure there is no rhdm already downloaded files
             if (!cacherUtils.fileExistsByNameExcludeTmp(UrlUtils.getFileName(rhdmProp.get(file).toString()))) {
