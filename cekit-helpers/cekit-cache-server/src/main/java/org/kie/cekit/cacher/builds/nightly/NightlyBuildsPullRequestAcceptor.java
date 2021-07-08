@@ -271,6 +271,53 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                             yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
                         }
                     });
+
+                    pamKieserver.getArtifacts().forEach(ar -> {
+                        // compare the name without the string placeholder
+                        // handle services-jbpm-cluster jar
+                        String jbpmClusterJarPrefix = buildUtils.KIE_SEVER_SERVICES_JBPM_CLUSTER_JAR.split("-%s")[0];
+                        if (ar.getName().contains(jbpmClusterJarPrefix)) {
+                            String newJarName = String.format(buildUtils.KIE_SEVER_SERVICES_JBPM_CLUSTER_JAR, cacherProperties.getKieVersion());
+                            String checksum = buildUtils.checkStandaloneJarChecksum(jbpmClusterJarPrefix,
+                                                                                    cacherProperties.getKieVersion(),
+                                                                                    ar.getMd5(),
+                                                                                    Optional.of("nightly"),
+                                                                                    0);
+
+                            if (checksum != ar.getMd5()) {
+                                ar.setName(newJarName);
+                                ar.setMd5(checksum);
+                                log.info("Found " + newJarName + " updating checksum to " + checksum);
+
+                                yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
+                            } else {
+                                log.info("Artifact " + jbpmClusterJarPrefix + " wil not be update, checksum didn't change. Check for previous errors if it is something not expected.");
+                            }
+                        }
+
+                        // compare the name without the string placeholder
+                        // handle jbpm-kafka-emitter jar
+                        String jbpmEmitterKafkaJarPrefix = buildUtils.JBPM_EVENTS_EMITTERS_KAFKA_JAR.split("-%s")[0];
+                        if (ar.getName().contains(jbpmEmitterKafkaJarPrefix)) {
+                            String newJarName = String.format(buildUtils.JBPM_EVENTS_EMITTERS_KAFKA_JAR, cacherProperties.getKieVersion());
+                            String checksum = buildUtils.checkStandaloneJarChecksum(jbpmEmitterKafkaJarPrefix,
+                                                                                    cacherProperties.getKieVersion(),
+                                                                                    ar.getMd5(),
+                                                                                    Optional.of("nightly"),
+                                                                                    0);
+
+                            if (checksum != ar.getMd5()) {
+                                ar.setName(newJarName);
+                                ar.setMd5(checksum);
+                                log.info("Found " + newJarName + " updating checksum to " + checksum);
+
+                                yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
+                            } else {
+                                log.info("Artifact " + jbpmEmitterKafkaJarPrefix + " wil not be update, checksum didn't change.");
+                            }
+                        }
+                    });
+
                     pamKieserver.getArtifacts().forEach(artifact -> {
                         String kieServerFileName = String.format(buildUtils.RHPAM_KIE_SERVER_EE8_NIGHTLY_ZIP, version, buildDate);
                         if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
@@ -291,51 +338,6 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
                             } catch (Exception e) {
                                 e.printStackTrace();
-                            }
-                        }
-
-
-                        // compare the name without the string placeholder
-                        // handle services-jbpm-cluster jar
-                        String jbpmClusterJarPrefix = buildUtils.KIE_SEVER_SERVICES_JBPM_CLUSTER_JAR.split("-%s")[0];
-                        if (artifact.getName().contains(jbpmClusterJarPrefix)) {
-                            String newJarName = String.format(buildUtils.KIE_SEVER_SERVICES_JBPM_CLUSTER_JAR, cacherProperties.getKieVersion());
-                            String checksum = buildUtils.checkStandaloneJarChecksum(jbpmClusterJarPrefix,
-                                                                                    cacherProperties.getKieVersion(),
-                                                                                    artifact.getMd5(),
-                                                                                    Optional.of("nightly"),
-                                                                                    0);
-
-                            if (checksum != artifact.getMd5()) {
-                                artifact.setName(newJarName);
-                                artifact.setMd5(checksum);
-                                log.info("Found " + newJarName + " updating checksum to " + checksum);
-
-                                yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
-                            } else {
-                                log.info("Artifact " + jbpmClusterJarPrefix + " wil not be update, checksum didn't change. Check for previous errors if it is something not expected.");
-                            }
-                        }
-
-                        // compare the name without the string placeholder
-                        // handle jbpm-kafka-emitter jar
-                        String jbpmEmitterKafkaJarPrefix = buildUtils.JBPM_EVENTS_EMITTERS_KAFKA_JAR.split("-%s")[0];
-                        if (artifact.getName().contains(jbpmEmitterKafkaJarPrefix)) {
-                            String newJarName = String.format(buildUtils.JBPM_EVENTS_EMITTERS_KAFKA_JAR, cacherProperties.getKieVersion());
-                            String checksum = buildUtils.checkStandaloneJarChecksum(jbpmEmitterKafkaJarPrefix,
-                                                                                    cacherProperties.getKieVersion(),
-                                                                                    artifact.getMd5(),
-                                                                                    Optional.of("nightly"),
-                                                                                    0);
-
-                            if (checksum != artifact.getMd5()) {
-                                artifact.setName(newJarName);
-                                artifact.setMd5(checksum);
-                                log.info("Found " + newJarName + " updating checksum to " + checksum);
-
-                                yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
-                            } else {
-                                log.info("Artifact " + jbpmEmitterKafkaJarPrefix + " wil not be update, checksum didn't change.");
                             }
                         }
 
