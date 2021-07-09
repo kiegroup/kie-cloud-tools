@@ -94,6 +94,10 @@ public class CacherProperties {
     String nightlyMavenRepo;
 
     @Inject
+    @CacherProperty(name = "org.kie.cekit.cacher.cr.maven.repo")
+    String crMavenRepo;
+
+    @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.product.version")
     String version;
 
@@ -254,6 +258,15 @@ public class CacherProperties {
     public String nightlyMavenRepo() {
         return nightlyMavenRepo;
     }
+
+    /**
+     * @return the CR maven repo to fetch information
+     * about the standalone jars needed by the KIE Server image
+     */
+    public String crMavenRepo() {
+        return crMavenRepo;
+    }
+
 
     /**
      * @return rhpam/dm product shortened version

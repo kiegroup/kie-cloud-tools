@@ -244,13 +244,16 @@ public class BuildUtils {
      */
     public String checkStandaloneJarChecksum(String standaloneJarName, String version, String currentChecksum, Optional<String> type, int crBuild) {
         log.fine("Trying to fetch the standalone jar checksum " + standaloneJarName);
-        String nightlyMavenRepo = cacherProperties.nightlyMavenRepo();
-        if (null == nightlyMavenRepo || nightlyMavenRepo.isEmpty()) {
-            log.warning("Property 'org.kie.cekit.cacher.nightly.maven.repo'  not set, falling back to the current checksum");
+        String mavenRepo = cacherProperties.nightlyMavenRepo();
+        if (type.get().equals("cr")) {
+            mavenRepo = cacherProperties.crMavenRepo();
+        }
+        if (null == mavenRepo || mavenRepo.isEmpty()) {
+            log.warning("Property 'org.kie.cekit.cacher.nightly.maven.repo' or 'org.kie.cekit.cr.nightly.maven.repo' not set, falling back to the current checksum");
             return currentChecksum;
         }
 
-        String requestJarUrl = buildUrl(nightlyMavenRepo, standaloneJarName, version);
+        String requestJarUrl = buildUrl(mavenRepo, standaloneJarName, version);
         String md5ChecksumUrl = requestJarUrl + ".md5";
         log.fine("Trying to get the artifact's checksum using the url --> " + md5ChecksumUrl);
         try (Response response = HttpRequestHandler.executeHttpCall(md5ChecksumUrl)) {
