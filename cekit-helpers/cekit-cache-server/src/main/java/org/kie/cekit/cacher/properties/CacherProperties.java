@@ -42,10 +42,6 @@ public class CacherProperties {
     String githubUsername;
 
     @Inject
-    @CacherProperty(name = "org.kie.cekit.cacher.github.password")
-    String githubPassword;
-
-    @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.github.oauth-token")
     String oauthToken;
 
@@ -148,13 +144,6 @@ public class CacherProperties {
     }
 
     /**
-     * @return github password
-     */
-    public String githubPassword() {
-        return githubPassword;
-    }
-
-    /**
      * @return github oauth token
      */
     public String oauthToken() {
@@ -175,9 +164,6 @@ public class CacherProperties {
         if (isGHBotEnabled) {
             if (null == githubUsername || githubUsername.equals("")) {
                 throw new RequiredParameterMissingException("The parameter org.kie.cekit.cacher.github.username is required!");
-            }
-            if (null == githubPassword || githubPassword.equals("")) {
-                throw new RequiredParameterMissingException("The parameter org.kie.cekit.cacher.github.password is required!");
             }
             if (null == oauthToken || oauthToken.equals("")) {
                 throw new RequiredParameterMissingException("The parameter org.kie.cekit.cacher.github.oauth-token is required!");

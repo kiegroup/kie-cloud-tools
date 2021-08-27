@@ -63,7 +63,7 @@ public class GitRepository {
 
                 // remove the origin remote to add the user credentials.
                 run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "remote", "remove", "origin"});
-                String origin = rhdmFork.replace("https://", "https://" + cacherProperties.githubUsername() + ":" + cacherProperties.githubPassword() + "@");
+                String origin = rhdmFork.replace("https://", "https://" + cacherProperties.githubUsername() + ":" + cacherProperties.oauthToken() + "@");
                 run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "remote", "add", "origin", origin});
 
                 //add bot gh email address
@@ -79,7 +79,7 @@ public class GitRepository {
 
                 // remove the origin remote to add the user credentials.
                 run(cacherProperties.getGitDir() + "/rhpam-7-image", new String[]{"git", "remote", "remove", "origin"});
-                String origin = rhpamFork.replace("https://", "https://" + cacherProperties.githubUsername() + ":" + cacherProperties.githubPassword() + "@");
+                String origin = rhpamFork.replace("https://", "https://" + cacherProperties.githubUsername() + ":" + cacherProperties.oauthToken() + "@");
                 run(cacherProperties.getGitDir() + "/rhpam-7-image", new String[]{"git", "remote", "add", "origin", origin});
 
                 //add bot gh email address
