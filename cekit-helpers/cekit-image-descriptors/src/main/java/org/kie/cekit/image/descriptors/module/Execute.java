@@ -15,12 +15,20 @@
 
 package org.kie.cekit.image.descriptors.module;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+        "script",
+        "user"
+})
 @RegisterForReflection
 public class Execute {
 
     private String script;
+    private String user;
 
     public Execute(){}
 
@@ -32,10 +40,19 @@ public class Execute {
         this.script = script;
     }
 
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "Execute{" +
                 "script='" + script + '\'' +
+                ", user='" + user + '\'' +
                 '}';
     }
 }
