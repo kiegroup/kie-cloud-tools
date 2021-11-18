@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 /**
- * This class holds the operations related with rhpam/rhdm nightly builds
+ * This class holds the operations related with rhpam nightly builds
  */
 @ApplicationScoped
 public class NightlyBuildsWatcher {
@@ -80,7 +80,6 @@ public class NightlyBuildsWatcher {
             String normalizedVersion = version.orElse(cacherProperties.version());
             String normalizedBranch = branch.orElse(cacherProperties.defaultBranch());
             int rhpamCounter = 0;
-            int rhdmCounter = 0;
 
             if (buildDate.isPresent()) {
 
@@ -94,12 +93,6 @@ public class NightlyBuildsWatcher {
                                             normalizedVersion,
                                             normalizedBranch,
                                             force);
-                rhdmNightlyBuildDownloader(cacherProperties.productPropertyFile(
-                        String.format(cacherProperties.rhdmUrl(), normalizedVersion, buildDate.get())),
-                                           buildDate.get(),
-                                           normalizedVersion,
-                                           normalizedBranch,
-                                           force);
             } else {
 
                 while (rhpamCounter < 4) {
@@ -124,27 +117,6 @@ public class NightlyBuildsWatcher {
                     rhpamCounter++;
                 }
 
-                while (rhdmCounter < 4) {
-                    Properties rhdmProps = cacherProperties.productPropertyFile(
-                            String.format(cacherProperties.rhdmUrl(),
-                                          cacherProperties.version(),
-                                          LocalDate.now().minusDays(rhdmCounter).format(
-                                                  builderUtils.formatter(cacherProperties.getFormattedVersion()))));
-
-                    if (rhdmProps != null && rhdmProps.size() > 0) {
-                        rhdmNightlyBuildDownloader(rhdmProps,
-                                                   LocalDate.now().minusDays(rhdmCounter).format(
-                                                           builderUtils.formatter(cacherProperties.getFormattedVersion())),
-                                                   normalizedVersion,
-                                                   normalizedBranch,
-                                                   force);
-                        log.info("RHDM - Nightly build found, latest is " +
-                                         LocalDate.now().minusDays(rhdmCounter).format(
-                                                 builderUtils.formatter(cacherProperties.getFormattedVersion())));
-                        break;
-                    }
-                    rhdmCounter++;
-                }
             }
         } else {
             log.info("Watcher disabled.");
@@ -178,30 +150,4 @@ public class NightlyBuildsWatcher {
         });
     }
 
-    /**
-     * Downloads rhdm files
-     *
-     * @param rhdmProp
-     * @param buildDate
-     * @param version
-     * @param branch
-     */
-    private void rhdmNightlyBuildDownloader(Properties rhdmProp, String buildDate, String version, String branch, boolean force) {
-        // set the kieVersion
-        cacherProperties.setKieVersion(rhdmProp.get("KIE_VERSION").toString());
-        cacherProperties.getRhdmFiles2DownloadPropName().stream().forEach(file -> {
-            // make sure there is no rhdm already downloaded files
-            if (!cacherUtils.fileExistsByNameExcludeTmp(UrlUtils.getFileName(rhdmProp.get(file).toString()))) {
-                // Notify the git consumer that a new file is being downloaded.
-                buildCallback.onNewBuildReceived(new PlainArtifact(UrlUtils.getFileName(rhdmProp.get(file).toString()),
-                                                                   "",
-                                                                   "",
-                                                                   buildDate,
-                                                                   version,
-                                                                   branch,
-                                                                   0), force);
-                new Thread(() -> log.info(cacherUtils.fetchFile(rhdmProp.get(file).toString(), Optional.of("nightly"), 0))).start();
-            }
-        });
-    }
 }
