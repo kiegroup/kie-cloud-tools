@@ -147,19 +147,6 @@ public class GitRepository {
         checkoutDesiredBranch(branch);
         gitRebase(branch);
 
-        String rhdmFilter = String.format("# rhdm-%s.redhat", cacherProperties.version());
-        if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
-            rhdmFilter = String.format("# rhdm-%s.DM-redhat", cacherProperties.version());
-        }
-        String finalRhdmFilter = rhdmFilter;
-
-        log.fine("Using RHDM filter " + finalRhdmFilter);
-        String rhdmKieServerDateBuild = yamlFilesHelper
-                .loadRawData(cacherProperties.getGitDir() + "/rhdm-7-image/kieserver/modules/kieserver/module.yaml")
-                .stream()
-                .filter(line -> line.contains(finalRhdmFilter))
-                .findFirst().get();
-
         String rhpamFilter = String.format("# rhpam-%s.redhat", cacherProperties.version());
         if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
             rhpamFilter = String.format("# rhpam-%s.PAM-redhat", cacherProperties.version());
@@ -173,32 +160,20 @@ public class GitRepository {
                 .filter(line -> line.contains(finalRhpamFilter))
                 .findFirst().get();
 
-        Matcher rhdmMatcher = null;
         Matcher rhpamMatcher = null;
 
         try {
-            rhdmMatcher = buildUtils.buildDatePattern.matcher(rhdmKieServerDateBuild);
             rhpamMatcher = buildUtils.buildDatePattern.matcher(rhpamKieServerDateBuild);
         } catch (final Exception e) {
-            log.warning("Failed to parse date pattern for " + rhdmKieServerDateBuild + " or " + rhpamKieServerDateBuild);
+            log.warning("Failed to parse date pattern for " + rhpamKieServerDateBuild);
         }
 
-        if (rhdmMatcher.find() && rhpamMatcher.find()) {
-            log.fine("Matchers found... Proceeding with the groups validation...");
-            log.fine("rhdmMatcher group " + rhdmMatcher.group() + " rhpamMatcher group " + rhpamMatcher.group());
-            if (rhdmMatcher.group().equals(rhpamMatcher.group())) {
-                log.fine("Build date validation succeed, current build date is: " + rhdmMatcher.group());
-                return rhdmMatcher.group();
-            } else {
-                log.fine("Looks like RHDM and RHDM are different, needs to be force to return the latest build date present on rhdm or rhpam.");
-                if (force) {
-                    String date = Collections.max(Arrays.asList(rhdmMatcher.group(), rhpamMatcher.group()));
-                    log.fine("Forcing build date to be returned, the latest from RHDM and RHPAM will be used -> [" + date + "].");
-                    return date;
-                }
-            }
+        if (rhpamMatcher.find()) {
+            log.fine("Build date validation succeed, current build date is: " + rhpamMatcher.group());
+            return rhpamMatcher.group();
+
         } else {
-            log.warning("Not able to identify upstream build date, this is mostly caused by merging the PRs wrongly. RHPAM and RHDM should always be the same.");
+            log.warning("Not able to identify upstream build date");
         }
         return "NONE";
     }

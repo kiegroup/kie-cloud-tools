@@ -1,36 +1,45 @@
+---
 schema_version: 1
-
-name: "rhdm-7-kieserver"
-description: "Red Hat Decision Manager KIE Server 7.6 install"
+name: "rhpam-7-kieserver"
+version: "1.0"
+description: "Red Hat Process Automation Manager KIE Server 7.13 installer"
 labels:
   - name: "org.jboss.product"
-    value: "rhdm-kieserver"
+    value: "rhpam-kieserver"
   - name: "org.jboss.product.version"
-    value: "7.6.0"
-  - name: "org.jboss.product.rhdm-kieserver.version"
-    value: "7.6.0"
+    value: "7.13.0"
+  - name: "org.jboss.product.rhpam-kieserver.version"
+    value: "7.13.0"
 envs:
   - name: "JBOSS_PRODUCT"
-    value: "rhdm-kieserver"
-  - name: "RHDM_KIESERVER_VERSION"
-    value: "7.6.0"
+    value: "rhpam-kieserver"
+  - name: "RHPAM_KIESERVER_VERSION"
+    value: "7.13.0"
   - name: "PRODUCT_VERSION"
-    value: "7.6.0"
+    value: "7.13.0"
   - name: "KIE_SERVER_DISTRIBUTION_ZIP"
-    value: "kie_server_distribution.zip"
+    value: "rhpam_kie_server_distribution.zip"
+  - name: "BUSINESS_CENTRAL_DISTRIBUTION_ZIP"
+    value: "rhpam_business_central_distribution.zip"
+  - name: "BUSINESS_CENTRAL_DISTRIBUTION_EAP"
+    value: "jboss-eap-7.4"
+  - name: "JBPM_WB_KIE_SERVER_BACKEND_JAR"
+    value: "jbpm-wb-kie-server-backend-7.62.0.redhat-211107.jar"
+# remember to also update "JBPM_WB_KIE_SERVER_BACKEND_JAR" value
 artifacts:
-  - name: "KIE_SERVER_DISTRIBUTION_ZIP"
-    target: "kie_server_distribution.zip"
-    #     rhdm-7.6.0.DM-redhat-20190521-kie-server-ee8.zip
-    md5: "03bc4e80d0945994c4e9beb9e756e0ab"
+  - name: "rhpam_kie_server_distribution.zip"
+    # rhpam-7.13.0.redhat-211107-kie-server-ee8.zip
+    md5: "8f7e87bd95cb31fb355b2e6e6d304c77"
+  - name: "rhpam_business_central_distribution.zip"
+    # rhpam-7.13.0.redhat-211107-business-central-eap7-deployable.zip
+    md5: "d4686b213a605e72b369b06e6fb93bbb"
   - name: "slf4j-simple.jar"
-    target: "slf4j-simple.jar"
-    #     slf4j-simple-1.7.22.redhat-1.jar
-    md5: "51c319582c16a07c21e41737e45cb03a"
-  - name: "jbpm-event-emitters-kafka-7.x.Final.jar"
-    # jbpm-event-emitters-kafka-7.52.0.Final-redhat-00004.jar
-    md5: "07e2ec53eb779fab36b357b145ba255b"
-    dest: /opt
+    # slf4j-simple-1.7.22.redhat-2.jar
+    md5: "62cc6eeb72e2738e3acc8957ca95f37b"
+  - name: "kie-server-services-jbpm-cluster-7.62.0.redhat-211107.jar"
+    md5: "becde72be53a9b4b6453ef9a79f9b4b2"
+  - name: "jbpm-event-emitters-kafka-7.62.0.redhat-211107.jar"
+    md5: "1f877ff3ebd754cc1f78e8cf9736fdfb"
 run:
   user: 185
   cmd:
@@ -40,4 +49,4 @@ run:
     - "-c"
     - "standalone-full.xml"
 execute:
-  - script: install
+  - script: "install"
