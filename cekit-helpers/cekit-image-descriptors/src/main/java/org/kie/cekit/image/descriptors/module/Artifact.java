@@ -23,6 +23,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @JsonPropertyOrder({
         "name",
         "url",
+        "path",
         "dest",
         "target",
         "md5"
@@ -32,6 +33,7 @@ public class Artifact {
 
     private String name;
     private String url;
+    private String path;
     private String target;
     private String md5;
     private String dest;
@@ -53,6 +55,14 @@ public class Artifact {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public String getTarget() {
