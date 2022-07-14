@@ -98,7 +98,10 @@ public class GitRepository {
      * make sure to checkout the default git branch
      */
     private void checkoutDesiredBranch(String branch) throws IOException, InterruptedException {
-        run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "checkout", branch});
+        Version ve = buildUtils.getVersion(cacherProperties.version().split("[.]"));
+        if (ve.compareTo(cacherProperties.pam713) < 0) {
+            run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "checkout", branch});
+        }
         run(cacherProperties.getGitDir() + "/rhpam-7-image", new String[]{"git", "checkout", branch});
     }
 
@@ -116,10 +119,13 @@ public class GitRepository {
 
     public void gitRebase(String branch) throws IOException, InterruptedException {
         // only rebase if the last rebase happened in the last hour, or force it
+        Version ve = buildUtils.getVersion(cacherProperties.version().split("[.]"));
         if ((cacherProperties.isGHBotEnabled() && lastRebase.plusHours(1).isBefore(LocalDateTime.now())) || forceRebase) {
-            log.info("Rebasing rhdm-7-image git repository...");
-            run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "fetch", "upstream"});
-            run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "rebase", "upstream/" + branch});
+            if (ve.compareTo(cacherProperties.pam713) < 0) {
+                log.info("Rebasing rhdm-7-image git repository...");
+                run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "fetch", "upstream"});
+                run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "rebase", "upstream/" + branch});
+            }
 
             log.info("Rebasing rhpam-7-image git repository...");
             run(cacherProperties.getGitDir() + "/rhpam-7-image", new String[]{"git", "fetch", "upstream"});

@@ -29,6 +29,7 @@ public class CacherProperties {
     public final Version versionBeforeDMPAMPrefix = new Version(7, 8, 0, null, null, null);
     public final Version pam710 = new Version(7, 10, 0, null, null, null);
     public final Version pam711 = new Version(7, 11, 0, null, null, null);
+    public final Version pam713 = new Version(7, 13, 0, null, null, null);
 
     @Inject
     BuildUtils buildUtils;

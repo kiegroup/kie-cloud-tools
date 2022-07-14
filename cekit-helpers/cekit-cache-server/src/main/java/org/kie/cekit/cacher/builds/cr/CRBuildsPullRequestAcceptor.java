@@ -56,7 +56,9 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
                 log.fine("File received for pull request [" + fileName + " - " + checkSum + "].");
                 elements.get(fileName).setChecksum(checkSum);
 
-                if (buildUtils.isRhdmReadyForPR(elements)) {
+                Version v = buildUtils.getVersion(cacherProperties.version().split("[.]"));
+
+                if (buildUtils.isRhdmReadyForPR(elements) && v.compareTo(cacherProperties.pam713) < 0) {
                     log.info("RHDM CR [" + crBuild + "] is ready for PR.");
 
                     Version version = buildUtils.getVersion(elements.get(fileName).getVersion().split("[.]"));
