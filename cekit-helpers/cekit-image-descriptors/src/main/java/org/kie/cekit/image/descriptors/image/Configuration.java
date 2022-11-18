@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import org.kie.cekit.image.descriptors.container.Container;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -29,6 +30,9 @@ public class Configuration {
 
     @JsonProperty("container_file")
     private String containerFile;
+
+    @JsonProperty("container")
+    private Container container;
 
     public Configuration(){}
 
@@ -42,4 +46,13 @@ public class Configuration {
         this.containerFile = containerFile;
     }
 
+    @JsonProperty("container")
+    public Container getContainer() {
+        return container;
+    }
+
+    @JsonProperty("container")
+    public void setContainer(Container container) {
+        this.container = container;
+    }
 }
