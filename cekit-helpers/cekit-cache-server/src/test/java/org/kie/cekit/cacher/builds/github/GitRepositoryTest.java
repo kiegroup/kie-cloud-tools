@@ -33,31 +33,26 @@ public class GitRepositoryTest {
     }
 
     /**
-     * If this tests runs ok means that the github repos
+     * If this tests runs ok means that the GitHub repos
      * are correctly persisted on filesystem
      */
     @Test
     public void getCurrentProductBuildDateTest() throws IOException, InterruptedException {
-        Assertions.assertNotNull(gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch(), false));
-        Assertions.assertNotEquals("NONE", gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch(), true));
+        System.out.println("~asdasdasdasd " + cacherProperties.defaultBranch());
+        Assertions.assertNotNull(gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch()));
+        Assertions.assertNotEquals("NONE", gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch()));
     }
 
     @Test
     public void handleBranchTest() throws IOException, InterruptedException {
         gitRepository.handleBranch(BranchOperation.NEW_BRANCH, "myBranch", cacherProperties.defaultBranch(), "rhpam-7-image");
-        gitRepository.handleBranch(BranchOperation.NEW_BRANCH, "myBranch", cacherProperties.defaultBranch(), "rhdm-7-image");
-
         gitRepository.handleBranch(BranchOperation.DELETE_BRANCH, "myBranch", null, "rhpam-7-image");
-        gitRepository.handleBranch(BranchOperation.DELETE_BRANCH, "myBranch", null, "rhdm-7-image");
     }
 
     @Test
     public void handleCustomBranchTest() throws IOException, InterruptedException {
-        gitRepository.handleBranch(BranchOperation.NEW_BRANCH, "myOtherBranch", "7.5.x", "rhpam-7-image");
-        gitRepository.handleBranch(BranchOperation.NEW_BRANCH, "myOtherBranch", "7.5.x", "rhdm-7-image");
-
+        gitRepository.handleBranch(BranchOperation.NEW_BRANCH, "myOtherBranch", "7.13.x", "rhpam-7-image");
         gitRepository.handleBranch(BranchOperation.DELETE_BRANCH, "myOtherBranch", null, "rhpam-7-image");
-        gitRepository.handleBranch(BranchOperation.DELETE_BRANCH, "myOtherBranch", null, "rhdm-7-image");
     }
 
 

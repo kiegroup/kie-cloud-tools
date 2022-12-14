@@ -71,28 +71,4 @@ public class YamlFilesLoaderTest {
         Assertions.assertEquals("rhpam-7-process-migration", processMigration.getName());
 
     }
-
-    @Test
-    public void loadRhdmModulesFromGitTest() {
-
-        Module controller = yamlFilesHelper.load(cacherProperties.getGitDir() +
-                "/rhdm-7-image/controller/modules/controller/module.yaml");
-
-        Module decisioncentral = yamlFilesHelper.load(cacherProperties.getGitDir() +
-                "/rhdm-7-image/decisioncentral/modules/decisioncentral/module.yaml");
-
-        Module kieserver = yamlFilesHelper.load(cacherProperties.getGitDir() +
-                "/rhdm-7-image/kieserver/modules/kieserver/module.yaml");
-
-        Assertions.assertNotNull(controller);
-        Assertions.assertEquals("rhdm-7-controller", controller.getName());
-
-        Assertions.assertNotNull(decisioncentral);
-        Assertions.assertEquals("rhdm-7-decisioncentral", decisioncentral.getName());
-
-        Assertions.assertNotNull(kieserver);
-        Assertions.assertEquals("rhdm-7-kieserver", kieserver.getName());
-
-    }
-
 }
