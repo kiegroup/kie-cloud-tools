@@ -58,7 +58,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
     public void onNewBuildReceived(PlainArtifact artifact, boolean force) {
         try {
             Version version = buildUtils.getVersion(artifact.getVersion().split("[.]"));
-            String bDate = gitRepository.getCurrentProductBuildDate(artifact.getBranch(), force);
+            String bDate = gitRepository.getCurrentProductBuildDate(artifact.getBranch());
 
             log.fine("KIE_VERSION retrieve from Nightly properties file --> " + cacherProperties.getKieVersion());
 

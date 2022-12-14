@@ -53,24 +53,7 @@ public class GitRepository {
             log.info("Preparing git repositories...");
             lastRebase = LocalDateTime.now();
             forceRebase = true;
-            String rhdmFork = cacherProperties.rhdmUpstream().replace(cacherProperties.rhdmUpstream().split("/")[3], cacherProperties.githubUsername());
             String rhpamFork = cacherProperties.rhpamUpstream().replace(cacherProperties.rhpamUpstream().split("/")[3], cacherProperties.githubUsername());
-
-            if (Files.isExecutable(Paths.get(cacherProperties.getGitDir() + "/rhdm-7-image"))) {
-                log.info("rhdm-image repo already exists.");
-            } else {
-                run(cacherProperties.getGitDir(), new String[]{"git", "clone", rhdmFork});
-
-                // remove the origin remote to add the user credentials.
-                run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "remote", "remove", "origin"});
-                String origin = rhdmFork.replace("https://", "https://" + cacherProperties.githubUsername() + ":" + cacherProperties.oauthToken() + "@");
-                run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "remote", "add", "origin", origin});
-
-                //add bot gh email address
-                run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "config", "user.email", cacherProperties.githubEmail()});
-
-                run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "remote", "add", "upstream", cacherProperties.rhdmUpstream()});
-            }
 
             if (Files.isExecutable(Paths.get(cacherProperties.getGitDir() + "/rhpam-7-image"))) {
                 log.info("rhpam-image repo already exists.");
@@ -95,18 +78,17 @@ public class GitRepository {
     }
 
     /**
-     * make sure to checkout the default git branch
+     * make sure to check out the default git branch
      */
     private void checkoutDesiredBranch(String branch) throws IOException, InterruptedException {
-        run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "checkout", branch});
         run(cacherProperties.getGitDir() + "/rhpam-7-image", new String[]{"git", "checkout", branch});
     }
 
     /**
-     * Every 24h a rebase on OpenShfit repo will be made
+     * Every 24h a rebase on OpenShift repo will be made
      * or everytime a new file resulting from a nightly build
      * was added to the cacher's artifact dir. Once it is done
-     * a new PR will be triggered updating the rhdm|rhpam-7-image
+     * a new PR will be triggered updating the rhpam-7-image
      * local repos.
      */
     @Scheduled(every = "24h", delay = 24, delayUnit = TimeUnit.HOURS)
@@ -117,10 +99,6 @@ public class GitRepository {
     public void gitRebase(String branch) throws IOException, InterruptedException {
         // only rebase if the last rebase happened in the last hour, or force it
         if ((cacherProperties.isGHBotEnabled() && lastRebase.plusHours(1).isBefore(LocalDateTime.now())) || forceRebase) {
-            log.info("Rebasing rhdm-7-image git repository...");
-            run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "fetch", "upstream"});
-            run(cacherProperties.getGitDir() + "/rhdm-7-image", new String[]{"git", "rebase", "upstream/" + branch});
-
             log.info("Rebasing rhpam-7-image git repository...");
             run(cacherProperties.getGitDir() + "/rhpam-7-image", new String[]{"git", "fetch", "upstream"});
             run(cacherProperties.getGitDir() + "/rhpam-7-image", new String[]{"git", "rebase", "upstream/" + branch});
@@ -132,13 +110,12 @@ public class GitRepository {
     }
 
     /**
-     * Verify one RHDM and RHPAM file that is usually updated:
+     * Verify one RHPAM file that is usually updated:
      * CacherUtils.CACHER_GIT_DIR + "/rhpam-7-image/kieserver/modules/kieserver/module.yaml"
-     * CacherUtils.CACHER_GIT_DIR + "/rhdm-7-image/kieserver/modules/kieserver/module.yaml"
      *
      * @return {@link String currentBuildDate}
      */
-    public String getCurrentProductBuildDate(String branch, boolean force) throws IOException, InterruptedException {
+    public String getCurrentProductBuildDate(String branch) throws IOException, InterruptedException {
 
         Version version = cacherProperties.getFormattedVersion();
 
@@ -163,6 +140,7 @@ public class GitRepository {
         Matcher rhpamMatcher = null;
 
         try {
+            log.fine("RHPAM KIE Server buildDate is " + rhpamKieServerDateBuild);
             rhpamMatcher = buildUtils.buildDatePattern.matcher(rhpamKieServerDateBuild);
         } catch (final Exception e) {
             log.warning("Failed to parse date pattern for " + rhpamKieServerDateBuild);

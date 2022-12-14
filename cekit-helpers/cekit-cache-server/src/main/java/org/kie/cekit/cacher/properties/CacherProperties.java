@@ -54,10 +54,6 @@ public class CacherProperties {
     String githubReviewers;
 
     @Inject
-    @CacherProperty(name = "org.kie.cekit.cacher.github.rhdm.upstream.project")
-    String rhdmUpstream;
-
-    @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.github.rhpam.upstream.project")
     String rhpamUpstream;
 
@@ -74,16 +70,8 @@ public class CacherProperties {
     String rhpamUrl;
 
     @Inject
-    @CacherProperty(name = "org.kie.cekit.cacher.rhdm.url")
-    String rhdmUrl;
-
-    @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.rhpam.cr.url")
     String rhpamCRUrl;
-
-    @Inject
-    @CacherProperty(name = "org.kie.cekit.cacher.rhdm.cr.url")
-    String rhdmCRUrl;
 
     @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.nightly.maven.repo")
@@ -174,9 +162,6 @@ public class CacherProperties {
             if (null == githubReviewers || githubReviewers.equals("")) {
                 throw new RequiredParameterMissingException("The parameter org.kie.cekit.cacher.github.reviewers is required!");
             }
-            if (null == rhdmUpstream || rhdmUpstream.equals("")) {
-                throw new RequiredParameterMissingException("The parameter org.kie.cekit.cacher.github.rhdm.upstream.project is required!");
-            }
             if (null == rhpamUpstream || rhpamUpstream.equals("")) {
                 throw new RequiredParameterMissingException("The parameter org.kie.cekit.cacher.github.rhpam.upstream.project is required!");
             }
@@ -192,18 +177,13 @@ public class CacherProperties {
     }
 
     /**
-     * @return the hanguots user id of the github PR reviewers
+     * @return the gchat user id of the GitHub PR reviewers
      */
     public String[] githubReviewers() {
         return githubReviewers.trim().split(",");
     }
 
-    /**
-     * @return rhdm upstream git repository
-     */
-    public String rhdmUpstream() {
-        return rhdmUpstream;
-    }
+
 
     /**
      * @return rhpam upstream git repository
@@ -220,21 +200,10 @@ public class CacherProperties {
     }
 
     /**
-     * @return rhdm nightly build url information
+     * @return the URL that holds CR build properties for rhdm
      */
-    public String rhdmUrl() {
-        return rhdmUrl;
-    }
-
     public String rhpamCRUrl() {
         return rhpamCRUrl;
-    }
-
-    /**
-     * @return the configure CR build properties for rhdm
-     */
-    public String rhdmCRUrl() {
-        return rhdmCRUrl;
     }
 
     /**
@@ -294,9 +263,6 @@ public class CacherProperties {
             if (null == rhpamUrl || rhpamUrl.equals("")) {
                 throw new RequiredParameterMissingException("The parameter org.kie.cekit.cacher.rhpam.url is required!");
             }
-            if (null == rhdmUrl || rhdmUrl.equals("")) {
-                throw new RequiredParameterMissingException("The parameter org.kie.cekit.cacher.rhdm.url is required!");
-            }
             if (null == version || version.equals("")) {
                 throw new RequiredParameterMissingException("The parameter org.kie.cekit.cacher.product.version is required!");
             }
@@ -305,7 +271,7 @@ public class CacherProperties {
     }
 
     /**
-     * @return the pre load file location, it will be read at startup time.
+     * @return the preload file location, it will be read at startup time.
      */
     public String preLoadFileLocation() {
         return preLoadFileLocation;
@@ -365,13 +331,6 @@ public class CacherProperties {
     }
 
     /**
-     * @return properties key name for rhdm artifacts
-     */
-    public List<String> getRhdmFiles2DownloadPropName() {
-        return rhdmFiles2DownloadPropName;
-    }
-
-    /**
      * fetch the RHDM/RHPAM build properties file.
      *
      * @param url
@@ -383,7 +342,7 @@ public class CacherProperties {
 
         try (Response response = HttpRequestHandler.executeHttpCall(url)) {
             if (response.code() == 404) {
-                log.info("RHDM/PAM properties file not found... url -> " + url);
+                log.info("RHPAM properties file not found... url -> " + url);
                 return p;
             }
             try (final InputStream stream = Objects.requireNonNull(response.body()).byteStream()) {

@@ -87,7 +87,7 @@ public class NightlyBuildsPullRequestAcceptorTest {
 
         // test rhpam kieserver
         String kieserverFile = cacherProperties.getGitDir() + "/rhpam-7-image/kieserver/modules/kieserver/module.yaml";
-        String buildDate = gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch(), true);
+        String buildDate = gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch());
         Module kieserver = yamlFilesHelper.load(kieserverFile);
 
         yamlFilesHelper.writeModule(kieserver, kieserverFile);
@@ -125,51 +125,6 @@ public class NightlyBuildsPullRequestAcceptorTest {
                 String.format("  # %s", "rhpam-7.8.0.redhat-201006-add-ons.zip"));
         Assertions.assertTrue(containsComment(processMigrationFile, String.format("  # %s", "rhpam-7.8.0.redhat-201006-add-ons.zip")));
 
-    }
-
-    @Test
-    public void testNightlyRhdmCommentaryAddition() throws IOException, InterruptedException {
-
-        String controllerFile = cacherProperties.getGitDir() + "/rhdm-7-image/controller/modules/controller/module.yaml";
-        Module controller = yamlFilesHelper.load(controllerFile);
-        yamlFilesHelper.writeModule(controller, controllerFile);
-        buildUtils.reAddComment(controllerFile, "name: \"" + buildUtils.RHDM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
-                String.format("  # %s", "rhdm-7.8.0.redhat-201006-add-ons.zip"));
-        Assertions.assertTrue(containsComment(controllerFile,
-                String.format("  # %s", "rhdm-7.8.0.redhat-201006-add-ons.zip")));
-        // test env file name update
-        controller.getEnvs().stream().forEach(env -> {
-            if (env.getName().equals("CONTROLLER_DISTRIBUTION_ZIP")) {
-                // rhdm-${shortenedVersion}-controller-ee7.zip
-                String controllerEE7Zip = String.format("rhdm-%s-controller-ee7.zip", "7.9");
-                // if the filename does not match the current shortened version, update it
-                if (!env.getValue().equals(controllerEE7Zip)) {
-                    env.setValue(controllerEE7Zip);
-                }
-                Assertions.assertEquals(controllerEE7Zip, env.getValue());
-            }
-        });
-
-
-        String decisionCentralFile = cacherProperties.getGitDir() + "/rhdm-7-image/decisioncentral/modules/decisioncentral/module.yaml";
-        Module decisionCentral = yamlFilesHelper.load(decisionCentralFile);
-        yamlFilesHelper.writeModule(decisionCentral, decisionCentralFile);
-        buildUtils.reAddComment(decisionCentralFile, "name: \"" + buildUtils.RHDM_DECISION_CENTRAL_DISTRIBUTION_ZIP + "\"",
-                String.format("  # %s", "rhdm-7.8.0.redhat-201006-decision-central-eap7-deployable.zip"));
-        Assertions.assertTrue(containsComment(decisionCentralFile,
-                String.format("  # %s", "rhdm-7.8.0.redhat-201006-decision-central-eap7-deployable.zip")));
-
-
-        String kieserverFile = cacherProperties.getGitDir() + "/rhdm-7-image/kieserver/modules/kieserver/module.yaml";
-        Module kieserver = yamlFilesHelper.load(kieserverFile);
-        yamlFilesHelper.writeModule(kieserver, kieserverFile);
-        buildUtils.reAddComment(kieserverFile, "name: \"" + buildUtils.RHDM_KIE_SERVER_DISTRIBUTION_ZIP + "\"",
-                String.format("  # %s", "rhdm-7.8.0.redhat-201006-kie-server-ee8.zip"));
-        buildUtils.reAddComment(kieserverFile, "name: \"slf4j-simple.jar\"", "  # slf4j-simple-1.7.22.redhat-2.jar");
-        Assertions.assertTrue(containsComment(kieserverFile,
-                String.format("  # %s", "rhdm-7.8.0.redhat-201006-kie-server-ee8.zip")));
-        Assertions.assertTrue(containsComment(kieserverFile,
-                String.format("  # %s", "slf4j-simple-1.7.22.redhat-2.jar")));
     }
 
     /**

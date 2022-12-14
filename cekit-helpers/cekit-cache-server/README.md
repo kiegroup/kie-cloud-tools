@@ -14,7 +14,6 @@ org.kie.cekit.cacher.preload.file - configure it with a txt file containing the 
 # Product Nightly Builds properties
 org.kie.cekit.cacher.enable.nightly.watcher - enables the nightly builds watcher
 org.kie.cekit.cacher.product.version (requiresd if watcher is enabled) - rhpam/rhdm product version
-org.kie.cekit.cacher.rhdm.url (requiresd if watcher is enabled) - RHDM nightly build properties url
 org.kie.cekit.cacher.rhpam.url (requiresd if watcher is enabled) - RHPAM nightly build properties url
 
 ## Github integration info
@@ -26,7 +25,6 @@ org.kie.cekit.cacher.github.oauth-token (required if github bot is enabled) - gi
 org.kie.cekit.cacher.github.reviewers (required if github bot is enabled) - The Google Chats user id, just use the ID in this field, ignore the "user/" prefix.
 
 # Forked repository will be based on the provided username.
-org.kie.cekit.cacher.github.rhdm.upstream.project - rhdm upstreagm
 org.kie.cekit.cacher.github.rhpam.upstream.project - rhpam upstream
 org.kie.cekit.cacher.github.default.branch - rhpam and rhdm upstream default branch
 
@@ -37,7 +35,6 @@ that you want to send notification.
 
 # Product CR builds
 org.kie.cekit.cacher.rhpam.cr.url -  RHPAM CR build properties url
-org.kie.cekit.cacher.rhdm.cr.url -  RHDM CR build properties url
 ```
 
 Note that, the cekit-cacher.properties also supports configuration using environment variables with the `${ENV_NAME}` pattern, example:
@@ -62,9 +59,7 @@ export CACHER_GITHUB_USERNAME=bsig-gh-bot; \
 export CACHER_GITHUB_PASSWORD=password; \
 export CACHER_GITHUB_OAUTH_TOKEN=token; \
 export CACHER_GITHUB_EMAIL=emailg@emailh.com; \
-export CACHER_RHDM_URL=https://url; \
 export CACHER_RHPAM_URL=https://url; \
-export CACHER_RHDM_UPSTREAM=https://github.com/jboss-container-images/rhdm-7-image.git; \
 export CACHER_RHPAM_UPSTREAM=https://github.com/jboss-container-images/rhpam-7-image.git; \
 export CACHER_DEFAULT_BRANCH=master; \
 export CACHER_GITHUB_REVIEWERS="user/ignore"; \
@@ -140,7 +135,7 @@ It will build the Java application a run the tests as well. The default builder 
 update the BUILD_ENGINE parameter in the Makefile.
 
 This build will produce the image ready to use, however the properties needs to be set using environment variables.
-Otherwise the bootstrap will fail.
+Otherwise, the bootstrap will fail.
 
 To run the image:
 

@@ -51,7 +51,7 @@ public class PullRequestSender {
     }
 
     /**
-     * perform the Pull request via Git Hub Rest API and notifies
+     * perform the Pull request via GitHub Rest API and notifies target recipients
      *
      * @param url
      * @param requestBodyAsText
