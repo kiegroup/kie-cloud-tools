@@ -16,6 +16,7 @@
 package org.kie.cekit.image.descriptors.common;
 
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -25,7 +26,8 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @JsonPropertyOrder({
         "user",
         "cmd",
-        "workdir"
+        "workdir",
+        "entrypoint"
 })
 @RegisterForReflection
 public class Run {
@@ -36,6 +38,9 @@ public class Run {
     private List<String> cmd;
     @JsonProperty("workdir")
     private String workdir;
+
+    @JsonProperty("entrypoint")
+    private List<String> entrypoint;
 
     public Run(){}
 
@@ -59,12 +64,24 @@ public class Run {
         this.cmd = cmd;
     }
 
+    @JsonProperty("workdir")
     public String getWorkdir() {
         return workdir;
     }
 
+    @JsonProperty("workdir")
     public void setWorkdir(String workdir) {
         this.workdir = workdir;
+    }
+
+    @JsonProperty("entrypoint")
+    public List<String> getEntrypoint() {
+        return entrypoint;
+    }
+
+    @JsonProperty("entrypoint")
+    public void setEntrypoint(List<String> entrypoint) {
+        this.entrypoint = entrypoint;
     }
 
     @Override
@@ -73,6 +90,7 @@ public class Run {
                 "user=" + user +
                 ", cmd=" + cmd +
                 ", workdir='" + workdir + '\'' +
+                ", entrypoint='" + entrypoint + '\'' +
                 '}';
     }
 }
