@@ -22,13 +22,29 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "value"
+        "value",
+        "service",
+        "expose",
+        "protocol",
+        "description"
 })
 @RegisterForReflection
 public class Port {
 
     @JsonProperty("value")
     private Integer value;
+
+    @JsonProperty("service")
+    private String service;
+
+    @JsonProperty("expose")
+    private Boolean expose;
+
+    @JsonProperty("protocol")
+    private String protocol;
+
+    @JsonProperty("description")
+    private String description;
 
     public Port(){}
 
@@ -42,10 +58,54 @@ public class Port {
         this.value = value;
     }
 
+    @JsonProperty("service")
+    public String getService() {
+        return service;
+    }
+
+    @JsonProperty("service")
+    public void setService(String service) {
+        this.service = service;
+    }
+
+    @JsonProperty("expose")
+    public Boolean getExpose() {
+        return expose;
+    }
+
+    @JsonProperty("expose")
+    public void setExpose(Boolean expose) {
+        this.expose = expose;
+    }
+
+    @JsonProperty("protocol")
+    public String getProtocol() {
+        return protocol;
+    }
+
+    @JsonProperty("protocol")
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    @JsonProperty("description")
+    public String getDescription() {
+        return description;
+    }
+
+    @JsonProperty("description")
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "Port{" +
                 "value=" + value +
+                ", service='" + service + '\'' +
+                ", expose=" + expose +
+                ", protocol='" + protocol + '\'' +
+                ", description='" + description + '\'' +
                 '}';
     }
 }
