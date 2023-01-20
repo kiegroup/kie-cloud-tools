@@ -3,14 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.kie</groupId>
   <artifactId>cekit-helpers</artifactId>
-  <version>1.3.4</version>
+  <version>1.3.5-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <scm>
     <connection>scm:git:https://github.com/kiegroup/kie-cloud-tools.git</connection>
     <developerConnection>scm:git:https://github.com/kiegroup/kie-cloud-tools.git</developerConnection>
     <url>https://github.com/kiegroup/kie-cloud-tools.git</url>
-    <tag>cekit-helpers-1.3.4</tag>
+    <tag>cekit-helpers-1.3.1</tag>
   </scm>
 
   <properties>
