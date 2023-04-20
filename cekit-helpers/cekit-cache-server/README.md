@@ -13,7 +13,7 @@ org.kie.cekit.cacher.preload.file - configure it with a txt file containing the 
 
 # Product Nightly Builds properties
 org.kie.cekit.cacher.enable.nightly.watcher - enables the nightly builds watcher
-org.kie.cekit.cacher.product.version (requiresd if watcher is enabled) - rhpam/rhdm product version
+org.kie.cekit.cacher.product.version (requiresd if watcher is enabled) - rhpam product version
 org.kie.cekit.cacher.rhpam.url (requiresd if watcher is enabled) - RHPAM nightly build properties url
 
 ## Github integration info
@@ -26,7 +26,7 @@ org.kie.cekit.cacher.github.reviewers (required if github bot is enabled) - The 
 
 # Forked repository will be based on the provided username.
 org.kie.cekit.cacher.github.rhpam.upstream.project - rhpam upstream
-org.kie.cekit.cacher.github.default.branch - rhpam and rhdm upstream default branch
+org.kie.cekit.cacher.github.default.branch - rhpam upstream default branch
 
 # google chat room webhook conf
 # be sure to scape special characters
@@ -53,7 +53,7 @@ Note that, to run the tests, a few parameters will be needed, the tests will run
 
 ```bash
 export CACHER_BASE_DIR=/tmp/cacher/data; \
-export CACHER_PRODUCT_VERSION=7.10.0; \
+export CACHER_PRODUCT_VERSION=7.14.0; \
 export CACHER_ENABLE_GITHUB_BOT=true; \
 export CACHER_GITHUB_USERNAME=bsig-gh-bot; \
 export CACHER_GITHUB_PASSWORD=password; \
@@ -61,9 +61,9 @@ export CACHER_GITHUB_OAUTH_TOKEN=token; \
 export CACHER_GITHUB_EMAIL=emailg@emailh.com; \
 export CACHER_RHPAM_URL=https://url; \
 export CACHER_RHPAM_UPSTREAM=https://github.com/jboss-container-images/rhpam-7-image.git; \
-export CACHER_DEFAULT_BRANCH=master; \
+export CACHER_DEFAULT_BRANCH=main; \
 export CACHER_GITHUB_REVIEWERS="user/ignore"; \
-export CACHER_PRELOAD_FILE=/opt/cacher/load-from-file.txt
+export CACHER_PRELOAD_FILE=/tmp/pre-load.txt
 ```
 
 ### Configuring the CeKit to fetch files from Cacher
@@ -164,7 +164,6 @@ Copying config 25710a6fad done
 Writing manifest to image destination
 Storing signatures
 ```
-
 
 
 ### Accessing the CEKit Cache Server

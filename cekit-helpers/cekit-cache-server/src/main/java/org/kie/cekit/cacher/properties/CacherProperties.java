@@ -97,6 +97,10 @@ public class CacherProperties {
     @CacherProperty(name = "org.kie.cekit.cacher.preload.file")
     String preLoadFileLocation;
 
+    @Inject
+    @CacherProperty(name = "org.kie.cekit.cacher.trust.all")
+    boolean trustAll;
+
     /**
      * Value will set during runtime while CR or Nightly build watcher is run, it comes from
      * the build properties file from the property "KIE_VERSION"
@@ -111,18 +115,7 @@ public class CacherProperties {
             "rhpam.addons.latest.url",
             "rhpam.business-central-eap7.latest.url",
             "rhpam.monitoring.latest.url",
-            "rhpam.kie-server.ee8.latest.url"
-    );
-
-    /**
-     * RHM properties keys needed to download the nightly builds artifacts
-     * These properties came from the product properties file.
-     */
-    private List<String> rhdmFiles2DownloadPropName = Arrays.asList(
-            "rhdm.addons.latest.url",
-            "rhdm.decision-central-eap7.latest.url",
-            "rhdm.kie-server.ee8.latest.url"
-    );
+            "rhpam.kie-server.ee8.latest.url");
 
     /**
      * @return github Username
@@ -170,7 +163,7 @@ public class CacherProperties {
     }
 
     /**
-     * @return default branch for rhdm/pam upstream
+     * @return default branch for rhpam upstream
      */
     public String defaultBranch() {
         return defaultBranch;
@@ -182,8 +175,6 @@ public class CacherProperties {
     public String[] githubReviewers() {
         return githubReviewers.trim().split(",");
     }
-
-
 
     /**
      * @return rhpam upstream git repository
@@ -200,7 +191,7 @@ public class CacherProperties {
     }
 
     /**
-     * @return the URL that holds CR build properties for rhdm
+     * @return the URL that holds CR build properties for rhpam
      */
     public String rhpamCRUrl() {
         return rhpamCRUrl;
@@ -221,7 +212,6 @@ public class CacherProperties {
     public String crMavenRepo() {
         return crMavenRepo;
     }
-
 
     /**
      * @return rhpam/dm product shortened version
@@ -300,16 +290,15 @@ public class CacherProperties {
         return cacherDataDir + "/git";
     }
 
+    public boolean trustAllCerts() {
+        return trustAll;
+    }
+
     /**
      * @return all cacher directories
      */
     public List<String> getCacherDirs() {
-        return Arrays.asList(
-                cacherDataDir,
-                getCacherArtifactsDir(),
-                getArtifactsTmpDir(),
-                getGitDir()
-        );
+        return Arrays.asList(cacherDataDir, getCacherArtifactsDir(), getArtifactsTmpDir(), getGitDir());
     }
 
     public String getKieVersion() {
@@ -331,7 +320,7 @@ public class CacherProperties {
     }
 
     /**
-     * fetch the RHDM/RHPAM build properties file.
+     * fetch the RHPAM build properties file.
      *
      * @param url
      * @return parsed properties from target url
@@ -340,7 +329,7 @@ public class CacherProperties {
         log.info("Trying to get product properties file from " + url);
         Properties p = new Properties();
 
-        try (Response response = HttpRequestHandler.executeHttpCall(url)) {
+        try (Response response = HttpRequestHandler.executeHttpCall(url, trustAllCerts())) {
             if (response.code() == 404) {
                 log.info("RHPAM properties file not found... url -> " + url);
                 return p;

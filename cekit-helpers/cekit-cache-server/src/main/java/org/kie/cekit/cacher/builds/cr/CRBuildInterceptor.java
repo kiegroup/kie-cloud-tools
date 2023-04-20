@@ -4,7 +4,7 @@ import org.kie.cekit.cacher.objects.PlainArtifact;
 
 /**
  * A simple callback to notify the PullRequestAcceptor class
- * when a new rhdm/rhpam artifact is being downloaded, and
+ * when a new rhpam artifact is being downloaded, and
  * after it is persisted (download is finished) to start the
  * Pull Request process
  */

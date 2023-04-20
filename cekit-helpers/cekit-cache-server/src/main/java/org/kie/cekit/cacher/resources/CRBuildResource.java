@@ -20,10 +20,6 @@ public class CRBuildResource {
     @Inject
     CRBuildsUpdater crBuildsUpdater;
 
-    @Inject
-    CacherProperties cacherProperties;
-
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/use/{version}/{releaseBranch}/{crBuild}")

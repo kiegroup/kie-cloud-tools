@@ -9,7 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -115,8 +116,7 @@ public class GitRepository {
      *
      * @return {@link String currentBuildDate}
      */
-    public String getCurrentProductBuildDate(String branch) throws IOException, InterruptedException {
-
+    public Optional<String> getCurrentProductBuildDate(String branch) throws IOException, InterruptedException {
         Version version = cacherProperties.getFormattedVersion();
 
         // rebase before
@@ -131,29 +131,29 @@ public class GitRepository {
         String finalRhpamFilter = rhpamFilter;
         log.fine("Using RHPAM filter " + finalRhpamFilter);
 
-        String rhpamKieServerDateBuild = yamlFilesHelper
+        Optional<String> rhpamKieServerDateBuild = yamlFilesHelper
                 .loadRawData(cacherProperties.getGitDir() + "/rhpam-7-image/kieserver/modules/kieserver/module.yaml")
                 .stream()
                 .filter(line -> line.contains(finalRhpamFilter))
-                .findFirst().get();
+                .findFirst();
 
         Matcher rhpamMatcher = null;
+        if (rhpamKieServerDateBuild.isPresent()) {
+            try {
+                log.fine("RHPAM KIE Server buildDate is " + rhpamKieServerDateBuild);
+                rhpamMatcher = buildUtils.buildDatePattern.matcher(rhpamKieServerDateBuild.get());
+            } catch (final Exception e) {
+                log.warning("Failed to parse date pattern for " + rhpamKieServerDateBuild);
+            }
 
-        try {
-            log.fine("RHPAM KIE Server buildDate is " + rhpamKieServerDateBuild);
-            rhpamMatcher = buildUtils.buildDatePattern.matcher(rhpamKieServerDateBuild);
-        } catch (final Exception e) {
-            log.warning("Failed to parse date pattern for " + rhpamKieServerDateBuild);
+            if (rhpamMatcher.find()) {
+                log.fine("Build date validation succeed, current build date is: " + rhpamMatcher.group());
+                return Optional.of(rhpamMatcher.group());
+            } else {
+                log.warning("Not able to identify upstream build date");
+            }
         }
-
-        if (rhpamMatcher.find()) {
-            log.fine("Build date validation succeed, current build date is: " + rhpamMatcher.group());
-            return rhpamMatcher.group();
-
-        } else {
-            log.warning("Not able to identify upstream build date");
-        }
-        return "NONE";
+        return Optional.empty();
     }
 
     /**
