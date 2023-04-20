@@ -1,15 +1,5 @@
 package org.kie.cekit.cacher.utils;
 
-import io.quarkus.scheduler.Scheduled;
-import org.kie.cekit.cacher.builds.cr.CRBuildInterceptor;
-import org.kie.cekit.cacher.builds.nightly.NightlyBuildUpdatesInterceptor;
-import org.kie.cekit.cacher.objects.CacherUploadedFile;
-import org.kie.cekit.cacher.objects.PlainArtifact;
-import org.kie.cekit.cacher.properties.CacherProperties;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,8 +17,10 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,6 +36,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import io.quarkus.scheduler.Scheduled;
+import org.kie.cekit.cacher.builds.cr.CRBuildInterceptor;
+import org.kie.cekit.cacher.builds.nightly.NightlyBuildUpdatesInterceptor;
+import org.kie.cekit.cacher.objects.CacherUploadedFile;
+import org.kie.cekit.cacher.objects.PlainArtifact;
+import org.kie.cekit.cacher.properties.CacherProperties;
 
 @ApplicationScoped
 public class CacherUtils {
@@ -131,7 +137,7 @@ public class CacherUtils {
      * org.kie.cekit.cacher.preload.file
      */
     public void preLoadFromFile() {
-        if (Paths.get(cacherProperties.preLoadFileLocation()).toFile().exists() && null != cacherProperties.preLoadFileLocation()) {
+        if (cacherProperties.preLoadFileLocation() != null && Paths.get(cacherProperties.preLoadFileLocation()).toFile().exists()) {
             log.info("File " + cacherProperties.preLoadFileLocation() + " found. Starting the pre load.");
 
             try (BufferedReader br = Files.newBufferedReader(Paths.get(cacherProperties.preLoadFileLocation()))) {
@@ -181,7 +187,8 @@ public class CacherUtils {
         String filePath = cacherProperties.getArtifactsTmpDir() + "/" + fileName;
         String fileChecksum = "";
 
-        if (Files.exists(Paths.get(filePath))) {
+        final Path path = Paths.get(filePath);
+        if (Files.exists(path)) {
             return "File " + fileName + " still being downloaded, skipping...";
         }
 
@@ -195,10 +202,10 @@ public class CacherUtils {
 
             try {
                 Files.createDirectory(Paths.get(cacherProperties.getCacherArtifactsDir() + "/" + fileChecksum));
-                Files.move(Paths.get(filePath), Paths.get(cacherProperties.getCacherArtifactsDir() + "/" + fileChecksum + "/" + fileName));
+                Files.move(path, Paths.get(cacherProperties.getCacherArtifactsDir() + "/" + fileChecksum + "/" + fileName));
             } catch (FileAlreadyExistsException e) {
                 try {
-                    Files.delete(Paths.get(filePath));
+                    Files.delete(path);
                 } catch (IOException ex) {
                     //ignore
                 }
@@ -210,7 +217,7 @@ public class CacherUtils {
         } catch (final IOException e) {
             e.printStackTrace();
             try {
-                Files.delete(Paths.get(filePath));
+                Files.delete(path);
                 Files.delete(Paths.get(cacherProperties.getCacherArtifactsDir() + "/" + fileChecksum));
             } catch (IOException ex) {
                 // ignore
@@ -464,7 +471,6 @@ public class CacherUtils {
                 Files.delete(Paths.get(tmpFileLocation));
                 return "File " + input.fileName + " already exists";
             }
-
         } catch (final Exception e) {
             try {
                 Files.delete(Paths.get(tmpFileLocation));

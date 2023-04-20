@@ -58,22 +58,26 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
     public void onNewBuildReceived(PlainArtifact artifact, boolean force) {
         try {
             Version version = buildUtils.getVersion(artifact.getVersion().split("[.]"));
-            String bDate = gitRepository.getCurrentProductBuildDate(artifact.getBranch());
 
             log.fine("KIE_VERSION retrieve from Nightly properties file --> " + cacherProperties.getKieVersion());
 
             // for upstream compare the build date size to make sure the correct formatter is being used
-            LocalDate upstreamBuildDate = LocalDate.parse(
-                    bDate,
-                    buildUtils.formatter(bDate));
-
-            LocalDate buildDate = LocalDate.parse(artifact.getBuildDate(), buildUtils.formatter(version));
-
-            if (buildDate.isAfter(upstreamBuildDate) || force) {
-                log.fine("File " + artifact.getFileName() + " received for PR.");
-                elements.put(artifact.getFileName(), artifact);
+            Optional<String> bDate = gitRepository.getCurrentProductBuildDate(artifact.getBranch());
+            if (bDate.isEmpty()) {
+                log.fine("Not able to determine the current build date, continuing...");
             } else {
-                log.fine(String.format("BuildDate received [%s] is before or equal than the upstream build date [%s]", buildDate, upstreamBuildDate));
+                LocalDate upstreamBuildDate = LocalDate.parse(
+                        bDate.get(),
+                        buildUtils.formatter(bDate.get()));
+
+                LocalDate buildDate = LocalDate.parse(artifact.getBuildDate(), buildUtils.formatter(version));
+
+                if (buildDate.isAfter(upstreamBuildDate) || force) {
+                    log.fine("File " + artifact.getFileName() + " received for PR.");
+                    elements.put(artifact.getFileName(), artifact);
+                } else {
+                    log.fine(String.format("BuildDate received [%s] is before or equal than the upstream build date [%s]", buildDate, upstreamBuildDate));
+                }
             }
         } catch (final Exception e) {
             e.printStackTrace();
@@ -462,147 +466,6 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
 
                     // remove rhpam from element items
                     removeItems("rhpam");
-                }
-
-                if (buildUtils.isRhdmReadyForPR(elements)) {
-                    log.info("RHDM is Ready to perform a Pull Request.");
-
-                    // create a new branch
-                    // only if all needed files are ready this step will be executed, any file is ok to retrieve
-                    // the build date, version and branch.
-                    String buildDate = elements.get(fileName).getBuildDate();
-
-                    Version version = buildUtils.getVersion(elements.get(fileName).getVersion().split("[.]"));
-                    String baseBranch = elements.get(fileName).getBranch();
-                    String branchName = elements.get(fileName).getBranch() + "-" + buildDate + "-" + (int) (Math.random() * 100);
-
-                    gitRepository.handleBranch(BranchOperation.NEW_BRANCH, branchName, baseBranch, "rhdm-7-image");
-
-                    Module dmController = yamlFilesHelper.load(buildUtils.dmControllerFile());
-                    Module decisionCentral = yamlFilesHelper.load(buildUtils.decisionCentralFile());
-                    Module dmKieserver = yamlFilesHelper.load(buildUtils.dmKieserverFile());
-
-                    // Prepare controller Changes - artifacts
-                    dmController.getArtifacts().forEach(artifact -> {
-                        if (artifact.getName().equals(buildUtils.RHDM_ADD_ONS_DISTRIBUTION_ZIP)) {
-                            String controllerFileName = String.format(buildUtils.RHDM_ADD_ONS_NIGHTLY_ZIP, version, buildDate);
-                            if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
-                                controllerFileName = String.format("rhdm-%s.DM-redhat-%s-add-ons.zip", version, buildDate);
-                            }
-                            String controllerCheckSum;
-                            try {
-                                controllerCheckSum = elements.get(controllerFileName).getChecksum();
-
-                                log.fine(String.format("Updating RHDM Controller %s from [%s] to [%s]",
-                                                       buildUtils.RHDM_ADD_ONS_DISTRIBUTION_ZIP,
-                                                       artifact.getMd5(),
-                                                       controllerCheckSum));
-
-                                artifact.setMd5(controllerCheckSum);
-                                yamlFilesHelper.writeModule(dmController, buildUtils.dmControllerFile());
-
-                                // find name: "rhdm_add_ons_distribution.zip"
-                                // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-add-ons.zip
-                                // or rhdm-${version}.DM-redhat-${buildDate}-add-ons.zip depending on DM version
-                                buildUtils.reAddComment(buildUtils.dmControllerFile(), "name: \"" + buildUtils.RHDM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
-                                                        String.format("  # %s", controllerFileName));
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                    // Prepare controller changes - envs
-                    dmController.getEnvs().forEach(env -> {
-                        if (env.getName().equals("CONTROLLER_DISTRIBUTION_ZIP")) {
-                            // rhdm-${shortenedVersion}-controller-ee7.zip
-                            String controllerEE7Zip = String.format("rhdm-%s-controller-ee7.zip", cacherProperties.shortenedVersion(version.toString()));
-                            // if the filename does not match the current shortened version, update it
-                            if (!env.getValue().equals(controllerEE7Zip)) {
-                                env.setValue(controllerEE7Zip);
-                            }
-                        }
-                    });
-
-                    // Prepare Decision Central changes
-                    decisionCentral.getArtifacts().forEach(artifact -> {
-                        if (artifact.getName().equals(buildUtils.RHDM_DECISION_CENTRAL_DISTRIBUTION_ZIP)) {
-                            String decisionCentralFileName = String.format(buildUtils.RHDM_DECISION_CENTRAL_EAP7_DEPLOYABLE_NIGHTLY_ZIP, version, buildDate);
-                            if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
-                                decisionCentralFileName = String.format("rhdm-%s.DM-redhat-%s-decision-central-eap7-deployable.zip", version, buildDate);
-                            }
-                            try {
-                                String decisionCentralCheckSum = elements.get(decisionCentralFileName).getChecksum();
-
-                                log.fine(String.format("Updating RHDM Decision Central %s from [%s] to [%s]",
-                                                       buildUtils.RHDM_DECISION_CENTRAL_DISTRIBUTION_ZIP,
-                                                       artifact.getMd5(),
-                                                       decisionCentralCheckSum));
-
-                                artifact.setMd5(decisionCentralCheckSum);
-                                yamlFilesHelper.writeModule(decisionCentral, buildUtils.decisionCentralFile());
-
-                                // find name: "rhdm_decision_central_distribution.zip"
-                                // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-decision-central-eap7-deployable.zip
-                                // or rhdm-${version}.DM-redhat-${buildDate}-decision-central-eap7-deployable.zip depending on DM version
-                                buildUtils.reAddComment(buildUtils.decisionCentralFile(), "name: \"" + buildUtils.RHDM_DECISION_CENTRAL_DISTRIBUTION_ZIP + "\"",
-                                                        String.format("  # %s", decisionCentralFileName));
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-
-                    // Prepare kieserver changes
-                    dmKieserver.getArtifacts().forEach(artifact -> {
-                        if (artifact.getName().equals(buildUtils.RHDM_KIE_SERVER_DISTRIBUTION_ZIP)) {
-                            String kieserverFileName = String.format(buildUtils.RHDM_KIE_SERVER_EE8_NIGHTLY_ZIP, version, buildDate);
-                            if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
-                                kieserverFileName = String.format("rhdm-%s.DM-redhat-%s-kie-server-ee8.zip", version, buildDate);
-                            }
-                            String kieserverCheckSum;
-                            try {
-                                kieserverCheckSum = elements.get(kieserverFileName).getChecksum();
-
-                                log.fine(String.format("Updating RHDM KieServer %s from [%s] to [%s]",
-                                                       buildUtils.RHDM_KIE_SERVER_DISTRIBUTION_ZIP,
-                                                       artifact.getMd5(),
-                                                       kieserverCheckSum));
-
-                                artifact.setMd5(kieserverCheckSum);
-                                yamlFilesHelper.writeModule(dmKieserver, buildUtils.dmKieserverFile());
-
-                                // find name: "rhdm_kie_server_distribution.zip"
-                                // and add comment on next line :  rhdm-${version}.redhat-${buildDate}-kie-server-ee8.zip
-                                // or rhdm-${version}.DM-redhat-${buildDate}-kie-server-ee8.zip depending on DM version
-                                buildUtils.reAddComment(buildUtils.dmKieserverFile(), "name: \"" + buildUtils.RHDM_KIE_SERVER_DISTRIBUTION_ZIP + "\"",
-                                                        String.format("  # %s", kieserverFileName));
-
-                                // find name: "slf4j-simple.jar"
-                                // and add comment on next line :  slf4j-simple-1.7.22.redhat-2.jar
-                                buildUtils.reAddComment(buildUtils.dmKieserverFile(), "name: \"slf4j-simple.jar\"", "  # slf4j-simple-1.7.22.redhat-2.jar");
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-
-                    if (gitRepository.addChanges("rhdm-7-image")
-                            && gitRepository.commitChanges("rhdm-7-image", branchName, "Applying RHDM nightly build for build date " + buildDate)) {
-
-                        log.fine("About to send Pull Request on rhdm-7-image git repository on branch " + branchName);
-
-                        String prTittle = "Updating RHDM artifacts based on the latest nightly build  " + buildDate;
-                        String prDescription = "This PR was created automatically, please review carefully before merge, the" +
-                                " base build date is " + buildDate + ". Do not merge if RHDM and RHPAM does not have the same build date.";
-                        pullRequestSender.performPullRequest("rhdm-7-image", baseBranch, branchName, prTittle, prDescription);
-
-                        gitRepository.handleBranch(BranchOperation.DELETE_BRANCH, branchName, null, "rhdm-7-image");
-                    } else {
-                        log.warning("something went wrong while preparing the rhdm-7-image for the pull request");
-                    }
-
-                    // remove RHDM files elements
-                    removeItems("rhdm");
                 }
             } else {
                 log.info("File " + fileName + " not found on the nightly build elements map. ignoring...");

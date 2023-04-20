@@ -99,7 +99,6 @@ public class CacherUtilsTest {
     @Order(2)
     public void preLoadFromFileAndFileExistsTest() throws InterruptedException {
         cacherUtils.preLoadFromFile();
-
         // wait a few seconds so the files are downloaded.
         // 10 seconds
         Thread.sleep(10000);
@@ -144,18 +143,19 @@ public class CacherUtilsTest {
         Assertions.assertFalse(cacherUtils.fileExists("0d3955b0fed4a2d03d1adc29b3fd7c67"));
         Assertions.assertFalse(cacherUtils.fileExists("8039610bc1401c3c3c21c2fd75707c9b"));
         Assertions.assertFalse(cacherUtils.fileExists("dfe927040dbd33159b61b2c92e0b7ae2"));
-
     }
 
 
     private void clean() {
-        try {
-            Files.walk(Paths.get(cacherProperties.getArtifactsTmpDir()))
-                    .map(Path::toFile)
-                    .forEach(file -> file.delete());
-            Paths.get(preLoadFileLocation).toFile().delete();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (preLoadFileLocation != null) {
+            try {
+                Files.walk(Paths.get(cacherProperties.getArtifactsTmpDir()))
+                        .map(Path::toFile)
+                        .forEach(file -> file.delete());
+                Paths.get(preLoadFileLocation).toFile().delete();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

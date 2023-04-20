@@ -2,6 +2,7 @@ package org.kie.cekit.cacher.utils;
 
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -30,19 +31,6 @@ public class BuildUtils {
     public final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
     public final DateTimeFormatter legacyFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
     public final Pattern buildDatePattern = Pattern.compile("(\\d{8})|(\\d{6})");
-
-    // artifacts and zip file names used on Nightly and CR builds
-    public String RHDM_ADD_ONS_DISTRIBUTION_ZIP = "rhdm_add_ons_distribution.zip";
-    public String RHDM_ADD_ONS_NIGHTLY_ZIP = "rhdm-%s.redhat-%s-add-ons.zip";
-    public String RHDM_ADD_ONS_ZIP = "rhdm-%s-add-ons.zip";
-
-    public String RHDM_DECISION_CENTRAL_DISTRIBUTION_ZIP = "rhdm_decision_central_distribution.zip";
-    public String RHDM_DECISION_CENTRAL_EAP7_DEPLOYABLE_NIGHTLY_ZIP = "rhdm-%s.redhat-%s-decision-central-eap7-deployable.zip";
-    public String RHDM_DECISION_CENTRAL_EAP7_DEPLOYABLE_ZIP = "rhdm-%s-decision-central-eap7-deployable.zip";
-
-    public String RHDM_KIE_SERVER_DISTRIBUTION_ZIP = "rhdm_kie_server_distribution.zip";
-    public String RHDM_KIE_SERVER_EE8_NIGHTLY_ZIP = "rhdm-%s.redhat-%s-kie-server-ee8.zip";
-    public String RHDM_KIE_SERVER_EE8_ZIP = "rhdm-%s-kie-server-ee8.zip";
 
     public String RHPAM_BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP = "rhpam_business_central_monitoring_distribution.zip";
     public String RHPAM_MONITORING_EE7_NIGHTLY_ZIP = "rhpam-%s.redhat-%s-monitoring-ee7.zip";
@@ -194,10 +182,11 @@ public class BuildUtils {
      * @param comment     comment that should be added
      */
     public void reAddComment(String fileName, String linePattern, String comment) {
-        try (Stream<String> lines = Files.lines(Paths.get(fileName))) {
+        Path path = Paths.get(fileName);
+        try (Stream<String> lines = Files.lines(path)) {
             List<String> replaced = lines.map(line -> line.replace(linePattern, linePattern + "\n" + comment))
                     .collect(Collectors.toList());
-            Files.write(Paths.get(fileName), replaced);
+            Files.write(path, replaced);
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -256,7 +245,7 @@ public class BuildUtils {
         String requestJarUrl = buildUrl(mavenRepo, standaloneJarName, version);
         String md5ChecksumUrl = requestJarUrl + ".md5";
         log.fine("Trying to get the artifact's checksum using the url --> " + md5ChecksumUrl);
-        try (Response response = HttpRequestHandler.executeHttpCall(md5ChecksumUrl)) {
+        try (Response response = HttpRequestHandler.executeHttpCall(md5ChecksumUrl, cacherProperties.trustAllCerts())) {
             if (response.code() == 404) {
                 log.warning("The artifact " + standaloneJarName + " was not found , url used: " + md5ChecksumUrl);
                 return currentChecksum;

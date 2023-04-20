@@ -27,13 +27,9 @@ parameters:
     description: "Enables the nightly builds watcher"
     name: CACHER_ENABLE_NIGHTLY_WATCHER
     required: false
-  - displayName: Cacher RHDM/PAM product version
-    description: "rhpam/rhdm product version"
+  - displayName: Cacher RHPAM product version
+    description: "rhpam product version"
     name: CACHER_PRODUCT_VERSION
-    required: false
-  - displayName: Cacher RHDM build properties url
-    description: "RHDM build properties url"
-    name: CACHER_RHDM_URL
     required: false
   - displayName: Cacher RHPAM build properties url
     description:  "RHPAM build properties url"
@@ -55,16 +51,12 @@ parameters:
     description: "Github user email"
     name: CACHER_GITHUB_EMAIL
     required: false
-  - displayName: Cacher RHDM GitHub upstream url
-    description: "RHDM GitHub upstream url"
-    name: CACHER_RHDM_UPSTREAM
-    required: false
   - displayName: Cacher RHPAM GitHub upstream url
     description: "RHPAM GitHub upstream url"
     name: CACHER_RHPAM_UPSTREAM
     required: false
-  - displayName: Cacher RHDM/PAM GitHub default branch
-    description: "RHPAM and RHDM upstream default branch"
+  - displayName: Cacher RHPAM GitHub default branch
+    description: "RHPAM upstream default branch"
     name: CACHER_DEFAULT_BRANCH
     required: false
   - displayName: Cacher GitHub PR reviewers
@@ -175,8 +167,6 @@ objects:
                   value: "${CACHER_ENABLE_NIGHTLY_WATCHER}"
                 - name: CACHER_PRODUCT_VERSION
                   value: "${CACHER_PRODUCT_VERSION}"
-                - name: CACHER_RHDM_URL
-                  value: "${CACHER_RHDM_URL}"
                 - name: CACHER_RHPAM_URL
                   value: "${CACHER_RHPAM_URL}"
                 - name: CACHER_ENABLE_GITHUB_BOT
@@ -187,8 +177,6 @@ objects:
                   value: "${CACHER_GITHUB_PASSWORD}"
                 - name: CACHER_GITHUB_EMAIL
                   value: "${CACHER_GITHUB_EMAIL}"
-                - name: CACHER_RHDM_UPSTREAM
-                  value: "${CACHER_RHDM_UPSTREAM}"
                 - name: CACHER_RHPAM_UPSTREAM
                   value: "${CACHER_RHPAM_UPSTREAM}"
                 - name: CACHER_DEFAULT_BRANCH

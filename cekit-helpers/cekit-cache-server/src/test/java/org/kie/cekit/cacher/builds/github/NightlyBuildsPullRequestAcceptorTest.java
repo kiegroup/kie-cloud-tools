@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Optional;
 
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -87,12 +88,12 @@ public class NightlyBuildsPullRequestAcceptorTest {
 
         // test rhpam kieserver
         String kieserverFile = cacherProperties.getGitDir() + "/rhpam-7-image/kieserver/modules/kieserver/module.yaml";
-        String buildDate = gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch());
+        Optional<String> buildDate = gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch());
         Module kieserver = yamlFilesHelper.load(kieserverFile);
 
         yamlFilesHelper.writeModule(kieserver, kieserverFile);
 
-        String backendFileName = String.format("jbpm-wb-kie-server-backend-7.62.0.redhat-%s.jar", buildDate);
+        String backendFileName = String.format("jbpm-wb-kie-server-backend-7.67.0.Final-redhat-00005.jar", buildDate);
         buildUtils.reAddComment(kieserverFile, String.format("  value: \"%s\"", backendFileName),
                 "# remember to also update \"JBPM_WB_KIE_SERVER_BACKEND_JAR\" value");
         Assertions.assertTrue(containsComment(kieserverFile, "# remember to also update \"JBPM_WB_KIE_SERVER_BACKEND_JAR\" value"));
