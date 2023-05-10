@@ -33,7 +33,15 @@ public class CRBuildsUpdater {
 
     public String updateCRBuild(@NotNull String version, @NotNull String releaseBranch, @NotNull int crBuild) {
         StringBuilder propsResponse = new StringBuilder();
-        String formattedRHPAMURL = String.format(cacherProperties.rhpamCRUrl(), version, crBuild);
+
+        String unformattedPropsUrl = cacherProperties.rhpamCRUrl();
+        String product = "rhpam";
+        if (releaseBranch.contains("blue")) {
+            unformattedPropsUrl = cacherProperties.bamoeCRUrl();
+            product = "bamoe";
+        }
+
+        String formattedRHPAMURL = String.format(unformattedPropsUrl, version, crBuild);
 
         // rhpam handling properties
         Properties rhpamCRProps = cacherProperties.productPropertyFile(formattedRHPAMURL);
@@ -49,9 +57,8 @@ public class CRBuildsUpdater {
 
         // set the kieVersion
         cacherProperties.setKieVersion(rhpamCRProps.get("KIE_VERSION").toString());
-
         // Download rhpam artifacts
-        cacherProperties.getRhpamFiles2DownloadPropName().forEach(fileProp -> {
+        cacherProperties.getFiles2DownloadPropName(product).forEach(fileProp -> {
             callback.onRequestReceived(new PlainArtifact(
                     UrlUtils.getFileName(rhpamCRProps.get(fileProp).toString()),
                     "",
@@ -65,7 +72,6 @@ public class CRBuildsUpdater {
         });
 
         // set the kieVersion
-        cacherProperties.setKieVersion(rhpamCRProps.get("KIE_VERSION").toString());
         return responseMessage(version, releaseBranch, crBuild);
     }
 

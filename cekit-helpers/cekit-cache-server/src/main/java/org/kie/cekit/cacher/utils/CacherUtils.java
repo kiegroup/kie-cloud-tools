@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.FileAlreadyExistsException;
@@ -194,7 +195,10 @@ public class CacherUtils {
 
         try {
             log.info("Trying to fetch file: " + url);
-            ReadableByteChannel readableByteChannel = Channels.newChannel(new URL(url).openStream());
+            URLConnection in = new URL(url).openConnection();
+            in.setReadTimeout(20000);
+            in.setConnectTimeout(20000);
+            ReadableByteChannel readableByteChannel = Channels.newChannel(in.getInputStream());
             FileOutputStream fileOutputStream = new FileOutputStream(filePath);
             fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
 

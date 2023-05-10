@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -72,6 +73,10 @@ public class CacherProperties {
     @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.rhpam.cr.url")
     String rhpamCRUrl;
+
+    @Inject
+    @CacherProperty(name = "org.kie.cekit.cacher.bamoe.cr.url")
+    String bamoeCRUrl;
 
     @Inject
     @CacherProperty(name = "org.kie.cekit.cacher.nightly.maven.repo")
@@ -198,6 +203,13 @@ public class CacherProperties {
     }
 
     /**
+     * @return the URL that holds CR build properties for bamoe
+     */
+    public String bamoeCRUrl() {
+        return bamoeCRUrl;
+    }
+
+    /**
      * @return the nightly maven repo to fetch information
      * about the standalone jars needed by the KIE Server image
      */
@@ -315,9 +327,15 @@ public class CacherProperties {
     /**
      * @return properties key name for rhpam artifacts
      */
-    public List<String> getRhpamFiles2DownloadPropName() {
+    public List<String> getFiles2DownloadPropName(String product) {
+        if (product.equals("bamoe")) {
+            return rhpamFiles2DownloadPropName.stream()
+                    .map(item -> item.replace("rhpam", "bamoe"))
+                    .collect(Collectors.toList());
+        }
         return rhpamFiles2DownloadPropName;
     }
+
 
     /**
      * fetch the RHPAM build properties file.
@@ -331,7 +349,7 @@ public class CacherProperties {
 
         try (Response response = HttpRequestHandler.executeHttpCall(url, trustAllCerts())) {
             if (response.code() == 404) {
-                log.info("RHPAM properties file not found... url -> " + url);
+                log.info("Property file not found... url -> " + url);
                 return p;
             }
             try (final InputStream stream = Objects.requireNonNull(response.body()).byteStream()) {

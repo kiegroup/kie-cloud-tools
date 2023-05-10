@@ -134,7 +134,7 @@ public class NightlyBuildsWatcher {
     private void rhpamNightlyBuildDownloader(Properties rhpamProp, String buildDate, String version, String branch, boolean force) {
         // set the kieVersion
         cacherProperties.setKieVersion(rhpamProp.get("KIE_VERSION").toString());
-        cacherProperties.getRhpamFiles2DownloadPropName().stream().forEach(file -> {
+        cacherProperties.getFiles2DownloadPropName("rhpam").stream().forEach(file -> {
             // make sure there is no rhpam already downloaded files
             if (!cacherUtils.fileExistsByNameExcludeTmp(UrlUtils.getFileName(rhpamProp.get(file).toString()))) {
                 // Notify the git consumer that a new file is being downloaded.

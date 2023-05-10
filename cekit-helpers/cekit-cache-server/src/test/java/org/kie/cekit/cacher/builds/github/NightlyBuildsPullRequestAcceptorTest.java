@@ -44,25 +44,28 @@ public class NightlyBuildsPullRequestAcceptorTest {
 
         // test bc monitoring
         String bcMonitoringFile = cacherProperties.getGitDir() + "/rhpam-7-image/businesscentral-monitoring/modules/businesscentral-monitoring/module.yaml";
+        String bcMonitoringZip = String.format(buildUtils.BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP, "rhpam");
         Module bcMonitoring = yamlFilesHelper.load(bcMonitoringFile);
         yamlFilesHelper.writeModule(bcMonitoring, bcMonitoringFile);
-        buildUtils.reAddComment(bcMonitoringFile, "name: \"" + buildUtils.RHPAM_BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP + "\"",
+        buildUtils.reAddComment(bcMonitoringFile, "name: \"" + bcMonitoringZip + "\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-201006-monitoring-ee7.zip"));
         Assertions.assertTrue(containsComment(bcMonitoringFile, String.format("  # %s", "rhpam-7.8.0.redhat-201006-monitoring-ee7.zip")));
 
         // test businessCentral
         String businessCentralFile = cacherProperties.getGitDir() + "/rhpam-7-image/businesscentral/modules/businesscentral/module.yaml";
+        String bcZip = String.format(buildUtils.BUSINESS_CENTRAL_DISTRIBUTION_ZIP, "rhpam");
         Module businessCentral = yamlFilesHelper.load(businessCentralFile);
         yamlFilesHelper.writeModule(businessCentral, businessCentralFile);
-        buildUtils.reAddComment(businessCentralFile, "name: \"" + buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP + "\"",
+        buildUtils.reAddComment(businessCentralFile, "name: \"" + bcZip + "\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-201006-business-central-eap7-deployable.zip"));
         Assertions.assertTrue(containsComment(businessCentralFile, String.format("  # %s", "rhpam-7.8.0.redhat-201006-business-central-eap7-deployable.zip")));
 
         // test rhpam controller
         String controllerFile = cacherProperties.getGitDir() + "/rhpam-7-image/controller/modules/controller/module.yaml";
+        String addonsDistZip = String.format(buildUtils.ADD_ONS_DISTRIBUTION_ZIP, "rhpam");
         Module controller = yamlFilesHelper.load(controllerFile);
         yamlFilesHelper.writeModule(controller, controllerFile);
-        buildUtils.reAddComment(controllerFile, "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
+        buildUtils.reAddComment(controllerFile, "name: \"" + addonsDistZip + "\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-201006-add-ons.zip"));
         Assertions.assertTrue(containsComment(controllerFile, String.format("  # %s", "rhpam-7.8.0.redhat-201006-add-ons.zip")));
         controller.getEnvs().stream().forEach(env -> {
@@ -81,13 +84,14 @@ public class NightlyBuildsPullRequestAcceptorTest {
         String dashbuilderFile = cacherProperties.getGitDir() + "/rhpam-7-image/dashbuilder/modules/dashbuilder/module.yaml";
         Module dashbuilder = yamlFilesHelper.load(dashbuilderFile);
         yamlFilesHelper.writeModule(dashbuilder, dashbuilderFile);
-        buildUtils.reAddComment(dashbuilderFile, "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
+        buildUtils.reAddComment(dashbuilderFile, "name: \"" + addonsDistZip + "\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-201006-add-ons.zip"));
         Assertions.assertTrue(containsComment(dashbuilderFile, String.format("  # %s", "rhpam-7.8.0.redhat-201006-add-ons.zip")));
 
 
         // test rhpam kieserver
         String kieserverFile = cacherProperties.getGitDir() + "/rhpam-7-image/kieserver/modules/kieserver/module.yaml";
+        String kieServerDistributionZip = String.format(buildUtils.KIE_SERVER_DISTRIBUTION_ZIP, "rhpam");
         Optional<String> buildDate = gitRepository.getCurrentProductBuildDate(cacherProperties.defaultBranch());
         Module kieserver = yamlFilesHelper.load(kieserverFile);
 
@@ -102,11 +106,11 @@ public class NightlyBuildsPullRequestAcceptorTest {
         Assertions.assertTrue(containsComment(kieserverFile,
                 String.format("  # %s", "slf4j-simple-1.7.22.redhat-2.jar")));
 
-        buildUtils.reAddComment(kieserverFile, "name: \"" + buildUtils.RHPAM_KIE_SERVER_DISTRIBUTION_ZIP + "\"",
+        buildUtils.reAddComment(kieserverFile, "name: \"" + kieServerDistributionZip + "\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-201006-kie-server-ee8.zip"));
         Assertions.assertTrue(containsComment(kieserverFile, String.format("  # %s", "rhpam-7.8.0.redhat-201006-kie-server-ee8.zip")));
 
-        buildUtils.reAddComment(kieserverFile, "name: \"" + buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP + "\"",
+        buildUtils.reAddComment(kieserverFile, "name: \"" + bcZip + "\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-201006-business-central-eap7-deployable.zip"));
         Assertions.assertTrue(containsComment(kieserverFile, String.format("  # %s", "rhpam-7.8.0.redhat-201006-business-central-eap7-deployable.zip")));
 
@@ -114,7 +118,7 @@ public class NightlyBuildsPullRequestAcceptorTest {
         String smartrouterFile = cacherProperties.getGitDir() + "/rhpam-7-image/smartrouter/modules/smartrouter/module.yaml";
         Module smartrouter = yamlFilesHelper.load(smartrouterFile);
         yamlFilesHelper.writeModule(smartrouter, smartrouterFile);
-        buildUtils.reAddComment(smartrouterFile, "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
+        buildUtils.reAddComment(smartrouterFile, "name: \"" + addonsDistZip + "\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-201006-add-ons.zip"));
         Assertions.assertTrue(containsComment(smartrouterFile, String.format("  # %s", "rhpam-7.8.0.redhat-201006-add-ons.zip")));
 
@@ -122,7 +126,7 @@ public class NightlyBuildsPullRequestAcceptorTest {
         String processMigrationFile = cacherProperties.getGitDir() + "/rhpam-7-image/process-migration/modules/process-migration/module.yaml";
         Module processMigration = yamlFilesHelper.load(processMigrationFile);
         yamlFilesHelper.writeModule(processMigration, processMigrationFile);
-        buildUtils.reAddComment(processMigrationFile, "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
+        buildUtils.reAddComment(processMigrationFile, "name: \"" + addonsDistZip + "\"",
                 String.format("  # %s", "rhpam-7.8.0.redhat-201006-add-ons.zip"));
         Assertions.assertTrue(containsComment(processMigrationFile, String.format("  # %s", "rhpam-7.8.0.redhat-201006-add-ons.zip")));
 

@@ -32,21 +32,21 @@ public class BuildUtils {
     public final DateTimeFormatter legacyFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
     public final Pattern buildDatePattern = Pattern.compile("(\\d{8})|(\\d{6})");
 
-    public String RHPAM_BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP = "rhpam_business_central_monitoring_distribution.zip";
-    public String RHPAM_MONITORING_EE7_NIGHTLY_ZIP = "rhpam-%s.redhat-%s-monitoring-ee7.zip";
-    public String RHPAM_MONITORING_EE7_ZIP = "rhpam-%s-monitoring-ee7.zip";
+    public String BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP = "%s_business_central_monitoring_distribution.zip";
+    public String MONITORING_EE7_NIGHTLY_ZIP = "%s-%s.redhat-%s-monitoring-ee7.zip";
+    public String MONITORING_EE7_ZIP = "%s-%s-monitoring-ee7.zip";
 
-    public String RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP = "rhpam_business_central_distribution.zip";
-    public String RHPAM_BUSINESS_CENTRAL_EAP7_DEPLOYABLE_NIGHTLY_ZIP = "rhpam-%s.redhat-%s-business-central-eap7-deployable.zip";
-    public String RHPAM_BUSINESS_CENTRAL_EAP7_DEPLOYABLE_ZIP = "rhpam-%s-business-central-eap7-deployable.zip";
+    public String BUSINESS_CENTRAL_DISTRIBUTION_ZIP = "%s_business_central_distribution.zip";
+    public String BUSINESS_CENTRAL_EAP7_DEPLOYABLE_NIGHTLY_ZIP = "%s-%s.redhat-%s-business-central-eap7-deployable.zip";
+    public String BUSINESS_CENTRAL_EAP7_DEPLOYABLE_ZIP = "%s-%s-business-central-eap7-deployable.zip";
 
-    public String RHPAM_ADD_ONS_DISTRIBUTION_ZIP = "rhpam_add_ons_distribution.zip";
-    public String RHPAM_ADD_ONS_NIGHTLY_ZIP = "rhpam-%s.redhat-%s-add-ons.zip";
-    public String RHPAM_ADD_ONS_ZIP = "rhpam-%s-add-ons.zip";
+    public String ADD_ONS_DISTRIBUTION_ZIP = "%s_add_ons_distribution.zip";
+    public String ADD_ONS_NIGHTLY_ZIP = "%s-%s.redhat-%s-add-ons.zip";
+    public String ADD_ONS_ZIP = "%s-%s-add-ons.zip";
 
-    public String RHPAM_KIE_SERVER_DISTRIBUTION_ZIP = "rhpam_kie_server_distribution.zip";
-    public String RHPAM_KIE_SERVER_EE8_NIGHTLY_ZIP = "rhpam-%s.redhat-%s-kie-server-ee8.zip";
-    public String RHPAM_KIE_SERVER_EE8_ZIP = "rhpam-%s-kie-server-ee8.zip";
+    public String KIE_SERVER_DISTRIBUTION_ZIP = "%s_kie_server_distribution.zip";
+    public String KIE_SERVER_EE8_NIGHTLY_ZIP = "%s-%s.redhat-%s-kie-server-ee8.zip";
+    public String KIE_SERVER_EE8_ZIP = "%s-%s-kie-server-ee8.zip";
     // for both jars, version will be added during nightly or CR builds update
     public String KIE_SEVER_SERVICES_JBPM_CLUSTER_JAR = "kie-server-services-jbpm-cluster-%s.jar";
     public String JBPM_EVENTS_EMITTERS_KAFKA_JAR = "jbpm-event-emitters-kafka-%s.jar";
@@ -128,17 +128,17 @@ public class BuildUtils {
      */
     public boolean isRhpamReadyForPR(Map<String, PlainArtifact> elements) {
         boolean isReady = true;
-        HashMap<String, PlainArtifact> rhpam = new HashMap<>();
+        HashMap<String, PlainArtifact> artifacts = new HashMap<>();
         elements.entrySet().stream()
-                .filter(entry -> entry.getKey().startsWith("rhpam-"))
-                .forEach(entry -> rhpam.put(entry.getKey(), entry.getValue()));
+                .filter(entry -> entry.getKey().startsWith("rhpam-") || entry.getKey().startsWith("bamoe-"))
+                .forEach(entry -> artifacts.put(entry.getKey(), entry.getValue()));
 
-        for (Map.Entry<String, PlainArtifact> element : rhpam.entrySet()) {
+        for (Map.Entry<String, PlainArtifact> element : artifacts.entrySet()) {
             if (element.getValue().getChecksum().isEmpty()) {
                 isReady = false;
             }
         }
-        return isReady && rhpam.size() == 4;
+        return isReady && artifacts.size() == 4;
     }
 
     /**
