@@ -57,13 +57,14 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
                 elements.get(fileName).setChecksum(checkSum);
 
 
-                // RHPAM artifacts
+                // RHPAM/BAMOE artifacts
                 if (buildUtils.isRhpamReadyForPR(elements)) {
                     log.info("RHPAM CR [" + crBuild + "] is ready for PR.");
 
                     Version version = buildUtils.getVersion(elements.get(fileName).getVersion().split("[.]"));
                     String baseBranch = elements.get(fileName).getBranch();
                     String branchName = elements.get(fileName).getVersion() + "-CR" + crBuild + "-" + (int) (Math.random() * 100);
+                    String product = fileName.startsWith("bamoe") ? "bamoe" : "rhpam";
 
                     gitRepository.handleBranch(BranchOperation.NEW_BRANCH,
                                                branchName,
@@ -79,21 +80,22 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
                     Module processMigration = yamlFilesHelper.load(buildUtils.processMigrationFile());
 
                     // Prepare Business Central Monitoring Changes
+                    String bcMonitoringZip = String.format(buildUtils.BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP, product);
                     bcMonitoring.getArtifacts().forEach(artifact -> {
-                        if (artifact.getName().equals(buildUtils.RHPAM_BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP)) {
-                            String bcMonitoringFileName = String.format(buildUtils.RHPAM_MONITORING_EE7_ZIP, version);
+                        if (artifact.getName().equals(bcMonitoringZip)) {
+                            String bcMonitoringFileName = String.format(buildUtils.MONITORING_EE7_ZIP, product, version);
 
                             try {
                                 log.fine(String.format("Updating BC monitoring %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP,
+                                                       bcMonitoringZip,
                                                        artifact.getMd5(),
                                                        elements.get(bcMonitoringFileName).getChecksum()));
                                 artifact.setMd5(elements.get(bcMonitoringFileName).getChecksum());
                                 yamlFilesHelper.writeModule(bcMonitoring, buildUtils.bcMonitoringFile());
 
-                                // find name: "rhpam_business_central_monitoring_distribution.zip"
+                                // find name: "rhpam|bamoe_business_central_monitoring_distribution.zip"
                                 // and add comment on next line : rhpam-${version}-monitoring-ee7.zip
-                                buildUtils.reAddComment(buildUtils.bcMonitoringFile(), "name: \"" + buildUtils.RHPAM_BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP + "\"",
+                                buildUtils.reAddComment(buildUtils.bcMonitoringFile(), "name: \"" + bcMonitoringZip + "\"",
                                                         String.format("  # %s", bcMonitoringFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -102,14 +104,16 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
                     });
 
                     // Prepare Business Central Changes
+                    String bcZip = String.format(buildUtils.BUSINESS_CENTRAL_DISTRIBUTION_ZIP, product);
+                    String bcFileName = String.format(buildUtils.BUSINESS_CENTRAL_EAP7_DEPLOYABLE_ZIP, product, version);
                     businessCentral.getArtifacts().forEach(artifact -> {
-                        if (artifact.getName().equals(buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP)) {
-                            String bcFileName = String.format(buildUtils.RHPAM_BUSINESS_CENTRAL_EAP7_DEPLOYABLE_ZIP, version);
+                        if (artifact.getName().equals(bcZip)) {
+
 
                             try {
 
                                 log.fine(String.format("Updating Business Central %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP,
+                                                       bcZip,
                                                        artifact.getMd5(),
                                                        elements.get(bcFileName).getChecksum()));
                                 artifact.setMd5(elements.get(bcFileName).getChecksum());
@@ -117,7 +121,7 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
 
                                 // find name: "rhpam_business_central_distribution.zip"
                                 // and add comment on next line : rhpam-${version}-business-central-eap7-deployable.zip
-                                buildUtils.reAddComment(buildUtils.businessCentralFile(), "name: \"" + buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP + "\"",
+                                buildUtils.reAddComment(buildUtils.businessCentralFile(), "name: \"" + bcZip + "\"",
                                                         String.format("  # %s", bcFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -126,23 +130,25 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
                     });
 
                     // Prepare controller Changes - artifacts
+                    String addonsDistributionZip = String.format(buildUtils.ADD_ONS_DISTRIBUTION_ZIP, product);
+                    String addonsZip = String.format(buildUtils.ADD_ONS_ZIP, product, version);
                     pamController.getArtifacts().forEach(artifact -> {
-                        if (artifact.getName().equals(buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP)) {
-                            String controllerFileName = String.format(buildUtils.RHPAM_ADD_ONS_ZIP, version);
+                        if (artifact.getName().equals(addonsDistributionZip)) {
+                            //String controllerFileName = String.format(buildUtils.ADD_ONS_ZIP, product, version);
 
                             try {
 
                                 log.fine(String.format("Updating RHPAM Controller %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
+                                                       addonsDistributionZip,
                                                        artifact.getMd5(),
-                                                       elements.get(controllerFileName).getChecksum()));
-                                artifact.setMd5(elements.get(controllerFileName).getChecksum());
+                                                       elements.get(addonsZip).getChecksum()));
+                                artifact.setMd5(elements.get(addonsZip).getChecksum());
                                 yamlFilesHelper.writeModule(pamController, buildUtils.pamControllerFile());
 
-                                // find name: "rhpam_add_ons_distribution.zip"
-                                // and add comment on next line :  rhpam-%s-add-ons.zip
-                                buildUtils.reAddComment(buildUtils.pamControllerFile(), "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
-                                                        String.format("  # %s", controllerFileName));
+                                // find name: "rhpam|bamoe_add_ons_distribution.zip"
+                                // and add comment on next line :  rhpam|bamoe-%s-add-ons.zip
+                                buildUtils.reAddComment(buildUtils.pamControllerFile(), "name: \"" + addonsDistributionZip + "\"",
+                                                        String.format("  # %s", addonsZip));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -153,22 +159,22 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
                     // Dashbuilder is supported only on pam >= 7.10.0
                     if (version.compareTo(cacherProperties.pam710) >= 0) {
                         dashbuilder.getArtifacts().forEach(artifact -> {
-                            if (artifact.getName().equals(buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP)) {
-                                String dashbuilderAddOnsFileName = String.format(buildUtils.RHPAM_ADD_ONS_ZIP, version);
+                            if (artifact.getName().equals(addonsDistributionZip)) {
+                                //String dashbuilderAddOnsFileName = String.format(buildUtils.ADD_ONS_ZIP, product, version);
 
                                 try {
                                     log.fine(String.format("Updating RHPAM Dashbuilder %s from [%s] to [%s]",
-                                                           buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
+                                                           addonsDistributionZip,
                                                            artifact.getMd5(),
-                                                           elements.get(dashbuilderAddOnsFileName).getChecksum()));
+                                                           elements.get(addonsZip).getChecksum()));
 
-                                    artifact.setMd5(elements.get(dashbuilderAddOnsFileName).getChecksum());
+                                    artifact.setMd5(elements.get(addonsZip).getChecksum());
                                     yamlFilesHelper.writeModule(dashbuilder, buildUtils.dashbuilderFile());
 
-                                    // find name: "rhpam_add_ons_distribution.zip"
-                                    // and add comment on next line :  rhpam-${version}-add-ons.zip
-                                    buildUtils.reAddComment(buildUtils.dashbuilderFile(), "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
-                                                            String.format("  # %s", dashbuilderAddOnsFileName));
+                                    // find name: "rhpam|bamoe_add_ons_distribution.zip"
+                                    // and add comment on next line :  rhpam|bamoe-${version}-add-ons.zip
+                                    buildUtils.reAddComment(buildUtils.dashbuilderFile(), "name: \"" + addonsDistributionZip + "\"",
+                                                            String.format("  # %s", addonsZip));
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -177,7 +183,7 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
                     }
 
                     String backendFileName = buildUtils.getJbpmWbKieBackendVersion(
-                            String.format(buildUtils.RHPAM_BUSINESS_CENTRAL_EAP7_DEPLOYABLE_ZIP, version),
+                            bcFileName,
                             Optional.empty());
 
                     pamKieserver.getEnvs().forEach(env -> {
@@ -235,14 +241,15 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
 
                     });
 
+                    String kieServerDistributionZip = String.format(buildUtils.KIE_SERVER_DISTRIBUTION_ZIP, product);
                     pamKieserver.getArtifacts().forEach(artifact -> {
-                        String kieServerFileName = String.format(buildUtils.RHPAM_KIE_SERVER_EE8_ZIP, version);
+                        String kieServerFileName = String.format(buildUtils.KIE_SERVER_EE8_ZIP, product, version);
 
-                        if (artifact.getName().equals(buildUtils.RHPAM_KIE_SERVER_DISTRIBUTION_ZIP)) {
+                        if (artifact.getName().equals(kieServerDistributionZip)) {
 
                             try {
-                                log.fine(String.format("Updating RHPAM kieserver %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_KIE_SERVER_DISTRIBUTION_ZIP,
+                                log.fine(String.format("Updating KIE Server %s from [%s] to [%s]",
+                                                       kieServerDistributionZip,
                                                        artifact.getMd5(),
                                                        elements.get(kieServerFileName).getChecksum()));
 
@@ -253,12 +260,10 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
                             }
                         }
 
-                        if (artifact.getName().equals(buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP)) {
-                            String bcFileName = String.format(buildUtils.RHPAM_BUSINESS_CENTRAL_EAP7_DEPLOYABLE_ZIP, version);
-
+                        if (artifact.getName().equals(bcZip)) {
                             try {
-                                log.fine(String.format("Updating RHPAM kieserver %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP,
+                                log.fine(String.format("Updating Business Central zip on KIE Server %s from [%s] to [%s]",
+                                                       bcZip,
                                                        artifact.getMd5(),
                                                        elements.get(bcFileName).getChecksum()));
 
@@ -266,14 +271,14 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
                                 yamlFilesHelper.writeModule(pamKieserver, buildUtils.pamKieserverFile());
 
                                 // Only add comments when the last write operation will be made.
-                                // find name: "rhpam_business_central_distribution.zip"
+                                // find name: "rhpam|bamoe_business_central_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}-business-central-eap7-deployable.zip
-                                buildUtils.reAddComment(buildUtils.pamKieserverFile(), "name: \"" + buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP + "\"",
+                                buildUtils.reAddComment(buildUtils.pamKieserverFile(), "name: \"" + bcZip + "\"",
                                                         String.format("  # %s", bcFileName));
 
-                                // find name: "rhpam_kie_server_distribution.zip"
-                                // and add comment on next line :  rhpam-${version}-kie-server-ee8.zip
-                                buildUtils.reAddComment(buildUtils.pamKieserverFile(), "name: \"" + buildUtils.RHPAM_KIE_SERVER_DISTRIBUTION_ZIP + "\"",
+                                // find name: "rhpam|bamoe_kie_server_distribution.zip"
+                                // and add comment on next line :  rhpam|bamoe-${version}-kie-server-ee8.zip
+                                buildUtils.reAddComment(buildUtils.pamKieserverFile(), "name: \"" + kieServerDistributionZip + "\"",
                                                         String.format("  # %s", kieServerFileName));
 
                                 // find name: "slf4j-simple.jar"
@@ -292,22 +297,22 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
 
                     // Prepare smartrouter changes
                     smartrouter.getArtifacts().forEach(artifact -> {
-                        if (artifact.getName().equals(buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP)) {
-                            String smartrouterFileName = String.format(buildUtils.RHPAM_ADD_ONS_ZIP, version);
+                        if (artifact.getName().equals(addonsDistributionZip)) {
+                           // String smartrouterFileName = String.format(buildUtils.ADD_ONS_ZIP, product, version);
 
                             try {
-                                log.fine(String.format("Updating RHPAM smartrouter %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
+                                log.fine(String.format("Updating Smartrouter %s from [%s] to [%s]",
+                                                       addonsDistributionZip,
                                                        artifact.getMd5(),
-                                                       elements.get(smartrouterFileName).getChecksum()));
+                                                       elements.get(addonsZip).getChecksum()));
 
-                                artifact.setMd5(elements.get(smartrouterFileName).getChecksum());
+                                artifact.setMd5(elements.get(addonsZip).getChecksum());
                                 yamlFilesHelper.writeModule(smartrouter, buildUtils.smartrouterFile());
 
-                                // find name: "rhpam_add_ons_distribution.zip"
-                                // and add comment on next line :  rhpam-${version}-add-ons.zip
-                                buildUtils.reAddComment(buildUtils.smartrouterFile(), "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
-                                                        String.format("  # %s", smartrouterFileName));
+                                // find name: "rhpam|bamoe_add_ons_distribution.zip"
+                                // and add comment on next line :  rhpam|bamoe-${version}-add-ons.zip
+                                buildUtils.reAddComment(buildUtils.smartrouterFile(), "name: \"" + addonsDistributionZip + "\"",
+                                                        String.format("  # %s", addonsZip));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -316,22 +321,22 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
 
                     // Prepare process-migration changes
                     processMigration.getArtifacts().forEach(artifact -> {
-                        if (artifact.getName().equals(buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP)) {
-                            String processMigrationFileName = String.format(buildUtils.RHPAM_ADD_ONS_ZIP, version);
+                        if (artifact.getName().equals(addonsDistributionZip)) {
+                            //String processMigrationFileName = String.format(buildUtils.ADD_ONS_ZIP, product, version);
 
                             try {
                                 log.fine(String.format("Updating RHPAM process-migration %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
+                                                       addonsDistributionZip,
                                                        artifact.getMd5(),
-                                                       elements.get(processMigrationFileName).getChecksum()));
+                                                       elements.get(addonsZip).getChecksum()));
 
-                                artifact.setMd5(elements.get(processMigrationFileName).getChecksum());
+                                artifact.setMd5(elements.get(addonsZip).getChecksum());
                                 yamlFilesHelper.writeModule(processMigration, buildUtils.processMigrationFile());
 
-                                // find name: "rhpam_add_ons_distribution.zip"
-                                // and add comment on next line :  rhpam-${version}-add-ons.zip
-                                buildUtils.reAddComment(buildUtils.processMigrationFile(), "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
-                                                        String.format("  # %s", processMigrationFileName));
+                                // find name: "rhpam|bamoe_add_ons_distribution.zip"
+                                // and add comment on next line :  rhpam|bamoe-${version}-add-ons.zip
+                                buildUtils.reAddComment(buildUtils.processMigrationFile(), "name: \"" + addonsDistributionZip + "\"",
+                                                        String.format("  # %s", addonsZip));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -339,12 +344,12 @@ public class CRBuildsPullRequestAcceptor implements CRBuildInterceptor {
                     });
 
                     if (gitRepository.addChanges("rhpam-7-image")
-                            && gitRepository.commitChanges("rhpam-7-image", branchName, "Applying RHPAM CR build CR" + crBuild)) {
+                            && gitRepository.commitChanges("rhpam-7-image", branchName, "Applying " + product.toUpperCase() + " CR build CR" + crBuild)) {
 
                         log.fine("About to send Pull Request on rhpam-7-image git repository cr CR build on branch " + branchName);
-                        String prTittle = "Updating RHPAM artifacts based on the latest CR build " + crBuild;
+                        String prTittle = "Updating " + product.toUpperCase() + " artifacts based on the latest CR build " + crBuild;
                         String prDescription = "This PR was created automatically, please review carefully before merge, the" +
-                                " CR build is CR" + crBuild + ". Do not merge if RHDM and RHPAM does not have the same CR build applied.";
+                                " CR build is CR" + crBuild + ".";
                         pullRequestSender.performPullRequest("rhpam-7-image", baseBranch, branchName, prTittle, prDescription);
 
                         gitRepository.handleBranch(BranchOperation.DELETE_BRANCH, branchName, null, "rhpam-7-image");

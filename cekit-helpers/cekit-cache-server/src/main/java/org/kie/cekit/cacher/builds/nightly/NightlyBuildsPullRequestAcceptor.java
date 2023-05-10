@@ -110,6 +110,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     Version version = buildUtils.getVersion(elements.get(fileName).getVersion().split("[.]"));
                     String baseBranch = elements.get(fileName).getBranch();
                     String branchName = elements.get(fileName).getBranch() + "-" + buildDate + "-" + (int) (Math.random() * 100);
+                    String product = fileName.startsWith("bamoe") ? "bamoe" : "rhpam";
 
                     gitRepository.handleBranch(BranchOperation.NEW_BRANCH, branchName, baseBranch, "rhpam-7-image");
 
@@ -122,9 +123,10 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     Module processMigration = yamlFilesHelper.load(buildUtils.processMigrationFile());
 
                     // Prepare Business Central Monitoring Changes
+                    String bcMonitoringZip = String.format(buildUtils.BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP, product);
                     bcMonitoring.getArtifacts().forEach(artifact -> {
-                        if (artifact.getName().equals(buildUtils.RHPAM_BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP)) {
-                            String bcMonitoringFileName = String.format(buildUtils.RHPAM_MONITORING_EE7_NIGHTLY_ZIP, version, buildDate);
+                        if (artifact.getName().equals(bcMonitoringZip)) {
+                            String bcMonitoringFileName = String.format(buildUtils.MONITORING_EE7_NIGHTLY_ZIP, product, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
                                 bcMonitoringFileName = String.format("rhpam-%s.PAM-redhat-%s-monitoring-ee7.zip", version, buildDate);
                             }
@@ -133,7 +135,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 bcMonitoringCheckSum = elements.get(bcMonitoringFileName).getChecksum();
 
                                 log.fine(String.format("Updating BC monitoring %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP,
+                                                       bcMonitoringZip,
                                                        artifact.getMd5(),
                                                        bcMonitoringCheckSum));
 
@@ -143,7 +145,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // find name: "rhpam_business_central_monitoring_distribution.zip"
                                 // and add comment on next line : rhpam-${version}.redhat-${buildDate}-monitoring-ee7.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-monitoring-ee7.zip depending on PAM version
-                                buildUtils.reAddComment(buildUtils.bcMonitoringFile(), "name: \"" + buildUtils.RHPAM_BUSINESS_CENTRAL_MONITORING_DISTRIBUTION_ZIP + "\"",
+                                buildUtils.reAddComment(buildUtils.bcMonitoringFile(), "name: \"" + bcMonitoringZip + "\"",
                                                         String.format("  # %s", bcMonitoringFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -152,9 +154,10 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     });
 
                     // Prepare Business Central Changes
+                    String bcZip = String.format(buildUtils.BUSINESS_CENTRAL_DISTRIBUTION_ZIP, product);
                     businessCentral.getArtifacts().forEach(artifact -> {
-                        if (artifact.getName().equals(buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP)) {
-                            String bcFileName = String.format(buildUtils.RHPAM_BUSINESS_CENTRAL_EAP7_DEPLOYABLE_NIGHTLY_ZIP, version, buildDate);
+                        if (artifact.getName().equals(bcZip)) {
+                            String bcFileName = String.format(buildUtils.BUSINESS_CENTRAL_EAP7_DEPLOYABLE_NIGHTLY_ZIP, product, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
                                 bcFileName = String.format("rhpam-%s.PAM-redhat-%s-business-central-eap7-deployable.zip", version, buildDate);
                             }
@@ -163,7 +166,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 bcCheckSum = elements.get(bcFileName).getChecksum();
 
                                 log.fine(String.format("Updating Business Central %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP,
+                                                       bcZip,
                                                        artifact.getMd5(),
                                                        bcCheckSum));
 
@@ -173,7 +176,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // find name: "rhpam_business_central_distribution.zip"
                                 // and add comment on next line : rhpam-${version}.redhat-${buildDate}-business-central-eap7-deployable.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-business-central-eap7-deployable.zip depending on PAM version
-                                buildUtils.reAddComment(buildUtils.businessCentralFile(), "name: \"" + buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP + "\"",
+                                buildUtils.reAddComment(buildUtils.businessCentralFile(), "name: \"" + bcZip + "\"",
                                                         String.format("  # %s", bcFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -182,9 +185,10 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     });
 
                     // Prepare controller Changes - artifacts
+                    String addonsZip = String.format(buildUtils.ADD_ONS_DISTRIBUTION_ZIP, product);
                     pamController.getArtifacts().forEach(artifact -> {
-                        if (artifact.getName().equals(buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP)) {
-                            String controllerFileName = String.format(buildUtils.RHPAM_ADD_ONS_NIGHTLY_ZIP, version, buildDate);
+                        if (artifact.getName().equals(addonsZip)) {
+                            String controllerFileName = String.format(buildUtils.ADD_ONS_NIGHTLY_ZIP, product, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
                                 controllerFileName = String.format("rhpam-%s.PAM-redhat-%s-add-ons.zip", version, buildDate);
                             }
@@ -193,17 +197,17 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 controllerCheckSum = elements.get(controllerFileName).getChecksum();
 
                                 log.fine(String.format("Updating RHPAM Controller %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
+                                                       addonsZip,
                                                        artifact.getMd5(),
                                                        controllerCheckSum));
 
                                 artifact.setMd5(controllerCheckSum);
                                 yamlFilesHelper.writeModule(pamController, buildUtils.pamControllerFile());
 
-                                // find name: "rhpam_add_ons_distribution.zip"
-                                // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
-                                // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
-                                buildUtils.reAddComment(buildUtils.pamControllerFile(), "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
+                                // find name: "rhpam|bamoe_add_ons_distribution.zip"
+                                // and add comment on next line :  rhpam|bamoe-${version}.redhat-${buildDate}-add-ons.zip
+                                // or rhpam|bamoe-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
+                                buildUtils.reAddComment(buildUtils.pamControllerFile(), "name: \"" + addonsZip + "\"",
                                                         String.format("  # %s", controllerFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -225,8 +229,8 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
 
                     // Prepare dashbuilder Changes - artifacts
                     dashbuilder.getArtifacts().forEach(artifact -> {
-                        if (artifact.getName().equals(buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP)) {
-                            String dashbuilderAddOnsFileName = String.format(buildUtils.RHPAM_ADD_ONS_NIGHTLY_ZIP, version, buildDate);
+                        if (artifact.getName().equals(addonsZip)) {
+                            String dashbuilderAddOnsFileName = String.format(buildUtils.ADD_ONS_NIGHTLY_ZIP, product, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
                                 dashbuilderAddOnsFileName = String.format("rhpam-%s.PAM-redhat-%s-add-ons.zip", version, buildDate);
                             }
@@ -234,7 +238,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 String dashbuilderCheckSum = elements.get(dashbuilderAddOnsFileName).getChecksum();
 
                                 log.fine(String.format("Updating RHPAM Dashbuilder %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
+                                                       addonsZip,
                                                        artifact.getMd5(),
                                                        dashbuilderCheckSum));
 
@@ -244,7 +248,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // find name: "rhpam_add_ons_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
-                                buildUtils.reAddComment(buildUtils.dashbuilderFile(), "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
+                                buildUtils.reAddComment(buildUtils.dashbuilderFile(), "name: \"" + addonsZip + "\"",
                                                         String.format("  # %s", dashbuilderAddOnsFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -265,7 +269,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                     });
 
                     // Prepare kieserver changes, jbpm-wb-kie-server-backend file
-                    String jbpmWbKieServerBackendSourceFile = String.format(buildUtils.RHPAM_BUSINESS_CENTRAL_EAP7_DEPLOYABLE_NIGHTLY_ZIP, version, buildDate);
+                    String jbpmWbKieServerBackendSourceFile = String.format(buildUtils.BUSINESS_CENTRAL_EAP7_DEPLOYABLE_NIGHTLY_ZIP, product, version, buildDate);
                     String jbpmWbKieServerBackendVersion = cacherUtils.detectJarVersion("jbpm-wb-kie-server-backend", jbpmWbKieServerBackendSourceFile);
                     String backendFileName = String.format("jbpm-wb-kie-server-backend-%s.redhat-%s.jar", jbpmWbKieServerBackendVersion, buildDate);
                     pamKieserver.getEnvs().forEach(env -> {
@@ -322,19 +326,20 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                         }
                     });
 
+                    String kieServerDistributionZip = String.format(buildUtils.KIE_SERVER_DISTRIBUTION_ZIP, "rhpam");
                     pamKieserver.getArtifacts().forEach(artifact -> {
-                        String kieServerFileName = String.format(buildUtils.RHPAM_KIE_SERVER_EE8_NIGHTLY_ZIP, version, buildDate);
+                        String kieServerFileName = String.format(buildUtils.KIE_SERVER_EE8_NIGHTLY_ZIP, "rhpam", version, buildDate);
                         if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
                             kieServerFileName = String.format("rhpam-%s.PAM-redhat-%s-kie-server-ee8.zip", version, buildDate);
                         }
-                        if (artifact.getName().equals(buildUtils.RHPAM_KIE_SERVER_DISTRIBUTION_ZIP)) {
+                        if (artifact.getName().equals(kieServerDistributionZip)) {
 
                             String kieServerCheckSum;
                             try {
                                 kieServerCheckSum = elements.get(kieServerFileName).getChecksum();
 
                                 log.fine(String.format("Updating RHPAM kieserver %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_KIE_SERVER_DISTRIBUTION_ZIP,
+                                                       kieServerDistributionZip,
                                                        artifact.getMd5(),
                                                        kieServerCheckSum));
 
@@ -345,8 +350,8 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                             }
                         }
 
-                        if (artifact.getName().equals(buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP)) {
-                            String bcFileName = String.format(buildUtils.RHPAM_BUSINESS_CENTRAL_EAP7_DEPLOYABLE_NIGHTLY_ZIP, version, buildDate);
+                        if (artifact.getName().equals(bcZip)) {
+                            String bcFileName = String.format(buildUtils.BUSINESS_CENTRAL_EAP7_DEPLOYABLE_NIGHTLY_ZIP, product, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
                                 bcFileName = String.format("rhpam-%s.PAM-redhat-%s-business-central-eap7-deployable.zip", version, buildDate);
                             }
@@ -355,7 +360,7 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 bcCheckSum = elements.get(bcFileName).getChecksum();
 
                                 log.fine(String.format("Updating RHPAM kieserver %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP,
+                                                       bcZip,
                                                        artifact.getMd5(),
                                                        bcCheckSum));
 
@@ -366,13 +371,13 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                                 // find name: "rhpam_business_central_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-business-central-eap7-deployable.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-business-central-eap7-deployable.zip depending on PAM version
-                                buildUtils.reAddComment(buildUtils.pamKieserverFile(), "name: \"" + buildUtils.RHPAM_BUSINESS_CENTRAL_DISTRIBUTION_ZIP + "\"",
+                                buildUtils.reAddComment(buildUtils.pamKieserverFile(), "name: \"" + bcZip + "\"",
                                                         String.format("  # %s", bcFileName));
 
                                 // find name: "rhpam_kie_server_distribution.zip"
                                 // and add comment on next line :  rhpam-${version}.PAM-redhat-${buildDate}-kie-server-ee8.zip
                                 // or rhpam-${version}.PAM-redhat-${buildDate}-kie-server-ee8.zip depending on PAM version
-                                buildUtils.reAddComment(buildUtils.pamKieserverFile(), "name: \"" + buildUtils.RHPAM_KIE_SERVER_DISTRIBUTION_ZIP + "\"",
+                                buildUtils.reAddComment(buildUtils.pamKieserverFile(), "name: \"" + kieServerDistributionZip + "\"",
                                                         String.format("  # %s", kieServerFileName));
 
                                 // find name: "slf4j-simple.jar"
@@ -391,8 +396,8 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
 
                     // Prepare smartrouter changes
                     smartrouter.getArtifacts().forEach(artifact -> {
-                        if (artifact.getName().equals(buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP)) {
-                            String smartrouterFileName = String.format(buildUtils.RHPAM_ADD_ONS_NIGHTLY_ZIP, version, buildDate);
+                        if (artifact.getName().equals(addonsZip)) {
+                            String smartrouterFileName = String.format(buildUtils.ADD_ONS_NIGHTLY_ZIP, product, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
                                 smartrouterFileName = String.format("rhpam-%s.PAM-redhat-%s-add-ons.zip", version, buildDate);
                             }
@@ -400,19 +405,19 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                             try {
                                 smartrouterCheckSum = elements.get(smartrouterFileName).getChecksum();
 
-                                log.fine(String.format("Updating RHPAM smartrouter %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
+                                log.fine(String.format("Updating Smartrouter %s from [%s] to [%s]",
+                                                       addonsZip,
                                                        artifact.getMd5(),
                                                        smartrouterCheckSum));
 
                                 artifact.setMd5(smartrouterCheckSum);
                                 yamlFilesHelper.writeModule(smartrouter, buildUtils.smartrouterFile());
 
-                                // find name: "rhpam_add_ons_distribution.zip"
-                                // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
-                                // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip
+                                // find name: "rhpam|bamoe_add_ons_distribution.zip"
+                                // and add comment on next line :  rhpam|bamoe-${version}.redhat-${buildDate}-add-ons.zip
+                                // or rhpam|bamoe-${version}.PAM-redhat-${buildDate}-add-ons.zip
                                 // depending on PAM version
-                                buildUtils.reAddComment(buildUtils.smartrouterFile(), "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
+                                buildUtils.reAddComment(buildUtils.smartrouterFile(), "name: \"" + addonsZip + "\"",
                                                         String.format("  # %s", smartrouterFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -422,8 +427,8 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
 
                     // Prepare process-migration changes
                     processMigration.getArtifacts().forEach(artifact -> {
-                        if (artifact.getName().equals(buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP)) {
-                            String processMigrationFileName = String.format(buildUtils.RHPAM_ADD_ONS_NIGHTLY_ZIP, version, buildDate);
+                        if (artifact.getName().equals(addonsZip)) {
+                            String processMigrationFileName = String.format(buildUtils.ADD_ONS_NIGHTLY_ZIP, product, version, buildDate);
                             if (version.compareTo(cacherProperties.versionBeforeDMPAMPrefix) < 0) {
                                 processMigrationFileName = String.format("rhpam-%s.PAM-redhat-%s-add-ons.zip", version, buildDate);
                             }
@@ -431,18 +436,18 @@ public class NightlyBuildsPullRequestAcceptor implements NightlyBuildUpdatesInte
                             try {
                                 processMigrationCheckSum = elements.get(processMigrationFileName).getChecksum();
 
-                                log.fine(String.format("Updating RHPAM process-migration %s from [%s] to [%s]",
-                                                       buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP,
+                                log.fine(String.format("Updating Process-migration %s from [%s] to [%s]",
+                                                       addonsZip,
                                                        artifact.getMd5(),
                                                        processMigrationCheckSum));
 
                                 artifact.setMd5(processMigrationCheckSum);
                                 yamlFilesHelper.writeModule(processMigration, buildUtils.processMigrationFile());
 
-                                // find name: "rhpam_add_ons_distribution.zip"
-                                // and add comment on next line :  rhpam-${version}.redhat-${buildDate}-add-ons.zip
-                                // or rhpam-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
-                                buildUtils.reAddComment(buildUtils.processMigrationFile(), "name: \"" + buildUtils.RHPAM_ADD_ONS_DISTRIBUTION_ZIP + "\"",
+                                // find name: "rhpam|bamoe_add_ons_distribution.zip"
+                                // and add comment on next line :  rhpam|bamoe-${version}.redhat-${buildDate}-add-ons.zip
+                                // or rhpam|bamoe-${version}.PAM-redhat-${buildDate}-add-ons.zip depending on PAM version
+                                buildUtils.reAddComment(buildUtils.processMigrationFile(), "name: \"" +addonsZip + "\"",
                                                         String.format("  # %s", processMigrationFileName));
                             } catch (Exception e) {
                                 e.printStackTrace();
