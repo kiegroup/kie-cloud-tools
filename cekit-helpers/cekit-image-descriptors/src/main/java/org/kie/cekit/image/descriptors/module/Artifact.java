@@ -22,21 +22,25 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "name",
+        "image",
         "url",
         "path",
         "dest",
         "target",
-        "md5"
+        "md5",
+        "description"
 })
 @RegisterForReflection
 public class Artifact {
 
     private String name;
+    private String image;
     private String url;
     private String path;
     private String target;
     private String md5;
     private String dest;
+    private String description;
 
     public Artifact() {
     }
@@ -89,14 +93,26 @@ public class Artifact {
         this.dest = dest;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
-        return "Artifact{" +
-                "name='" + name + '\'' +
-                ", url='" + url + '\'' +
-                ", dest='" + dest + '\'' +
-                ", target='" + target + '\'' +
-                ", md5='" + md5 + '\'' +
-                '}';
+        return "Artifact [name=" + name + ", image=" + image + ", url=" + url + ", path=" + path + ", target=" + target
+                + ", md5=" + md5 + ", dest=" + dest + ", description=" + description + "]";
     }
+    
 }
