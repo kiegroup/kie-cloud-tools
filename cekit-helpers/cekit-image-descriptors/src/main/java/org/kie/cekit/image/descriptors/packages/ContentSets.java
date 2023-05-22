@@ -24,13 +24,17 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "x86_64"
+        "x86_64",
+        "ppc64le"
 })
 @RegisterForReflection
 public class ContentSets {
 
     @JsonProperty("x86_64")
     private List<String> x8664;
+
+    @JsonProperty("ppc64le")
+    private List<String> ppc64le;
 
     public ContentSets(){}
 
@@ -42,6 +46,16 @@ public class ContentSets {
     @JsonProperty("x86_64")
     public void setX8664(List<String> x8664) {
         this.x8664 = x8664;
+    }
+
+    @JsonProperty("ppc64le")
+    public List<String> getPPC64LE() {
+        return ppc64le;
+    }
+
+    @JsonProperty("ppc64le")
+    public void setPPC64LE(List<String> ppc64le) {
+        this.ppc64le = ppc64le;
     }
 }
 

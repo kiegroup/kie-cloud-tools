@@ -13,56 +13,43 @@ import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 @ApplicationScoped
 public class SingleFileValidator {
     private final Logger log = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
 
-    public int validate(Path name) {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-
-        try (InputStream is = Files.newInputStream(name)) {
-
-            Image image;
-            Module module;
-            ContentSets contentSets;
-            Container container;
-
-            if (name.getFileName().toString().contains("image") || name.getFileName().toString().contains("overrides")) {
-                log.info("Trying to validate file " + name.toString());
+    public int validate(Path path) {
+        try {
+            if (path.getFileName().toString().contains("image") || path.getFileName().toString().contains("overrides")) {
+                log.info("Trying to validate file " + path.toString());
 
                 // rhpam contains artifacts overrides, this file is based on the Module
-                if (name.getFileName().toString().equals("artifact-overrides.yaml")) {
-                    module = mapper.readValue(is, Module.class);
-                    log.info("Artifact-overrides file [" + name.toString() + "] loaded and validated");
-
+                if (path.getFileName().toString().equals("artifact-overrides.yaml")) {
+                    validate(path, "artifact-overrides", Module.class);
                 } else {
-                    image = mapper.readValue(is, Image.class);
-                    if (null == image.getName()) {
-                        log.info("Image file [" + name.toString() + "] loaded and validated");
-                    } else {
-                        log.info("Image file [" + name.toString() + "] loaded and validated: " + image.getName());
+                    List<Image> images;
+                    try {
+                        images = Arrays.asList(validate(path, "image", Image.class));
+                    }catch (Exception e) {
+                        log.info("Cannot parse as single image. Trying as an array of images ...");
+                        images = Arrays.asList(validate(path, "multi images", Image[].class));
                     }
                 }
             }
 
-            if (name.getFileName().toString().equals("module.yaml")) {
-                log.info("Trying to validate file " + name.toString());
-                module = mapper.readValue(is, Module.class);
-                log.info("Module file [" + name.toString() + "] loaded and validated: " + module.getName());
+            if (path.getFileName().toString().equals("module.yaml")) {
+                validate(path, "module", Module.class);
             }
 
-            if (name.getFileName().toString().equals("container.yaml")) {
-                log.info("Trying to validate file " + name.toString());
-                container = mapper.readValue(is, Container.class);
-                log.info("Container file [" + name.toString() + "] loaded and validated");
+            if (path.getFileName().toString().equals("container.yaml")) {
+                validate(path, "container", Container.class);
             }
 
-            if (name.getFileName().toString().contains("content_sets")) {
-                log.info("Trying to validate file " + name.toString());
-                contentSets = mapper.readValue(is, ContentSets.class);
-                log.info("Content sets file [" + name.toString() + "] loaded and validated");
+            if (path.getFileName().toString().contains("content_sets")) {
+                validate(path, "content sets", ContentSets.class);
             }
 
             return 0;
@@ -70,5 +57,16 @@ public class SingleFileValidator {
             log.severe(e.getMessage());
             return 1;
         }
+    }
+
+    private <T> T validate(Path path, String fileTypeName, Class<T> valueType) throws IOException {
+        log.info("Trying to validate file " + path.toString() + " as " + valueType.getName());
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        T value;
+        try (InputStream is = Files.newInputStream(path)) {
+            value = mapper.readValue(is, valueType);
+            log.info("File " + fileTypeName + " [" + path.toString() + "] loaded and validated");
+        }
+        return value;
     }
 }
