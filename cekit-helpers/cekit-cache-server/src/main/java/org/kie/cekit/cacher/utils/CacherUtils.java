@@ -196,7 +196,8 @@ public class CacherUtils {
         try {
             log.info("Trying to fetch file: " + url);
             URLConnection in = new URL(url).openConnection();
-            in.setReadTimeout(20000);
+            // one min
+            in.setReadTimeout(60000);
             in.setConnectTimeout(20000);
             ReadableByteChannel readableByteChannel = Channels.newChannel(in.getInputStream());
             FileOutputStream fileOutputStream = new FileOutputStream(filePath);
